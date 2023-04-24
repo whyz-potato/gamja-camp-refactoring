@@ -34,8 +34,12 @@ public class CustomOAuth2UserService implements OAuth2UserService {
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName(); //oauth 로그인 시 키가 되는 필드값
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        //TODO
-        return null;
+        // 저장 (GUEST)
+        Member member = saveOrUpdate(attributes);
+
+        // TODO 세션 유저
+
+        return oAuth2User;
     }
 
     public Member saveOrUpdate(OAuthAttributes attributes){

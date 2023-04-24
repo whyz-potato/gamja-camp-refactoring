@@ -1,11 +1,14 @@
 package whyzpotato.gamjacamp.domain.member;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Member {
 
@@ -16,9 +19,6 @@ public class Member {
     private String account;
 
     @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
     private String username;
 
     @Enumerated(EnumType.STRING)
@@ -26,12 +26,10 @@ public class Member {
     private Role role;
 
     @Builder
-    public Member(String account, String password, String username, Role role) {
+    public Member(String account, String username, Role role) {
         this.account = account;
-        this.password = password;
         this.username = username;
         this.role = role;
     }
-
 
 }
