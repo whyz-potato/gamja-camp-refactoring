@@ -3,17 +3,20 @@
     <Header></Header>
     <v-main>
       <router-view/>
+      <chat-btn></chat-btn>
     </v-main>
   </v-app>
 </template>
 
 <script>
 import Header from '@/layouts/Header'
+import ChatBtn from '@/components/ChatBtn'
 
 export default {
   name: 'App',
   components: {
-    Header  
+    Header,
+    ChatBtn  
   },
   data: () => ({
     

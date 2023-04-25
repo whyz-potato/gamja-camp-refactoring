@@ -1,17 +1,17 @@
 <template>
   <div>
     <div class="header">
-      <div class="home">
+      <router-link :to="{ name: 'Home' }" class="home">
         <!--감자 사진 임시로...-->
         <v-img :src="require('@/assets/imgs/gamja.png')" width="60px" />
         감자캠핑
-      </div>
+      </router-link>
       <div>
         <router-link :to="{ name: 'Test' }">전국캠핑장</router-link>
         <router-link :to="{ name: 'Test' }">커뮤니티</router-link>
       </div>
       <div class="login">
-        <router-link :to="{ name: 'Test' }" v-if="!isLogin">로그인</router-link>
+        <router-link :to="{ name: 'Login' }" v-if="!isLogin">로그인</router-link>
         <router-link :to="{ name: 'Test' }" v-else>마이페이지</router-link>
       </div>
     </div>
@@ -23,6 +23,11 @@ export default {
   data () {
     return {
       isLogin: false
+    }
+  },
+  methods: {
+    goHome () {
+      this.$router.push('/')
     }
   }
 }
