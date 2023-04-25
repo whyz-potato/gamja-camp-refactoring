@@ -14,13 +14,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/oauth_login").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                    .oauth2Login() //oauth2 설정
-                        .userInfoEndpoint()
-                            .userService(customOAuth2UserService); // 소셜로그인 성공 후 후석 조치
+        http
+                .csrf().disable();
+        http
+                .authorizeRequests()
+                .antMatchers(
+                        "/",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/webjars/**").permitAll()
+                .anyRequest().authenticated();
+
+        http
+                .logout().logoutSuccessUrl("/"); // 로그아웃 성공시 "/" 주소로 이동
+        http
+                .oauth2Login()//oauth2 설정
+                    .userInfoEndpoint()
+                        .userService(customOAuth2UserService); // 소셜로그인 성공 후 조치
 
         return http.build();
     }

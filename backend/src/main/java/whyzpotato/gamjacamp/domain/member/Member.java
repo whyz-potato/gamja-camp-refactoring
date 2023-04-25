@@ -21,14 +21,19 @@ public class Member {
     @Column(nullable = false)
     private String username;
 
+    @Column
+    private String picture;
+
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     @Builder
-    public Member(String account, String username, Role role) {
+    public Member(String account, String username, String picture, Role role) {
         this.account = account;
         this.username = username;
+        this.picture = picture;
         this.role = role;
     }
 
