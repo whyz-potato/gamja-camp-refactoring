@@ -1,6 +1,11 @@
 <template>
-  <div>
-    <div id="map" ref="maps" style="width:80%; height:700px;"></div>
+  <div id="camp">
+    <div id="list">
+      <div width="20%" height="700px">
+        캠핑장 리스트
+      </div>
+    </div>
+    <div id="map" style="width:80%; height:700px; float:right;"></div>
   </div>
 </template>
 
@@ -8,31 +13,37 @@
 export default {
   data () {
     return {
-      lat: null,
-      lng: null
+      map: null
     }
   },
   mounted () {
-    navigator.geolocation.getCurrentPosition((e) => {
-      this.lat = e.coords.latitude
-      this.lng = e.coords.longitude
-      console.log(this.lat, this.lng)
-
-      const map = new window.naver.maps.Map('map',{
-        center: new window.naver.maps.LatLng(this.lat, this.lng),
-        zoom: 15
-      })
-
-      new window.naver.maps.Marker({
-        position: new window.naver.maps.LatLng(this.lat, this.lng),
-        map: map
-      })
+    this.map = new window.naver.maps.Map('map',{
+      zoom: 15
     })
 
+    navigator.geolocation.getCurrentPosition((e) => {
+      const lat = e.coords.latitude
+      const lng = e.coords.longitude
+      console.log(lat, lng)
 
-    
+      const center = new window.naver.maps.LatLng(lat, lng)
+      this.map.setCenter(center)
+
+      new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(lat, lng),
+        map: this.map
+      })
+
+    })
   },
   methods: {
   }
 }
 </script>
+
+
+<style scoped>
+.camp {
+  display: flex;
+}
+</style>

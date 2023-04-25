@@ -31,4 +31,18 @@ export default {
   src: local('Noto Sans KR');
   unicode-range: U+AC00-U+D7A3;
 }
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb:hover  {
+  border-radius: 3px;
+  background-color: gray;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background-color: transparent;
+}
 </style>
