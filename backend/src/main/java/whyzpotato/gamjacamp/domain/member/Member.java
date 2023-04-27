@@ -12,8 +12,10 @@ import javax.persistence.*;
 @Entity
 public class Member {
 
-    @Id @GeneratedValue
-    private Long memberId;
+    @Id
+    @GeneratedValue
+    @Column(name = "member_id")
+    private Long id;
 
     @Column(nullable = false)
     private String account;
@@ -21,13 +23,14 @@ public class Member {
     @Column(nullable = false)
     private String username;
 
-    @Column
     private String picture;
 
+    //TODO 전화번호 할 지 의논
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
 
     @Builder
     public Member(String account, String username, String picture, Role role) {
