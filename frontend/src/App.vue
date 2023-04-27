@@ -28,6 +28,9 @@ export default {
 <style>
 #app {
   font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+  width : 100vw;
+  height : 100vh;
+  background-color: #FBE0C3;
 }
 @font-face {
   font-family: 'Noto Sans KR';

@@ -1,7 +1,7 @@
 <template>
   <div id="camp">
     <div id="list">
-      <v-card height="800">
+      <v-card height="100%" color="secondary">
         캠핑장 리스트
       </v-card>
     </div>
@@ -46,13 +46,14 @@ export default {
 <style scoped>
 #camp {
   display: flex;
+  height:100%; 
 }
 #list {
-  width:30%; 
-  height:800px; 
+  width:25%; 
+  height:100%; 
 }
 #map {
-  width:70%; 
-  height:800px;
+  width:75%; 
+  height:100%;
 }
 </style>
