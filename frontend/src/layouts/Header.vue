@@ -7,7 +7,7 @@
         감자캠핑
       </router-link>
       <div>
-        <router-link :to="{ name: 'Test' }">전국캠핑장</router-link>
+        <router-link :to="{ name: 'Home' }">전국캠핑장</router-link>
         <router-link :to="{ name: 'Test' }">커뮤니티</router-link>
       </div>
       <div class="login">
@@ -39,6 +39,7 @@ export default {
   height: 70px;
   display: flex;
   align-items: center;
+  background-color: white;
 }
 a:link {
   text-decoration: none;
@@ -49,7 +50,7 @@ a:visited {
   color: black;
 }
 a:hover {
-  color: #344648;
+  color: #FFBB98;
 }
 .home {
   font-size: 30px;
