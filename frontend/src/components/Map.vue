@@ -1,12 +1,10 @@
 <template>
-  <div id="camp">
-    <div id="list">
-      <v-card height="100%" color="secondary">
-        캠핑장 리스트
-      </v-card>
+  <div class="camp">
+    <div class="list">
+      캠핑장 리스트
     </div>
     
-    <div id="map"></div>
+    <div id="map" class="map"></div>
   </div>
 </template>
 
@@ -44,15 +42,16 @@ export default {
 
 
 <style scoped>
-#camp {
+.camp {
   display: flex;
   height:100%; 
+  background-color: #f7f7f7;
 }
-#list {
+.list {
   width:25%; 
   height:100%; 
 }
-#map {
+.map {
   width:75%; 
   height:100%;
 }

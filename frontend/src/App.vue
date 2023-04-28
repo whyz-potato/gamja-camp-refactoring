@@ -30,7 +30,9 @@ export default {
   font-family: 'Roboto', 'Noto Sans KR', sans-serif;
   width : 100vw;
   height : 100vh;
-  background-color: #FBE0C3;
+  /* background-color: #fef1e3; */
+  background-color: #f7f7f7;
+  /* position: relative; */
 }
 @font-face {
   font-family: 'Noto Sans KR';

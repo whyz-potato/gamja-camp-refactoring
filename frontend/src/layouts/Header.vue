@@ -49,8 +49,13 @@ a:link {
 a:visited {
   color: black;
 }
+/* a:hover {
+  font-size: 17px;
+  transition: 0.4s;
+} */
 a:hover {
   color: #FFBB98;
+  transition: 0.3s;
 }
 .home {
   font-size: 30px;
