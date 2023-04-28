@@ -89,6 +89,7 @@ label {
   cursor: pointer;
   color: gray;
   transition: 0.5s;
+  letter-spacing: 3px;
   /* transition: 0.6s cubic-bezier(0.55, 0.055, 0.675, 0.19); */
 }
 label:hover {
