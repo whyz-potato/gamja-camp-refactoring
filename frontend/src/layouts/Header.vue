@@ -3,7 +3,7 @@
     <div class="header">
       <router-link :to="{ name: 'Home' }" class="home">
         <!--감자 사진 임시로...-->
-        <v-img :src="require('@/assets/imgs/gamja.png')" width="60px" />
+        <img :src="require('@/assets/imgs/gamja.png')" width="60px" />
         감자캠핑
       </router-link>
       <div>
@@ -40,6 +40,7 @@ export default {
   display: flex;
   align-items: center;
   background-color: white;
+  letter-spacing: 3px;
 }
 a:link {
   text-decoration: none;
@@ -54,8 +55,8 @@ a:visited {
   transition: 0.4s;
 } */
 a:hover {
-  color: #FFBB98;
-  transition: 0.3s;
+  color: #999999;
+  transition: 0.2s;
 }
 .home {
   font-size: 30px;

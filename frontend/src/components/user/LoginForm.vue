@@ -21,15 +21,15 @@
     <div class="line"></div>
 
     <div>
-      <div class="button" @click="login">
+      <div class="button" @click="login('kakao')">
         <img class="logo" :src="require('@/assets/imgs/k-logo.png')"/>
         <span class="btn-text">카카오 로그인</span>
       </div>
-      <div class="button">
+      <div class="button" @click="login('naver')">
         <img class="logo" :src="require('@/assets/imgs/n-logo.png')"/>
         <span class="btn-text">네이버 로그인</span>
       </div>
-      <div class="button">
+      <div class="button" @click="login('google')">
         <img class="logo" :src="require('@/assets/imgs/g-logo.png')"/>
         <span class="btn-text">구글 로그인</span>
       </div>
@@ -46,8 +46,10 @@ export default {
     }
   },
   methods: {
-    login () {
+    login (social) {
       console.log(this.tabValue)
+      console.log(social)
+      this.$router.push({ name: 'Join' })
     }
   }
 }
