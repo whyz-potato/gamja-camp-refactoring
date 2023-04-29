@@ -3,6 +3,7 @@ package whyzpotato.gamjacamp.domain;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,13 +18,20 @@ public class Reservation extends BaseTimeEntity {
     @Column(name = "reservation_id")
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "camp_id")
-//    private Camp camp;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    Member member;
 
-//    @OneToOne
-//    @JoinColumn(name = "room_id")
-//    private Room room;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "camp_id")
+    private Camp camp;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
 
     private int numGuest;
 
@@ -32,5 +40,6 @@ public class Reservation extends BaseTimeEntity {
     private LocalDateTime stayEnds;
 
     private int price;
+
 
 }

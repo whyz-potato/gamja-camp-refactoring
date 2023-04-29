@@ -1,4 +1,4 @@
-package whyzpotato.gamjacamp.domain.post;
+package whyzpotato.gamjacamp.domain.chat;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,28 +11,24 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class Comment extends BaseTimeEntity {
+public class ChatMember extends BaseTimeEntity {
 
+    // 복합키 대신 대리키 사용
     @Id
     @GeneratedValue
-    @Column(name = "comment_id")
+    @Column(name = "chat_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "upper_comment_id")
-    private Comment upperComment;
-
-    @Column(length = 300)
-    private String content;
-
-    // TODO : 삭제 이후에는 admin만 댓글 확인 할 수 있게 인가
+    @JoinColumn(name = "message_id")
+    private Message lastReadMessage;
 
 }

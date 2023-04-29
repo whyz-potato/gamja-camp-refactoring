@@ -4,10 +4,13 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.BaseTimeEntity;
-import whyzpotato.gamjacamp.domain.Chat;
+import whyzpotato.gamjacamp.domain.Image;
+import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -19,11 +22,11 @@ public class Post extends BaseTimeEntity {
     @Column(name = "post_id")
     private Long id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member writer;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
 
@@ -36,5 +39,7 @@ public class Post extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private PostType type;
 
+    @OneToMany(mappedBy = "post")
+    private List<Image> images = new ArrayList<Image>();
 
 }

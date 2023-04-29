@@ -6,35 +6,23 @@ import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class Review extends BaseTimeEntity {
+public class ScrapCamp {
 
     @Id
     @GeneratedValue
-    @Column(name = "review_id")
+    @Column(name = "scrap_camp_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member writer;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camp_id")
     private Camp camp;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id")
-    private Reservation reservation;
-
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
-
-    @OneToMany(mappedBy = "review")
-    private List<Image> images = new ArrayList<Image>();
 
 }
