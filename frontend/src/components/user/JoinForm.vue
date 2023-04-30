@@ -12,7 +12,6 @@
     </div>
     </div>
     
-    
     <div class="input_profile">
       <span>닉네임</span>
       <input type="text" placeholder="닉네임을 입력하세요."
@@ -123,7 +122,7 @@ export default {
   margin: auto;
   margin-bottom: 50px;
   position:relative;
-  background-color: #f2f2f2;
+  background-color: #f7f7f7;
 }
 .select_img:hover {
   border: 2px solid #dddddd;
@@ -139,6 +138,7 @@ export default {
   width: 100%;
   height: 100%;
   border-radius: 100%;
+  object-fit: cover;
 }
 .input_profile {
   display: flex;
@@ -154,7 +154,7 @@ export default {
   cursor: pointer;
   align-items: center;
   display: flex;
-  background-color: #f2f2f2;
+  background-color: #f7f7f7;
   outline-color: #dddddd;
   padding-left: 10px;
   text-align: center;

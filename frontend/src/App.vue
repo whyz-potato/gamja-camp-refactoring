@@ -33,6 +33,7 @@ export default {
   /* background-color: #fef1e3; */
   background-color: #f7f7f7;
   /* position: relative; */
+  letter-spacing: 1px;
 }
 @font-face {
   font-family: 'Noto Sans KR';
