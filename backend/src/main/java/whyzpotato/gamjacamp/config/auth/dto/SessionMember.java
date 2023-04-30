@@ -11,13 +11,13 @@ import whyzpotato.gamjacamp.domain.member.Member;
 @Getter
 @NoArgsConstructor
 public class SessionMember {
-    private Long memberId;
+    private Long id;
     private String name;
     private String account;
     private String picture;
 
     public SessionMember(Member member) {
-        this.memberId = member.getMemberId();
+        this.id = member.getId();
         this.name = member.getUsername();
         this.account = member.getAccount();
         this.picture = member.getPicture();
