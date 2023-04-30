@@ -23,15 +23,15 @@
     <div>
       <div class="button" @click="login('kakao')">
         <img class="logo" :src="require('@/assets/imgs/k-logo.png')"/>
-        <span class="btn-text">카카오 로그인</span>
+        <span class="button-text">카카오 로그인</span>
       </div>
       <div class="button" @click="login('naver')">
         <img class="logo" :src="require('@/assets/imgs/n-logo.png')"/>
-        <span class="btn-text">네이버 로그인</span>
+        <span class="button-text">네이버 로그인</span>
       </div>
       <div class="button" @click="login('google')">
         <img class="logo" :src="require('@/assets/imgs/g-logo.png')"/>
-        <span class="btn-text">구글 로그인</span>
+        <span class="button-text">구글 로그인</span>
       </div>
     </div>
   </div>
@@ -39,6 +39,8 @@
 
 
 <script>
+//import api from '@/api/index'
+
 export default {
   data (){
     return {
@@ -49,6 +51,9 @@ export default {
     login (social) {
       console.log(this.tabValue)
       console.log(social)
+      // api.get(`/`).then(() => {
+
+      // })
       this.$router.push({ name: 'Join' })
     }
   }
@@ -118,7 +123,6 @@ input:checked ~ label{
   cursor: pointer;
   align-items: center;
   display: flex;
-  
 }
 .button:hover {
   background-color: #f2f2f2;
@@ -128,7 +132,7 @@ input:checked ~ label{
   height: 50%;
   margin-left: 40px;
 }
-.btn-text {
+.button-text {
   /* width: 200px; */
   margin: auto;
   text-align: center;
