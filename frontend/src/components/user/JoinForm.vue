@@ -45,12 +45,14 @@ export default {
   methods: {
     inputFile (e) {
       this.image = e.target.files[0]
+      e.target.value = ''
       console.log(this.image)
 
       try {
         this.imgUrl = URL.createObjectURL(this.image)
-      }catch(e) {
+      } catch(e) {
         this.imgUrl = null
+        this.file = null
       }
     },
     deleteImg () {
