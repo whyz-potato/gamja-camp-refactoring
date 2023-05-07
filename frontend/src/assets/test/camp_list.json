@@ -1,0 +1,31 @@
+{
+  "count": 3,
+  "camps": [
+    {
+      "name": "정아 캠핑장",
+      "OneNightPrice": 90000,
+      "rate": 3,
+      "images": ["test1.jpg", "test2.jpg"],
+      "lat": 37.58607839926063,
+      "lng": 127.08875714417745
+    },
+    {
+      "name": "다슬 캠핑장",
+      "OneNightPrice": 150000,
+      "rate": 4.5,
+      "images": ["test3.jpg", "test2.jpg", "test1.jpg"],
+      "lat": 37.5879928,
+      "lng": 127.0923014
+    },
+    {
+      "name": "서영 캠핑장",
+      "OneNightPrice": 130000,
+      "rate": 5,
+      "images": ["test3.jpg", "test1.jpg"],
+      "lat": 37.584388,
+      "lng": 127.0881065
+    }
+  ]
+
+
+}
