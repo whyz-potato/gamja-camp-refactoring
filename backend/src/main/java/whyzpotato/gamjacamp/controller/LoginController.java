@@ -20,14 +20,14 @@ public class LoginController {
 
 
     //TODO : 프론트 연결되면 clientRegistrationRepository에서 google/naver/kakao 키로 리턴
-    @GetMapping("/oauth_login")
+    @GetMapping("/login")
     public String getLoginPage(Model model) {
         Iterable<ClientRegistration> clientRegistrations = (Iterable<ClientRegistration>) clientRegistrationRepository;
 
         Map<String, String> oauth2AuthenticationUrls = new HashMap<>();
         clientRegistrations.forEach(registration ->
                 oauth2AuthenticationUrls.put(registration.getClientName(),
-                        "oauth2/authorization" + "/" + registration.getRegistrationId()));
+                        "oauth2/authorization/" + registration.getRegistrationId()));
         model.addAttribute("urls", oauth2AuthenticationUrls);
         return "oauth_login";
     }
