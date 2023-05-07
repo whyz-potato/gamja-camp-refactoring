@@ -3,11 +3,11 @@
     <div class="header">
       <router-link :to="{ name: 'Home' }" class="home">
         <!--감자 사진 임시로...-->
-        <v-img :src="require('@/assets/imgs/gamja.png')" width="60px" />
+        <img :src="require('@/assets/imgs/gamja.png')" width="60px" />
         감자캠핑
       </router-link>
       <div>
-        <router-link :to="{ name: 'Test' }">전국캠핑장</router-link>
+        <router-link :to="{ name: 'Home' }">전국캠핑장</router-link>
         <router-link :to="{ name: 'Test' }">커뮤니티</router-link>
       </div>
       <div class="login">
@@ -39,6 +39,8 @@ export default {
   height: 70px;
   display: flex;
   align-items: center;
+  background-color: white;
+  letter-spacing: 3px;
 }
 a:link {
   text-decoration: none;
@@ -48,8 +50,13 @@ a:link {
 a:visited {
   color: black;
 }
+/* a:hover {
+  font-size: 17px;
+  transition: 0.4s;
+} */
 a:hover {
-  color: #344648;
+  color: #999999;
+  transition: 0.2s;
 }
 .home {
   font-size: 30px;

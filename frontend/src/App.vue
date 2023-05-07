@@ -28,6 +28,12 @@ export default {
 <style>
 #app {
   font-family: 'Roboto', 'Noto Sans KR', sans-serif;
+  width : 100vw;
+  height : 100vh;
+  /* background-color: #fef1e3; */
+  background-color: #f7f7f7;
+  /* position: relative; */
+  letter-spacing: 1px;
 }
 @font-face {
   font-family: 'Noto Sans KR';
