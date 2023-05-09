@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,16 +18,16 @@ public class PeakPrice {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="room_id")
+    @JoinColumn(name = "room_id")
     private Room room;
 
     @Column
     private Integer peakPrice;
 
     @Column
-    private Date peakStart;
+    private LocalDate peakStart;
 
     @Column
-    private Date peakEnd;
+    private LocalDate peakEnd;
 
 }

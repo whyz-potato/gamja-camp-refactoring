@@ -6,13 +6,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="room")
+@Table(name = "room")
 public class Room {
 
     @Id
@@ -20,7 +22,7 @@ public class Room {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="camp_id")
+    @JoinColumn(name = "camp_id")
     private Camp camp;
 
     @Column(nullable = false)
@@ -34,11 +36,11 @@ public class Room {
 
     // images
 
-    @OneToOne
-    @JoinColumn(name="ordinary_price_id")
-    private OrdinaryPrice ordinaryPrice;
 
-    @OneToMany(mappedBy="room")
+    private int weekPrice;
+    private int weekendPrice;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<PeakPrice> peakPrices = new ArrayList<PeakPrice>();
 
     @Builder
@@ -48,5 +50,28 @@ public class Room {
         this.cnt = cnt;
         this.capacity = capacity;
     }
+
+    public List<Integer> getPrices(LocalDate start, LocalDate end) {
+        List<Integer> prices = new ArrayList<>();
+        int length;
+        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
+            length = prices.size();
+            for (PeakPrice peakPrice : peakPrices) {
+                if (peakPrice.getPeakStart().compareTo(date) <= 0 && peakPrice.getPeakStart().compareTo(date) >= 0) {
+                    prices.add(peakPrice.getPeakPrice());
+                    break;
+                }
+            }
+            if (length < prices.size()) {
+                DayOfWeek dayOfWeek = date.getDayOfWeek();
+                if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY)
+                    prices.add(weekPrice);
+                else
+                    prices.add(weekendPrice);
+            }
+        }
+        return prices;
+    }
+
 
 }
