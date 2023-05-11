@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -62,7 +61,7 @@ public class Room {
 
     public void setCamp(Camp camp) {
         this.camp = camp;
-        if(!camp.getRooms().contains(this))
+        if (!camp.getRooms().contains(this))
             camp.getRooms().add(this);
     }
 
@@ -90,4 +89,12 @@ public class Room {
     }
 
 
+    public void update(Room room) {
+        this.name = room.getName();
+        this.cnt = room.getCnt();
+        this.capacity = room.getCapacity();
+        this.weekPrice = room.getWeekPrice();
+        this.weekendPrice = room.getWeekendPrice();
+        this.peakPrices = room.getPeakPrices();
+    }
 }

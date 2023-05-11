@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class RoomSave {
 
+    private Long id;
+
     @NotBlank
     private String name;
 
@@ -38,7 +40,8 @@ public class RoomSave {
 
 
     @Builder
-    public RoomSave(String name, int cnt, int capacity, int weekPrice, int weekendPrice, List<PeakPriceDto> peakPrices) {
+    public RoomSave(Long id, String name, int cnt, int capacity, int weekPrice, int weekendPrice, List<PeakPriceDto> peakPrices) {
+        this.id = id;
         this.name = name;
         this.cnt = cnt;
         this.capacity = capacity;

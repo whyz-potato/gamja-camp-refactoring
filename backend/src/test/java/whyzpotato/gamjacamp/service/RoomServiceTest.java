@@ -8,6 +8,7 @@ import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
+import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.service.dto.PeakPriceDto;
 import whyzpotato.gamjacamp.service.dto.RoomSave;
 
@@ -20,9 +21,11 @@ import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -90,7 +93,7 @@ class RoomServiceTest {
 
     @DisplayName("객실 저장 실패 테스트 : 필수 정보 누락")
     @Test
-    public void saveRoom_WithoutRequireParam_Fail() {
+    public void saveRoom_withoutRequireParam_fail() {
         //given
         RoomSave roomSave = RoomSave.builder()
                 .cnt(1)
@@ -150,6 +153,90 @@ class RoomServiceTest {
         assertThat(camp.getRooms().get(0)).isEqualTo(room);
 
     }
+
+    @DisplayName("객실 정보 수정 성공 : 영속된 객체 반환")
+    @Test
+    public void updateRoom(){
+        //given
+        RoomSave roomSave = RoomSave.builder()
+                .name("room")
+                .cnt(10)
+                .capacity(3)
+                .weekendPrice(1000)
+                .weekPrice(1200)
+                .build();
+        Room room = roomService.saveRoom(camp, roomSave);
+
+        //when
+        RoomSave updateRoomSave = RoomSave.builder()
+                .id(room.getId())
+                .name("room")
+                .cnt(5)
+                .capacity(1)
+                .weekendPrice(2000)
+                .weekPrice(8000)
+                .build();
+        Room updatedRoom = roomService.saveRoom(camp, updateRoomSave);
+
+
+        //that
+        assertThat(updatedRoom).isSameAs(room);
+
+    }
+
+    @DisplayName("객실 정보 수정 성공 : 정보 업데이트")
+    @Test
+    public void updateRoom_infoUpdate(){
+        //given
+        RoomSave roomSave = RoomSave.builder()
+                .name("room")
+                .cnt(10)
+                .capacity(3)
+                .weekendPrice(1000)
+                .weekPrice(1200)
+                .build();
+        Room room = roomService.saveRoom(camp, roomSave);
+
+        //when
+        RoomSave updateRoomSave = RoomSave.builder()
+                .id(room.getId())
+                .name("room")
+                .cnt(5)
+                .capacity(1)
+                .weekendPrice(2000)
+                .weekPrice(8000)
+                .build();
+        Room updatedRoom = roomService.saveRoom(camp, updateRoomSave);
+
+
+        //that
+        assertThat(updatedRoom.getCnt()).isEqualTo(room.getCnt());
+        assertThat(updatedRoom.getCapacity()).isEqualTo(room.getCapacity());
+        assertThat(updatedRoom.getWeekendPrice()).isEqualTo(room.getWeekendPrice());
+        assertThat(updatedRoom.getWeekPrice()).isEqualTo(room.getWeekPrice());
+
+    }
+
+    @DisplayName("객실 정보 수정 실패 : 존재하지 않는 아이디")
+    @Test
+    public void updateRoom_wrongId_fail(){
+
+        //given
+        RoomSave updateRoomSave = RoomSave.builder()
+                .id(30000L)
+                .name("room")
+                .cnt(5)
+                .capacity(1)
+                .weekendPrice(2000)
+                .weekPrice(8000)
+                .build();
+
+        //then
+        assertThrows(NotFoundException.class, () -> roomService.saveRoom(camp, updateRoomSave));
+
+    }
+
+
 
 
 }
