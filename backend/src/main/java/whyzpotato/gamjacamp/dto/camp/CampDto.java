@@ -38,7 +38,7 @@ public class CampDto {
 
     public CampDto(Camp camp) {
         this.id = camp.getId();
-        this.memberId = camp.getMember().getMemberId();
+        this.memberId = camp.getMember().getId();
         this.name = camp.getName();
         this.address = camp.getAddress();
         this.phone = camp.getPhone();

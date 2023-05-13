@@ -34,10 +34,10 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         CampSaveRequestDto campSaveRequestDto = CampSaveRequestDto.builder().name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").build();
 
-        Long campId = campService.register(member.getMemberId(), campSaveRequestDto);
+        Long campId = campService.register(member.getId(), campSaveRequestDto);
 
         Optional<Camp> camp = campRepository.findById(campId);
-        assertThat(camp.get().getMember().getMemberId()).isEqualTo(member.getMemberId());
+        assertThat(camp.get().getMember().getId()).isEqualTo(member.getId());
         assertThat(camp.get().getName()).isEqualTo(campSaveRequestDto.getName());
         assertThat(camp.get().getAddress()).isEqualTo(campSaveRequestDto.getAddress());
     }
@@ -46,10 +46,10 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
 
-        CampDto campDto = campService.findCamp(member.getMemberId());
+        CampDto campDto = campService.findCamp(member.getId());
 
         assertThat(campDto.getId()).isEqualTo(camp.getId());
-        assertThat(campDto.getMemberId()).isEqualTo(member.getMemberId());
+        assertThat(campDto.getMemberId()).isEqualTo(member.getId());
         assertThat(campDto.getName()).isEqualTo("감자캠핑");
         assertThat(campDto.getAddress()).isEqualTo("서울특별시 광진구 동일로40길 25-1");
         assertThat(campDto.getCampX()).isEqualTo(126.1332152f);
@@ -61,7 +61,7 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
 
-        campService.updateCamp(member.getMemberId(), camp.getId(), CampUpdateRequestDto.builder().name("이름변경").phone("010-1234-1234").campIntroduction("캠프소개").build());
+        campService.updateCamp(member.getId(), camp.getId(), CampUpdateRequestDto.builder().name("이름변경").phone("010-1234-1234").campIntroduction("캠프소개").build());
 
         Optional<Camp> updateCamp = campRepository.findById(camp.getId());
         assertThat(updateCamp.get().getName()).isEqualTo("이름변경");
@@ -74,7 +74,7 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").phone("010-1234-1234").campIntroduction("캠프소개").campX(126.1332152f).campY(92.1234455f).build());
 
-        campService.updateCamp(member.getMemberId(), camp.getId(), CampUpdateRequestDto.builder().name("감자캠핑").build());
+        campService.updateCamp(member.getId(), camp.getId(), CampUpdateRequestDto.builder().name("감자캠핑").build());
 
         Optional<Camp> updateCamp = campRepository.findById(camp.getId());
         assertThat(updateCamp.get().getName()).isEqualTo("감자캠핑");
@@ -87,7 +87,7 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 군자동 218").campX(126.1332152f).campY(92.1234455f).build());
 
-        campService.updateCampAddress(member.getMemberId(), camp.getId(), "서울특별시 광진구 동일로40길 25-1");
+        campService.updateCampAddress(member.getId(), camp.getId(), "서울특별시 광진구 동일로40길 25-1");
 
         Optional<Camp> updateCamp = campRepository.findById(camp.getId());
         assertThat(updateCamp.get().getAddress()).isEqualTo("서울특별시 광진구 동일로40길 25-1");
@@ -100,7 +100,7 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
 
-        campService.updateOperatingHours(member.getMemberId(),  camp.getId(), 11, 0, 22, 30);
+        campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
 
         Optional<Camp> updateCamp = campRepository.findById(camp.getId());
         assertThat(updateCamp.get().getCampOperationStart()).isEqualTo(LocalTime.of(11,0));
@@ -112,7 +112,7 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
 
-        campService.delete(member.getMemberId(), camp.getId());
+        campService.delete(member.getId(), camp.getId());
 
         Optional<Camp> deleteCamp = campRepository.findById(camp.getId());
         assertThat(deleteCamp.isPresent()).isFalse();
@@ -122,9 +122,9 @@ public class CampServiceTest {
     public void 캠핑장_운영시간삭제() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
-        campService.updateOperatingHours(member.getMemberId(),  camp.getId(), 11, 0, 22, 30);
+        campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
 
-        campService.deleteOperatingHours(member.getMemberId(), camp.getId());
+        campService.deleteOperatingHours(member.getId(), camp.getId());
 
         Optional<Camp> optionalCamp = campRepository.findById(camp.getId());
         assertThat(optionalCamp.get().getCampOperationStart()).isNull();
