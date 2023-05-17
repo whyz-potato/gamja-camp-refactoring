@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import whyzpotato.gamjacamp.utils.Utils;
 
 import javax.persistence.*;
 import javax.validation.constraints.Min;
@@ -40,4 +41,10 @@ public class PeakPrice {
         this.peakStart = peakStart;
         this.peakEnd = peakEnd;
     }
+
+    public boolean isPeakDate(LocalDate date) {
+        return Utils.isBetween(date, peakStart, peakEnd);
+    }
+
+
 }

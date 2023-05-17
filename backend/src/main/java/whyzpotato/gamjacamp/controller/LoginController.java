@@ -7,13 +7,14 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
-@Controller
+@RestController
 public class LoginController {
 
     private final ClientRegistrationRepository clientRegistrationRepository;
@@ -29,7 +30,7 @@ public class LoginController {
                 oauth2AuthenticationUrls.put(registration.getClientName(),
                         "oauth2/authorization/" + registration.getRegistrationId()));
         model.addAttribute("urls", oauth2AuthenticationUrls);
-        return "oauth_login";
+        return "OK";
     }
 
 }

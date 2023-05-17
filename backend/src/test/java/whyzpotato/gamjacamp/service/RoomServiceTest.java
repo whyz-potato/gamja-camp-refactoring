@@ -10,7 +10,7 @@ import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
 import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.service.dto.PeakPriceDto;
-import whyzpotato.gamjacamp.service.dto.RoomSave;
+import whyzpotato.gamjacamp.service.dto.RoomDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -21,7 +21,6 @@ import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,11 +70,11 @@ class RoomServiceTest {
 
     }
 
-    @DisplayName("객실 저장 테스트 (기본)")
+    @DisplayName("객실 저장 성공(기본)")
     @Test
     public void saveRoom() {
         //given
-        RoomSave roomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .name("room")
                 .cnt(10)
                 .capacity(3)
@@ -84,23 +83,23 @@ class RoomServiceTest {
                 .build();
 
         //when
-        Room room = roomService.saveRoom(camp, roomSave);
+        Room room = roomService.saveRoom(camp, roomSaveRequest);
 
         //then
         assertThat(room.getId()).isNotNull();
 
     }
 
-    @DisplayName("객실 저장 실패 테스트 : 필수 정보 누락")
+    @DisplayName("객실 저장 실패 : 필수 정보 누락")
     @Test
     public void saveRoom_withoutRequireParam_fail() {
         //given
-        RoomSave roomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .cnt(1)
                 .build();
 
         //when
-        Room room = roomService.saveRoom(camp, roomSave);
+        Room room = roomService.saveRoom(camp, roomSaveRequest);
         Set<ConstraintViolation<Room>> constraintViolations = validator.validate(room);
 
         //then
@@ -108,7 +107,7 @@ class RoomServiceTest {
     }
 
 
-    @DisplayName("PeakPrice 영속성 전이 테스트")
+    @DisplayName("객실 PeakPrice 영속성 전이 성공")
     @Test
     public void saveRoom_withPeakPrice() {
         // given
@@ -124,12 +123,12 @@ class RoomServiceTest {
                 .peakEnd(LocalDate.now())
                 .build());
 
-        RoomSave roomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .peakPrices(list)
                 .build();
 
         //when
-        Room room = roomService.saveRoom(camp, roomSave);
+        Room room = roomService.saveRoom(camp, roomSaveRequest);
 
         //then
         assertThat(room.getPeakPrices().get(0).getId()).isNotNull();
@@ -137,16 +136,16 @@ class RoomServiceTest {
 
     }
 
-    @DisplayName("캠핑장-객실 연관관계 편의 메소드 확인")
+    @DisplayName("객실 캠핑장 연관관계 편의 메소드 확인")
     @Test
     public void campRoom_relation() {
         //given
-        RoomSave roomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .name("room")
                 .build();
 
         //when
-        Room room = roomService.saveRoom(camp, roomSave);
+        Room room = roomService.saveRoom(camp, roomSaveRequest);
 
         //then
         assertThat(room.getCamp()).isEqualTo(camp);
@@ -158,17 +157,17 @@ class RoomServiceTest {
     @Test
     public void updateRoom(){
         //given
-        RoomSave roomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .name("room")
                 .cnt(10)
                 .capacity(3)
                 .weekendPrice(1000)
                 .weekPrice(1200)
                 .build();
-        Room room = roomService.saveRoom(camp, roomSave);
+        Room room = roomService.saveRoom(camp, roomSaveRequest);
 
         //when
-        RoomSave updateRoomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest updateRoomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .id(room.getId())
                 .name("room")
                 .cnt(5)
@@ -176,7 +175,7 @@ class RoomServiceTest {
                 .weekendPrice(2000)
                 .weekPrice(8000)
                 .build();
-        Room updatedRoom = roomService.saveRoom(camp, updateRoomSave);
+        Room updatedRoom = roomService.saveRoom(camp, updateRoomSaveRequest);
 
 
         //that
@@ -188,17 +187,17 @@ class RoomServiceTest {
     @Test
     public void updateRoom_infoUpdate(){
         //given
-        RoomSave roomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .name("room")
                 .cnt(10)
                 .capacity(3)
                 .weekendPrice(1000)
                 .weekPrice(1200)
                 .build();
-        Room room = roomService.saveRoom(camp, roomSave);
+        Room room = roomService.saveRoom(camp, roomSaveRequest);
 
         //when
-        RoomSave updateRoomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest updateRoomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .id(room.getId())
                 .name("room")
                 .cnt(5)
@@ -206,7 +205,7 @@ class RoomServiceTest {
                 .weekendPrice(2000)
                 .weekPrice(8000)
                 .build();
-        Room updatedRoom = roomService.saveRoom(camp, updateRoomSave);
+        Room updatedRoom = roomService.saveRoom(camp, updateRoomSaveRequest);
 
 
         //that
@@ -222,7 +221,7 @@ class RoomServiceTest {
     public void updateRoom_wrongId_fail(){
 
         //given
-        RoomSave updateRoomSave = RoomSave.builder()
+        RoomDto.RoomSaveRequest updateRoomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .id(30000L)
                 .name("room")
                 .cnt(5)
@@ -232,10 +231,28 @@ class RoomServiceTest {
                 .build();
 
         //then
-        assertThrows(NotFoundException.class, () -> roomService.saveRoom(camp, updateRoomSave));
+        assertThrows(NotFoundException.class, () -> roomService.saveRoom(camp, updateRoomSaveRequest));
 
     }
 
+    @DisplayName("객실 예약 성공")
+    @Test
+    public void reserveRoom(){
+
+
+    }
+
+
+//    @DisplayName("객실 예약 실패 : 객실수 이하로만 예약할 수 있다")
+//
+//
+//    @DisplayName("예약가능한 객실 검색 성공")
+//
+//    @DisplayName("예약가능한 객실 검색 성공 : 날짜가 없는 경우 당일 1박 검색")
+//
+//    @DisplayName("예약가능한 객실 검색 성공 : 그러한 객실이 존재하지 않음")
+//
+//    @DisplayName("예약가능한 객실 검색 실패 : 필수 파라미터 검증")
 
 
 

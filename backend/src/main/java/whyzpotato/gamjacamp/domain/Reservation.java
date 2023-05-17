@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -35,9 +35,9 @@ public class Reservation extends BaseTimeEntity {
 
     private int numGuest;
 
-    private LocalDateTime stayStarts;
+    private LocalDate stayStarts;
 
-    private LocalDateTime stayEnds;
+    private LocalDate stayEnds;
 
     private int price;
 

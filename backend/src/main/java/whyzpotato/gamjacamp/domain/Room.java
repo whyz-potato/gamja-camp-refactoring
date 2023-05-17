@@ -66,23 +66,24 @@ public class Room {
     }
 
     // 해당 기간 동안의 방 가격 리스트 반환
-    public List<Integer> getPrices(LocalDate start, LocalDate end) {
+    public List<Integer> getPrices(LocalDate stayStarts, LocalDate stayEnds) {
         List<Integer> prices = new ArrayList<>();
-        int length;
-        for (LocalDate date = start; date.isBefore(end); date = date.plusDays(1)) {
-            length = prices.size();
+
+        for (LocalDate date = stayStarts; date.isBefore(stayEnds); date = date.plusDays(1)) {
+            boolean isPeak = false;
             for (PeakPrice peakPrice : peakPrices) {
-                if (peakPrice.getPeakStart().compareTo(date) <= 0 && peakPrice.getPeakStart().compareTo(date) >= 0) {
+                if(peakPrice.isPeakDate(date)) {
+                    isPeak = true;
                     prices.add(peakPrice.getPeakPrice());
                     break;
                 }
             }
-            if (length < prices.size()) {
-                DayOfWeek dayOfWeek = date.getDayOfWeek();
-                if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY)
-                    prices.add(weekPrice);
-                else
+            if(!isPeak){
+                if ((date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.THURSDAY)) {
                     prices.add(weekendPrice);
+                } else {
+                    prices.add(weekPrice);
+                }
             }
         }
         return prices;
