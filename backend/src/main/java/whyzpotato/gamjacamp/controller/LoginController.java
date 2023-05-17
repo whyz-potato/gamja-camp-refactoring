@@ -6,6 +6,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 @Controller
+@CrossOrigin(origins = "http://localhost:7777", allowedHeaders = "*")
 public class LoginController {
 
     private final ClientRegistrationRepository clientRegistrationRepository;
