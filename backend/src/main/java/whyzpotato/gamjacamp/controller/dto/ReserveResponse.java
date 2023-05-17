@@ -1,10 +1,10 @@
-package whyzpotato.gamjacamp.service.dto;
+package whyzpotato.gamjacamp.controller.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
-import whyzpotato.gamjacamp.service.dto.RoomDto.RoomResponse;
+import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomResponse;
 
 import java.time.LocalDate;
 

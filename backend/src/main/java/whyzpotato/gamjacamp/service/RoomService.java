@@ -3,11 +3,11 @@ package whyzpotato.gamjacamp.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.RoomDto;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.RoomRepository;
-import whyzpotato.gamjacamp.service.dto.RoomDto;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +30,11 @@ public class RoomService {
 
         entity.setCamp(camp);
         return roomRepository.save(entity);
+    }
+
+    public Room findRoom(Long id) {
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("잘못된 객실 정보입니다."));
     }
 
 

@@ -1,4 +1,4 @@
-package whyzpotato.gamjacamp.service.dto;
+package whyzpotato.gamjacamp.controller.dto;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -71,14 +71,16 @@ public class Room {
 
         for (LocalDate date = stayStarts; date.isBefore(stayEnds); date = date.plusDays(1)) {
             boolean isPeak = false;
-            for (PeakPrice peakPrice : peakPrices) {
-                if(peakPrice.isPeakDate(date)) {
-                    isPeak = true;
-                    prices.add(peakPrice.getPeakPrice());
-                    break;
+            if (peakPrices != null) {
+                for (PeakPrice peakPrice : peakPrices) {
+                    if (peakPrice.isPeakDate(date)) {
+                        isPeak = true;
+                        prices.add(peakPrice.getPeakPrice());
+                        break;
+                    }
                 }
             }
-            if(!isPeak){
+            if (!isPeak) {
                 if ((date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.THURSDAY)) {
                     prices.add(weekendPrice);
                 } else {
@@ -97,5 +99,13 @@ public class Room {
         this.weekPrice = room.getWeekPrice();
         this.weekendPrice = room.getWeekendPrice();
         this.peakPrices = room.getPeakPrices();
+    }
+
+    public void setWeekPrice(int weekPrice) {
+        this.weekPrice = weekPrice;
+    }
+
+    public void setWeekendPrice(int weekendPrice) {
+        this.weekendPrice = weekendPrice;
     }
 }

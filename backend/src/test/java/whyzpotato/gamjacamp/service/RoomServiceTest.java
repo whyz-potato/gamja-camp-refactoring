@@ -4,13 +4,13 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.PeakPriceDto;
+import whyzpotato.gamjacamp.controller.dto.RoomDto;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
 import whyzpotato.gamjacamp.exception.NotFoundException;
-import whyzpotato.gamjacamp.service.dto.PeakPriceDto;
-import whyzpotato.gamjacamp.service.dto.RoomDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -50,22 +50,10 @@ class RoomServiceTest {
     }
 
     @BeforeEach
-    public void initEach() {
-        member = Member.builder()
-                .account("account@mail.com")
-                .role(Role.ROLE_OWNER)
-                .username("tester")
-                .picture("img")
-                .build();
+    public void setUp() {
+        member = Member.builder().account("account@mail.com").role(Role.ROLE_OWNER).username("tester").picture("img").build();
         em.persist(member);
-
-        camp = Camp.builder()
-                .member(member)
-                .name("tester camp")
-                .address("경기도 남양주시")
-                .campX((float) 1.1)
-                .campY((float) 1.1)
-                .build();
+        camp = Camp.builder().member(member).name("tester camp").address("경기도 남양주시").campX((float) 1.1).campY((float) 1.1).build();
         em.persist(camp);
 
     }
@@ -155,7 +143,7 @@ class RoomServiceTest {
 
     @DisplayName("객실 정보 수정 성공 : 영속된 객체 반환")
     @Test
-    public void updateRoom(){
+    public void updateRoom() {
         //given
         RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .name("room")
@@ -185,7 +173,7 @@ class RoomServiceTest {
 
     @DisplayName("객실 정보 수정 성공 : 정보 업데이트")
     @Test
-    public void updateRoom_infoUpdate(){
+    public void updateRoom_infoUpdate() {
         //given
         RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
                 .name("room")
@@ -218,7 +206,7 @@ class RoomServiceTest {
 
     @DisplayName("객실 정보 수정 실패 : 존재하지 않는 아이디")
     @Test
-    public void updateRoom_wrongId_fail(){
+    public void updateRoom_wrongId_fail() {
 
         //given
         RoomDto.RoomSaveRequest updateRoomSaveRequest = RoomDto.RoomSaveRequest.builder()
@@ -235,17 +223,7 @@ class RoomServiceTest {
 
     }
 
-    @DisplayName("객실 예약 성공")
-    @Test
-    public void reserveRoom(){
 
-
-    }
-
-
-//    @DisplayName("객실 예약 실패 : 객실수 이하로만 예약할 수 있다")
-//
-//
 //    @DisplayName("예약가능한 객실 검색 성공")
 //
 //    @DisplayName("예약가능한 객실 검색 성공 : 날짜가 없는 경우 당일 1박 검색")
@@ -253,7 +231,6 @@ class RoomServiceTest {
 //    @DisplayName("예약가능한 객실 검색 성공 : 그러한 객실이 존재하지 않음")
 //
 //    @DisplayName("예약가능한 객실 검색 실패 : 필수 파라미터 검증")
-
 
 
 }
