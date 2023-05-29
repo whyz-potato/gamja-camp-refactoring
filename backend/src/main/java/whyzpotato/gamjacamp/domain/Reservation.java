@@ -14,14 +14,15 @@ import java.time.LocalDate;
 @Entity
 public class Reservation extends BaseTimeEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    Member member;
 
     @Id
     @GeneratedValue
     @Column(name = "reservation_id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "camp_id")

@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +32,10 @@ public class Review extends BaseTimeEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
+
+    @Column(nullable = false)
+    @Min(1) @Max(5)
+    private int rate;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;

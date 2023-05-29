@@ -7,6 +7,7 @@ import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
+import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.ReservationRepository;
 
 import java.time.LocalDate;
@@ -18,6 +19,12 @@ import java.util.List;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+
+    public Reservation findById(Long id) {
+        return reservationRepository.findById(id)
+                .orElseThrow(()
+                        -> new NotFoundException());
+    }
 
     //RQ06 : 고객 예약
     @Transactional
