@@ -4,11 +4,11 @@ import lombok.Getter;
 
 @Getter
 public class Coordinate {
-    private Float campX;
-    private Float campY;
+    private double longitude;
+    private double latitude;
 
-    public Coordinate(Float campX, Float campY) {
-        this.campX = campX;
-        this.campY = campY;
+    public Coordinate(double longitude, double latitude) {
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
 }

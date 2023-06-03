@@ -39,10 +39,10 @@ public class Camp {
     private String campIntroduction;
 
     @Column(nullable = false)
-    private Float campX;
+    private double longitude;
 
     @Column(nullable = false)
-    private Float campY;
+    private double latitude;
 
     @Column
     private LocalTime campOperationStart;
@@ -57,14 +57,14 @@ public class Camp {
     // images
 
     @Builder
-    public Camp(Member member, String name, String address, String phone, String campIntroduction, Float campX, Float campY, LocalTime campOperationStart, LocalTime campOperationEnd) {
+    public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd) {
         this.member = member;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.campIntroduction = campIntroduction;
-        this.campX = campX;
-        this.campY = campY;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.campOperationStart = campOperationStart;
         this.campOperationEnd = campOperationEnd;
     }
@@ -78,8 +78,8 @@ public class Camp {
 
     public Camp updateAddress(String address, Coordinate coordinate) {
         this.address = address;
-        this.campX = coordinate.getCampX();
-        this.campY = coordinate.getCampY();
+        this.longitude = coordinate.getLongitude();
+        this.latitude = coordinate.getLatitude();
         return this;
     }
 

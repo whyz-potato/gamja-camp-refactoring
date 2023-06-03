@@ -44,7 +44,7 @@ public class CampServiceTest {
 
     @Test void 캠핑장_정보조회() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
+        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").longitude(126.1332152).latitude(92.1234455).build());
 
         CampDto campDto = campService.findCamp(member.getId());
 
@@ -52,14 +52,14 @@ public class CampServiceTest {
         assertThat(campDto.getMemberId()).isEqualTo(member.getId());
         assertThat(campDto.getName()).isEqualTo("감자캠핑");
         assertThat(campDto.getAddress()).isEqualTo("서울특별시 광진구 동일로40길 25-1");
-        assertThat(campDto.getCampX()).isEqualTo(126.1332152f);
-        assertThat(campDto.getCampY()).isEqualTo(92.1234455f);
+        assertThat(campDto.getLongitude()).isEqualTo(126.1332152);
+        assertThat(campDto.getLatitude()).isEqualTo(92.1234455);
     }
 
     @Test
     public void 캠핑장_정보변경() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
+        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").longitude(126.1332152f).latitude(92.1234455).build());
 
         campService.updateCamp(member.getId(), camp.getId(), CampUpdateRequestDto.builder().name("이름변경").phone("010-1234-1234").campIntroduction("캠프소개").build());
 
@@ -72,7 +72,7 @@ public class CampServiceTest {
     @Test
     public void 캠핑장_정보변경_연락처소개_삭제() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").phone("010-1234-1234").campIntroduction("캠프소개").campX(126.1332152f).campY(92.1234455f).build());
+        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").phone("010-1234-1234").campIntroduction("캠프소개").longitude(126.1332152f).latitude(92.1234455).build());
 
         campService.updateCamp(member.getId(), camp.getId(), CampUpdateRequestDto.builder().name("감자캠핑").build());
 
@@ -85,20 +85,20 @@ public class CampServiceTest {
     @Test
     public void 캠핑장_주소변경() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 군자동 218").campX(126.1332152f).campY(92.1234455f).build());
+        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 군자동 218").longitude(126.1332152).latitude(92.1234455).build());
 
         campService.updateCampAddress(member.getId(), camp.getId(), "서울특별시 광진구 동일로40길 25-1");
 
         Optional<Camp> updateCamp = campRepository.findById(camp.getId());
         assertThat(updateCamp.get().getAddress()).isEqualTo("서울특별시 광진구 동일로40길 25-1");
-        System.out.println(updateCamp.get().getCampX());
-        System.out.println(updateCamp.get().getCampY());
+        System.out.println(updateCamp.get().getLongitude());
+        System.out.println(updateCamp.get().getLatitude());
     }
 
     @Test
     public void 캠핑장_운영시간변경() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
+        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").longitude(126.1332152).latitude(92.1234455).build());
 
         campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
 
@@ -110,7 +110,7 @@ public class CampServiceTest {
     @Test
     public void 캠핑장_삭제() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
+        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").longitude(126.1332152).latitude(92.1234455).build());
 
         campService.delete(member.getId(), camp.getId());
 
@@ -121,7 +121,7 @@ public class CampServiceTest {
     @Test
     public void 캠핑장_운영시간삭제() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
+        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").longitude(126.1332152).latitude(92.1234455).build());
         campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
 
         campService.deleteOperatingHours(member.getId(), camp.getId());

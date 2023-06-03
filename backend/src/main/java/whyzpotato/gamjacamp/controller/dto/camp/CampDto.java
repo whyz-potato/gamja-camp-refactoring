@@ -17,21 +17,21 @@ public class CampDto {
     private String address;
     private String phone;
     private String campIntroduction;
-    private Float campX;
-    private Float campY;
+    private double longitude;
+    private double latitude;
     private LocalTime campOperationStart;
     private LocalTime campOperationEnd;
 
     @Builder
-    public CampDto(Long id, Long memberId, String name, String address, String phone, String campIntroduction, Float campX, Float campY, LocalTime campOperationStart, LocalTime campOperationEnd) {
+    public CampDto(Long id, Long memberId, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd) {
         this.id = id;
         this.memberId = memberId;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.campIntroduction = campIntroduction;
-        this.campX = campX;
-        this.campY = campY;
+        this.longitude = longitude;
+        this.latitude = latitude;
         this.campOperationStart = campOperationStart;
         this.campOperationEnd = campOperationEnd;
     }
@@ -43,8 +43,8 @@ public class CampDto {
         this.address = camp.getAddress();
         this.phone = camp.getPhone();
         this.campIntroduction = camp.getCampIntroduction();
-        this.campX = camp.getCampX();
-        this.campY = camp.getCampY();
+        this.longitude = camp.getLongitude();
+        this.latitude = camp.getLatitude();
         this.campOperationStart = camp.getCampOperationStart();
         this.campOperationEnd = camp.getCampOperationEnd();
     }

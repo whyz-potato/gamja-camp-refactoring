@@ -53,7 +53,7 @@ class RoomServiceTest {
     public void setUp() {
         member = Member.builder().account("account@mail.com").role(Role.OWNER).username("tester").picture("img").build();
         em.persist(member);
-        camp = Camp.builder().member(member).name("tester camp").address("경기도 남양주시").campX((float) 1.1).campY((float) 1.1).build();
+        camp = Camp.builder().member(member).name("tester camp").address("경기도 남양주시").longitude(1.1).latitude(1.1).build();
         em.persist(camp);
 
     }

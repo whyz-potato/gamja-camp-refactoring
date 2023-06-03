@@ -32,8 +32,8 @@ public class CampSaveRequestDto {
                 .address(this.address)
                 .phone(this.phone)
                 .campIntroduction(this.campIntroduction)
-                .campX(coordinate.getCampX())
-                .campY(coordinate.getCampY())
+                .longitude(coordinate.getLongitude())
+                .latitude(coordinate.getLatitude())
                 .build();
     }
 

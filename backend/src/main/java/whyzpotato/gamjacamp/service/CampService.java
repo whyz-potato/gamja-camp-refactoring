@@ -65,7 +65,8 @@ public class CampService {
             }
 
             JSONObject jsonObject = new JSONObject(response.toString()).getJSONArray("documents").getJSONObject(0);
-            return new Coordinate(Float.parseFloat(jsonObject.getString("x")), Float.parseFloat(jsonObject.getString("y")));
+            return new Coordinate(Double.parseDouble(jsonObject.getString("x")), Double.parseDouble(jsonObject.getString("y")));
+
 
             //TODO 올바르지 않은 주소 처리
 
