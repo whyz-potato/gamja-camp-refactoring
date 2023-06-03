@@ -3,6 +3,7 @@ package whyzpotato.gamjacamp.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import whyzpotato.gamjacamp.config.auth.LoginMember;
 import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 
 import javax.servlet.http.HttpSession;
@@ -14,8 +15,7 @@ public class IndexController {
     private final HttpSession httpSession;
 
     @GetMapping("/")
-    public SessionMember index() {
-        SessionMember member = (SessionMember) httpSession.getAttribute("member");
+    public SessionMember index(@LoginMember SessionMember member) {
         return member;
     }
 
