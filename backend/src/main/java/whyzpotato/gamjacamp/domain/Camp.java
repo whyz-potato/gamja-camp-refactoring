@@ -57,8 +57,7 @@ public class Camp {
     private List<Review> reviews = new ArrayList<>();
 
     // images
-
-    // 테스트용 임시 생성자 ( TODO 서영님 머지 후 삭제 예정 )
+    
     @Builder
     public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd) {
         this.member = member;

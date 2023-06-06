@@ -64,7 +64,7 @@ public class CampDto {
             this.name = camp.getName();
             //this.images = camp.getImages(); //TODO image
             this.address = camp.getAddress();
-            this.contact = camp.getContact();
+            this.contact = camp.getPhone();
             this.checkInTime = camp.getCampOperationStart();
             this.checkOutTime = camp.getCampOperationEnd();
         }
@@ -96,7 +96,7 @@ public class CampDto {
             this.latitude = camp.getLatitude();
             this.longitude = camp.getLongitude();
             this.address = camp.getAddress();
-            this.contact = camp.getContact();
+            this.contact = camp.getPhone();
             this.checkInTime = camp.getCampOperationStart();
             this.checkOutTime = camp.getCampOperationEnd();
             this.introduction = camp.getCampIntroduction();

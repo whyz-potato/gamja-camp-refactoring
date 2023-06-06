@@ -7,15 +7,18 @@ import whyzpotato.gamjacamp.controller.dto.MemberDto.MemberSimple;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomReserved;
 import whyzpotato.gamjacamp.domain.Reservation;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
 public class ReservationDto {
 
+
     @Getter
     @NoArgsConstructor
-    public static class ReservationSimple{
+    public static class ReservationInfo {
 
         private Long id;
         private LocalDate reservationDate;
@@ -25,7 +28,7 @@ public class ReservationDto {
         private LocalDate stayEnds;
         private int price;
 
-        public ReservationSimple(Reservation reservation){
+        public ReservationInfo(Reservation reservation) {
             this.id = reservation.getId();
             this.reservationDate = reservation.getCreatedTime().toLocalDate();
             this.numGuest = reservation.getNumGuest();
@@ -37,26 +40,54 @@ public class ReservationDto {
 
     }
 
-    public static class ReservationDetail{
+    @Getter
+    @NoArgsConstructor
+    public static class ReservationDetail {
         private LocalDate checkIn;
         private LocalDate checkOut;
         private MemberSimple guest;
         private CampInfo camp;
         private RoomReserved room;
-        private ReservationSimple reservation;
+        private ReservationInfo reservation;
 
-        public ReservationDetail(Reservation reservation){
+        public ReservationDetail(Reservation reservation) {
             this.checkIn = reservation.getStayStarts();
             this.checkOut = reservation.getStayEnds();
             this.guest = new MemberSimple(reservation.getMember());
             this.camp = new CampInfo(reservation.getCamp());
             this.room = new RoomReserved(reservation.getRoom());
-            this.reservation = new ReservationSimple(reservation);
+            this.reservation = new ReservationInfo(reservation);
 
         }
     }
 
+    @Getter
+    @NoArgsConstructor
+    public static class ReservationSimple {
+        @NotNull
+        private int numGuest;
+        @NotNull
+        private List<Integer> dailyPrice;
+    }
 
+
+    @Getter
+    @NoArgsConstructor
+    public static class ReservationRequest {
+
+        @NotNull
+        private LocalDate checkIn;
+
+        @NotNull
+        private LocalDate checkOut;
+
+        @NotNull
+        private MemberSimple guest;
+
+        @NotNull
+        private ReservationSimple reservation;
+
+    }
 
 
 }

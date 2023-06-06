@@ -54,7 +54,7 @@ class ReservationServiceTest {
         List<Integer> prices = room.getPrices(start, end);
         int numGuest = 2;
 
-        Reservation reservation = reservationService.reserve(member, camp, room, numGuest, start, end, prices);
+        Reservation reservation = reservationService.createReservation(member, camp, room, numGuest, start, end, prices);
 
         assertThat(reservation.getId()).isNotNull();
     }
@@ -66,7 +66,7 @@ class ReservationServiceTest {
         List<Integer> prices = room.getPrices(start, end);
         int numGuest = 2;
 
-        Reservation reservation = reservationService.reserve(member, camp, room, numGuest, start, end, prices);
+        Reservation reservation = reservationService.createReservation(member, camp, room, numGuest, start, end, prices);
 
         assertThat(reservation.getPrice()).isEqualTo(prices.stream().mapToInt(Integer::intValue).sum());
         assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.PENDING);
@@ -89,7 +89,7 @@ class ReservationServiceTest {
 
         //when - then
         assertThrows(IllegalArgumentException.class,
-                () -> reservationService.reserve(member, camp, room, room.getCapacity() + 1, start, end, prices));
+                () -> reservationService.createReservation(member, camp, room, room.getCapacity() + 1, start, end, prices));
     }
 
     @DisplayName("객실 예약 실패 <- 검색과 저장 사이에 가격변동이 발생한 경우 예약할 수 없다")
@@ -105,7 +105,7 @@ class ReservationServiceTest {
 
         //then
         assertThrows(IllegalStateException.class,
-                () -> reservationService.reserve(member, camp, room, room.getCapacity() - 1, start, end, prices));
+                () -> reservationService.createReservation(member, camp, room, room.getCapacity() - 1, start, end, prices));
 
     }
 

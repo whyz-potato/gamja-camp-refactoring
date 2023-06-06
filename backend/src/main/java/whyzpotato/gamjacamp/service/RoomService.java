@@ -32,10 +32,11 @@ public class RoomService {
         return roomRepository.save(entity);
     }
 
-    public Room findRoom(Long id) {
+    public Room findById(Long id) {
         return roomRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("잘못된 객실 정보입니다."));
     }
+
 
 
 //    // RQ28 : 고객 특정 캠핑장의 예약 가능한 객실들 조회
