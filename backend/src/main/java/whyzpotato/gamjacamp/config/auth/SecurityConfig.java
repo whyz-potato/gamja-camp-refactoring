@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import whyzpotato.gamjacamp.domain.member.Role;
 
+import java.net.http.WebSocket;
+
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
@@ -17,6 +19,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .cors().and().csrf().disable();
         http
@@ -30,6 +33,7 @@ public class SecurityConfig {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/customer").hasRole(Role.CUSTOMER.name())
                 .antMatchers("/owner").hasRole(Role.OWNER.name())
+                .antMatchers("/test").permitAll()
                 .anyRequest().permitAll();
 
         http
