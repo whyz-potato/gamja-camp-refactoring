@@ -9,18 +9,36 @@ function setConnected(connected) {
     else {
         $("#conversation").hide();
     }
-    $("#greetings").html("");
+    $("#receivedMessages").html("");
 }
 
 function connect() {
-    var socket = new SockJS('/test');
+    var socket = new SockJS('/prototype');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/greetings', function (greeting) {
-            showGreeting(JSON.parse(greeting.body).content);
+
+//        //채팅방 구별 X
+//        stompClient.subscribe('/topic/group-chat', function (message) {
+//            //showMessages(message); //문자열만 주고 받는 경우
+//            showMessages(JSON.parse(message.body).content); //json 으로 주고 받는 경우
+//        });
+
+//        // 특정 채팅방 구독(입장)
+//        var subRoomId = $("#subRoom").val();
+//        stompClient.subscribe('/topic/group-chat/'+subRoomId, function (message) {
+//            showMessages(JSON.parse(message.body).content); //json 으로 주고 받는 경우
+//        });
+
+        //여러개의 채팅방 구독(입장)
+        stompClient.subscribe('/topic/group-chat/1', function (message) {
+            showMessages(JSON.parse(message.body).content); //json 으로 주고 받는 경우
         });
+        stompClient.subscribe('/topic/group-chat/2', function (message) {
+            showMessages(JSON.parse(message.body).content); //json 으로 주고 받는 경우
+        });
+
     });
 }
 
@@ -32,12 +50,21 @@ function disconnect() {
     console.log("Disconnected");
 }
 
-function sendName() {
-    stompClient.send("/app/hello", {}, JSON.stringify({'name': $("#name").val()}));
+function sendMessage() {
+    var pubRoomId = $("#pubRoom").val();
+
+//    //문자열만 전송하는 경우
+//    stompClient.send("/app/group-chat", {}, "just String!");
+
+//    //JSON 으로 메세지 주고 받는 경우 & 채팅방 구별 x
+//    stompClient.send("/app/group-chat", {}, JSON.stringify({'content': $("#message").val()}));
+
+    //JSON 으로 메세지 주고 받는 경우 & 채팅방 구별 o
+    stompClient.send("/app/group-chat/"+pubRoomId, {}, JSON.stringify({'content': $("#message").val()}));
 }
 
-function showGreeting(message) {
-    $("#greetings").append("<tr><td>" + message + "</td></tr>");
+function showMessages(message) {
+    $("#receivedMessages").append("<tr><td>" + message + "</td></tr>");
 }
 
 $(function () {
@@ -46,5 +73,5 @@ $(function () {
     });
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
-    $( "#send" ).click(function() { sendName(); });
+    $( "#send" ).click(function() { sendMessage(); });
 });

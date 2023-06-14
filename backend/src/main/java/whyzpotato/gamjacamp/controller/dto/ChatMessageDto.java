@@ -6,13 +6,8 @@ public class ChatMessageDto {
 
     @Data
     public static class MessageTestDto{
-        Long id;
-        String message;
+        String content;
     }
 
-    @Data
-    public static class MessageName{
-        String name;
-    }
 
 }

@@ -22,7 +22,7 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer{
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         log.info("스톰프 엔드포인트 설정");
-        registry.addEndpoint("/test") // WebSocket handshake endpoint (HTTP URL)
+        registry.addEndpoint("/prototype") // WebSocket handshake endpoint (HTTP URL)
                 .setAllowedOriginPatterns("*")
                 .withSockJS(); //SockJS 라이브러리 확장
         ;

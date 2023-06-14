@@ -6,8 +6,8 @@
     <link href="/main.css" rel="stylesheet">
     <script src="/webjars/jquery/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
-    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
-    <script src="/app.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js" ></script>
+    <script src="/app.js" charset="utf-8"></script>
 </head>
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
@@ -18,6 +18,8 @@
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
+                    <label for="subRoom">Sub ChatRoom</label>
+                    <input type="text" id="subRoom" class="form-control" placeholder="Enter Sub ChatRoom">
                     <label for="connect">WebSocket connection:</label>
                     <button id="connect" class="btn btn-default" type="submit">Connect</button>
                     <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
@@ -28,8 +30,10 @@
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="name">What is your name?</label>
-                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                    <label for="pubRoom">Pub ChatRoom</label>
+                    <input type="text" id="pubRoom" class="form-control" placeholder="Enter Pub ChatRoom">
+                    <label for="message">Message</label>
+                    <input type="text" id="message" class="form-control" placeholder="Enter New Message">
                 </div>
                 <button id="send" class="btn btn-default" type="submit">Send</button>
             </form>
@@ -40,10 +44,10 @@
             <table id="conversation" class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Greetings</th>
+                    <th>Received Messages</th>
                 </tr>
                 </thead>
-                <tbody id="greetings">
+                <tbody id="receivedMessages">
                 </tbody>
             </table>
         </div>
