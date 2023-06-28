@@ -6,8 +6,13 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.MessageTestDto;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,6 +59,13 @@ public class CustomStompChatController {
         message.setContent("???: " + content + " from room " + roomId);
         return message;
 
+    }
+
+    @GetMapping("/csrf")
+    public @ResponseBody CsrfToken csrf(HttpServletRequest request){
+        CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        log.debug("csrf token : {}", csrf.getToken().toString());
+        return csrf;
     }
 
 

@@ -14,8 +14,11 @@ function setConnected(connected) {
 
 function connect() {
     var socket = new SockJS('/prototype');
+    var headers = {};
+    headers[$("#header").val()] = $("#token").val();
+
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
+    stompClient.connect(headers, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
 

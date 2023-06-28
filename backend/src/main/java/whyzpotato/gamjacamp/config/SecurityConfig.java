@@ -1,4 +1,4 @@
-package whyzpotato.gamjacamp.config.auth;
+package whyzpotato.gamjacamp.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import whyzpotato.gamjacamp.config.auth.CustomOAuth2UserService;
 import whyzpotato.gamjacamp.domain.member.Role;
 
 import java.net.http.WebSocket;
@@ -21,7 +23,17 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .cors().and().csrf().disable();
+                .cors();
+
+        //relax csrf for sockJS
+        http
+                .csrf(csrf -> csrf
+                        .ignoringAntMatchers("/prototype/**"));
+
+        //allow frame-option for sockJS
+        http
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions
+                        .sameOrigin()));
         http
                 .authorizeRequests()
                 .antMatchers(
@@ -33,7 +45,7 @@ public class SecurityConfig {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/customer").hasRole(Role.CUSTOMER.name())
                 .antMatchers("/owner").hasRole(Role.OWNER.name())
-                .antMatchers("/test").permitAll()
+                .antMatchers("/prototype/**").permitAll()
                 .anyRequest().permitAll();
 
         http
