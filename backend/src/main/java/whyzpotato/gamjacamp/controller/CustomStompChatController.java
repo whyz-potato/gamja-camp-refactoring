@@ -43,22 +43,16 @@ public class CustomStompChatController {
     public MessageTestDto groupChat(@Payload MessageTestDto message) {
         String content = message.getContent();
         log.debug("message : {}", content);
-        message.setContent("???: " + content);
+        //message.setContent("???: " + content); //메세지 변경 가능
         return message;
     }
 
     @MessageMapping("/group-chat/{roomId}")  // STOMP메세지의 헤더가 "/app/group-chat"로 시작하는 메세지를 처리
     @SendTo("/topic/group-chat/{roomId}") // 컨트롤러 처리 후 "/topic/group-chat" 을 처리하는 메세지 브로커에 ??? 전달
     public MessageTestDto groupChatRoom(@Payload MessageTestDto message, @DestinationVariable String roomId) {
-
-        log.debug("payload : {}", message.toString());
-        log.debug("roomId : {}", roomId);
-
         String content = message.getContent();
-        log.debug("message : {}", content);
-        message.setContent("???: " + content + " from room " + roomId);
+        log.debug("roomId : {}, payload : {}, message : {}", roomId, message.toString(), content);
         return message;
-
     }
 
     @GetMapping("/csrf")

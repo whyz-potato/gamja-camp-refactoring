@@ -6,11 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import whyzpotato.gamjacamp.config.auth.CustomOAuth2UserService;
 import whyzpotato.gamjacamp.domain.member.Role;
-
-import java.net.http.WebSocket;
 
 @RequiredArgsConstructor
 @Configuration
@@ -45,17 +42,18 @@ public class SecurityConfig {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/customer").hasRole(Role.CUSTOMER.name())
                 .antMatchers("/owner").hasRole(Role.OWNER.name())
-                .antMatchers("/prototype/**").permitAll()
-                .anyRequest().permitAll();
+                .antMatchers("/csrf/**").authenticated() //csrf token for sock js & spring security
+                .antMatchers("/prototype/**").authenticated() //websocket endpoint
+                .anyRequest().permitAll(); //TODO denyAll();
 
         http
                 .logout().logoutSuccessUrl("/"); // 로그아웃 성공시 "/" 주소로 이동
 
         http
                 .oauth2Login()//oauth2 설정
-                    .loginPage("/login")
-                    .userInfoEndpoint()
-                        .userService(customOAuth2UserService); // 소셜로그인 성공 후 조치
+                .loginPage("/login") //TODO ?type= 해결
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService); // 소셜로그인 성공 후 조치
 
         return http.build();
     }
