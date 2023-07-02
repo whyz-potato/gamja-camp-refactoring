@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@PropertySource(value = {"application-aws.properties"})
+@PropertySource(value = {"classpath:/application-aws.properties"})
 public class S3Config {
     @Value("${cloud.aws.credentials.access-key}")
     private String accessKey;
