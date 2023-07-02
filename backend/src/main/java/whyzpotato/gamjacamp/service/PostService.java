@@ -62,8 +62,7 @@ public class PostService {
         Member writer = memberRepository.findById(memberId).get();
         Post post = postRepository.findById(postId).get();
         if(post.getWriter().equals(writer)) {
-            postRepository.save(post.update(generalPostUpdateRequestDto));
-            return new GeneralPostDto(post);
+            return new GeneralPostDto(postRepository.save(post.update(generalPostUpdateRequestDto)));
         }
         throw new NoSuchElementException();
     }

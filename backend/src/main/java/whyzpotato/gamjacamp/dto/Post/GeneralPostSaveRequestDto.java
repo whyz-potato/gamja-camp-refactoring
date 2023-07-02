@@ -20,9 +20,10 @@ public class GeneralPostSaveRequestDto {
     private List<Image> images = new ArrayList<Image>();
 
     @Builder
-    public GeneralPostSaveRequestDto(String title, String content) {
+    public GeneralPostSaveRequestDto(String title, String content, List<Image> images) {
         this.title = title;
         this.content = content;
+        this.images = images;
     }
 
     public Post toEntity(Member member, PostType postType) {

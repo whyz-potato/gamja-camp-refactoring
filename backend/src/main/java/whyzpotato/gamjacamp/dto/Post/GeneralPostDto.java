@@ -18,7 +18,7 @@ public class GeneralPostDto {
     private String title;
     private String content;
     private PostType postType;
-    private List<Image> images = new ArrayList<Image>();
+    private List<Image> images;
 
     @Builder
     public GeneralPostDto(Long id, Long memberId, String title, String content, PostType postType, List<Image> images) {
