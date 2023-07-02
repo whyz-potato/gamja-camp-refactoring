@@ -44,6 +44,9 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post")
     private List<Image> images = new ArrayList<Image>();
 
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<Comment>();
+
     @Builder
     public Post(Member writer, Chat chat, String title, String content, PostType type, List<Image> images) {
         this.writer = writer;
@@ -59,5 +62,9 @@ public class Post extends BaseTimeEntity {
         this.content = generalPostUpdateRequestDto.getContent();
         this.images = generalPostUpdateRequestDto.getImages();
         return this;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
     }
 }
