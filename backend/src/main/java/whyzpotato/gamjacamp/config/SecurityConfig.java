@@ -1,4 +1,4 @@
-package whyzpotato.gamjacamp.config.auth;
+package whyzpotato.gamjacamp.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import whyzpotato.gamjacamp.config.auth.CustomOAuth2UserService;
 import whyzpotato.gamjacamp.domain.member.Role;
 
 @RequiredArgsConstructor
@@ -17,8 +18,19 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
-                .cors().and().csrf().disable();
+                .cors();
+
+        //relax csrf for sockJS
+        http
+                .csrf(csrf -> csrf
+                        .ignoringAntMatchers("/prototype/**"));
+
+        //allow frame-option for sockJS
+        http
+                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions
+                        .sameOrigin()));
         http
                 .authorizeRequests()
                 .antMatchers(
@@ -30,16 +42,18 @@ public class SecurityConfig {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/customer").hasRole(Role.CUSTOMER.name())
                 .antMatchers("/owner").hasRole(Role.OWNER.name())
-                .anyRequest().permitAll();
+                .antMatchers("/csrf/**").authenticated() //csrf token for sock js & spring security
+                .antMatchers("/prototype/**").authenticated() //websocket endpoint
+                .anyRequest().permitAll(); //TODO denyAll();
 
         http
                 .logout().logoutSuccessUrl("/"); // 로그아웃 성공시 "/" 주소로 이동
 
         http
                 .oauth2Login()//oauth2 설정
-                    .loginPage("/login")
-                    .userInfoEndpoint()
-                        .userService(customOAuth2UserService); // 소셜로그인 성공 후 조치
+                .loginPage("/login") //TODO ?type= 해결
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService); // 소셜로그인 성공 후 조치
 
         return http.build();
     }
