@@ -31,10 +31,12 @@ public class Chat {
 
     private int capacity;
 
-    private String lastMessage;
+    @OneToOne
+    @JoinColumn(name = "last_message_id")
+    private Message lastMessage;
 
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
+    public void setLastMessage(Message message){
+        this.lastMessage = message;
     }
 
 }

@@ -34,5 +34,7 @@ public class Message extends BaseTimeEntity {
         this.chat = chat;
         this.from = from;
         this.content = content;
+        chat.setLastMessage(this);
     }
+
 }

@@ -20,16 +20,21 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        log.info("스톰프 엔드포인트 설정");
-        registry.addEndpoint("/prototype") // WebSocket handshake endpoint (HTTP URL)
+
+        // 테스트용 엔드포인트 등록 (개발 단계 중 permitAll)
+        registry.addEndpoint("/prototype") // WebSocket handshake endpoint (for test) (HTTP URL)
                 .setAllowedOriginPatterns("*")
                 .withSockJS(); //SockJS 라이브러리 확장
-        ;
+
+        // 실제 채팅 엔드포인트 등록 (authenticated)
+        registry.addEndpoint("/chats") // WebSocket handshake endpoint (HTTP URL)
+                .setAllowedOriginPatterns("*")
+                .withSockJS(); //SockJS 라이브러리 확장
+
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        log.info("메세지 브로커 설정");
         registry.enableSimpleBroker("/queue", "/topic"); // STOMP 메세지의 destination header가 /topic, /queue 로 시작하면 SimpleBroker(기본 내장 브로커)가 바로 처리한다.
         registry.setApplicationDestinationPrefixes("/app"); // STOMP 메세지의 destination header가 "/app" 로 시작하면 @MessageMapping 이 달린 컨트롤러로 전달된다.
     }
@@ -42,6 +47,7 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
                 .simpSubscribeDestMatchers("/topic/**").permitAll()
                 .anyMessage().denyAll(); //endpoint
 
+//        // TODO : STOMP 전송, 구독 제한
 //        messages
 //                .nullDestMatcher().permitAll() // CONNECT, HEARTBEAT 등은 열어준다.
 //                .simpDestMatchers("/app/**").authenticated()
