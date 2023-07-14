@@ -7,6 +7,7 @@ import whyzpotato.gamjacamp.domain.BaseTimeEntity;
 import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -29,6 +30,24 @@ public class ChatMember extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "message_id")
-    private Message lastReadMessage;
+    private Message lastReadMessage = null;
+
+    @NotNull
+    private String title;
+
+    public ChatMember(Chat chat, Member member, String title) {
+        this.chat = chat;
+        this.member = member;
+        this.title = title;
+    }
+
+    public void updateLastReadMessage(Message lastReadMessage) {
+        this.lastReadMessage = lastReadMessage;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
 
 }

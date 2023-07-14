@@ -9,6 +9,11 @@ import java.util.List;
 
 public interface ChatMemberRepository extends JpaRepository<ChatMember, Long> {
 
-    List<ChatMember> findByMemberOrderByLastMessage(Member member);
+//    @Query("SELECT cm FROM ChatMember cm " +
+//            "JOIN Chat c ON cm.chat = c " +
+//            "WHERE cm.member = :member " +
+//            "ORDER BY c.last_message desc")
+//    List<ChatMember> findByMemberOrderByLastMessage(Member member);
+
 
 }
