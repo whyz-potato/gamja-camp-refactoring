@@ -12,6 +12,7 @@ import whyzpotato.gamjacamp.controller.dto.ChatDto.PrivateChatRequest;
 import whyzpotato.gamjacamp.controller.dto.ChatDto.PublicChatRequest;
 import whyzpotato.gamjacamp.controller.dto.ChatDto.SimpleChatDto;
 import whyzpotato.gamjacamp.domain.chat.Chat;
+import whyzpotato.gamjacamp.service.ChatMemberService;
 import whyzpotato.gamjacamp.service.ChatService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +25,7 @@ import javax.validation.Valid;
 public class ChatController {
 
     private final ChatService chatService;
+    private final ChatMemberService chatMemberService;
 
     @GetMapping("/csrf")
     public CsrfToken csrf(HttpServletRequest request) {
@@ -37,7 +39,7 @@ public class ChatController {
                                                @Valid @RequestBody PrivateChatRequest request) {
 
         Chat privateChat = chatService.createPrivateChat(member.getId(), request.getTo());
-        return ResponseEntity.ok(new SimpleChatDto(privateChat));
+        return ResponseEntity.ok(new SimpleChatDto(privateChat)); //TODO : 201 채팅 목록
 
     }
 
@@ -46,8 +48,14 @@ public class ChatController {
                                               @Valid @RequestBody PublicChatRequest request) {
 
         Chat publicChat = chatService.createPublicChat(member.getId(), request.getTitle(), request.getCapacity());
-        return ResponseEntity.ok(new SimpleChatDto(publicChat));
+        return ResponseEntity.ok(new SimpleChatDto(publicChat)); //TODO : 201 채팅 목록
 
+    }
+
+    @PostMapping("/{roomId}/members")
+    public ResponseEntity<?> enterChat(@LoginMember SessionMember member,
+                                       @PathVariable Long roomId){
+        return ResponseEntity.ok(chatService.enter(roomId, member.getId())); //TODO : 201 채팅 메세지 내역
     }
 
 }

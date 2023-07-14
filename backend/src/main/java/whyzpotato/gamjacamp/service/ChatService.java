@@ -27,5 +27,11 @@ public class ChatService {
         return chatRepository.save(Chat.createPrivateChat(host, customer));
     }
 
+    public Chat enter(Long chatId, Long memberId){
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
+        Member member = memberRepository.findById(memberId).get();
+        return chat.enter(member);
+    }
+
 
 }
