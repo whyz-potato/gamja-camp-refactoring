@@ -58,4 +58,13 @@ public class ChatController {
         return ResponseEntity.ok(chatService.enter(roomId, member.getId())); //TODO : 201 채팅 메세지 내역
     }
 
+    @PostMapping("/{roomId}/last-read/{messageId}")
+    public ResponseEntity<?> updateLastReadMessage(@LoginMember SessionMember member,
+                                            @PathVariable Long roomId,
+                                            @PathVariable Long messageId){
+
+        chatMemberService.updateLastReadMessage(roomId, member.getId(), messageId);
+        return ResponseEntity.ok().build();
+    }
+
 }
