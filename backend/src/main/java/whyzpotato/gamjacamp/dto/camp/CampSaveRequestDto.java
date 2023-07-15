@@ -17,6 +17,9 @@ public class CampSaveRequestDto {
     private String phone;
     private String campIntroduction;
 
+    public CampSaveRequestDto() {
+    }
+
     @Builder
     public CampSaveRequestDto(String name, String address, String phone, String campIntroduction) {
         this.name = name;

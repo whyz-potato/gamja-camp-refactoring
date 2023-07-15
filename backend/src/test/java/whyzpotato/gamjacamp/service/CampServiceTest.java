@@ -34,7 +34,7 @@ public class CampServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         CampSaveRequestDto campSaveRequestDto = CampSaveRequestDto.builder().name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").build();
 
-        Long campId = campService.register(member.getId(), campSaveRequestDto);
+        Long campId = campService.register(member.getId(), campSaveRequestDto, null);
 
         Optional<Camp> camp = campRepository.findById(campId);
         assertThat(camp.get().getMember().getId()).isEqualTo(member.getId());
@@ -95,17 +95,17 @@ public class CampServiceTest {
         System.out.println(updateCamp.get().getCampY());
     }
 
-    @Test
-    public void 캠핑장_운영시간변경() {
-        Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
-        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
-
-        campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
-
-        Optional<Camp> updateCamp = campRepository.findById(camp.getId());
-        assertThat(updateCamp.get().getCampOperationStart()).isEqualTo(LocalTime.of(11,0));
-        assertThat(updateCamp.get().getCampOperationEnd()).isEqualTo(LocalTime.of(22,30));
-    }
+//    @Test
+//    public void 캠핑장_운영시간변경() {
+//        Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
+//        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
+//
+//        campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
+//
+//        Optional<Camp> updateCamp = campRepository.findById(camp.getId());
+//        assertThat(updateCamp.get().getCampOperationStart()).isEqualTo(LocalTime.of(11,0));
+//        assertThat(updateCamp.get().getCampOperationEnd()).isEqualTo(LocalTime.of(22,30));
+//    }
 
     @Test
     public void 캠핑장_삭제() {
@@ -118,16 +118,28 @@ public class CampServiceTest {
         assertThat(deleteCamp.isPresent()).isFalse();
     }
 
+//    @Test
+//    public void 캠핑장_운영시간삭제() {
+//        Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
+//        Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
+//        campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
+//
+//        campService.deleteOperatingHours(member.getId(), camp.getId());
+//
+//        Optional<Camp> optionalCamp = campRepository.findById(camp.getId());
+//        assertThat(optionalCamp.get().getCampOperationStart()).isNull();
+//        assertThat(optionalCamp.get().getCampOperationEnd()).isNull();
+//    }
+
     @Test
-    public void 캠핑장_운영시간삭제() {
+    public void 캠핑장_운영시간() {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_OWNER).build());
         Camp camp = campRepository.save(Camp.builder().member(member).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").campX(126.1332152f).campY(92.1234455f).build());
-        campService.updateOperatingHours(member.getId(),  camp.getId(), 11, 0, 22, 30);
 
-        campService.deleteOperatingHours(member.getId(), camp.getId());
+        campRepository.save(campService.updateOperatingHour(camp, "18:00", "11:30"));
 
-        Optional<Camp> optionalCamp = campRepository.findById(camp.getId());
-        assertThat(optionalCamp.get().getCampOperationStart()).isNull();
-        assertThat(optionalCamp.get().getCampOperationEnd()).isNull();
+        Camp updateCamp = campRepository.findById(camp.getId()).get();
+        assertThat(updateCamp.getCampOperationStart()).isEqualTo(LocalTime.of(18,0));
+        assertThat(updateCamp.getCampOperationEnd()).isEqualTo(LocalTime.of(11,30));
     }
 }

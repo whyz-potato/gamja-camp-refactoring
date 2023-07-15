@@ -54,10 +54,12 @@ public class Camp {
     private List<Room> rooms = new ArrayList<Room>();
 
     // reviews
-    // images
+
+    @OneToMany(mappedBy = "camp")
+    private List<Image> images = new ArrayList<Image>();
 
     @Builder
-    public Camp(Member member, String name, String address, String phone, String campIntroduction, Float campX, Float campY, LocalTime campOperationStart, LocalTime campOperationEnd) {
+    public Camp(Member member, String name, String address, String phone, String campIntroduction, Float campX, Float campY, LocalTime campOperationStart, LocalTime campOperationEnd, List<Image> images) {
         this.member = member;
         this.name = name;
         this.address = address;
@@ -67,6 +69,7 @@ public class Camp {
         this.campY = campY;
         this.campOperationStart = campOperationStart;
         this.campOperationEnd = campOperationEnd;
+        this.images = images;
     }
 
     public Camp update(CampUpdateRequestDto campUpdateRequestDto) {

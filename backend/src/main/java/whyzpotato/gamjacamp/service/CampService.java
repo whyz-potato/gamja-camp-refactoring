@@ -6,11 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Coordinate;
+import whyzpotato.gamjacamp.domain.Image;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.dto.camp.CampDto;
 import whyzpotato.gamjacamp.dto.camp.CampSaveRequestDto;
 import whyzpotato.gamjacamp.dto.camp.CampUpdateRequestDto;
 import whyzpotato.gamjacamp.repository.CampRepository;
+import whyzpotato.gamjacamp.repository.ImageRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.RoomRepository;
 
@@ -21,6 +23,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -33,6 +36,7 @@ public class CampService {
     private final MemberRepository memberRepository;
     private final CampRepository campRepository;
     private final RoomRepository roomRepository;
+    private final ImageRepository imageRepository;
 
     /**
      * 캠핑장 주소 좌표 찾기
@@ -79,10 +83,15 @@ public class CampService {
     /**
      * 캠핑장 등록
      */
-    public Long register(Long memberId, CampSaveRequestDto campSaveRequestDto) {
+    public Long register(Long memberId, CampSaveRequestDto campSaveRequestDto, List<String> fileNameList) {
         Member member = memberRepository.findById(memberId).get();
         Coordinate coordinate = findCoordinate(campSaveRequestDto.getAddress());
-        return campRepository.save(campSaveRequestDto.toEntity(member, coordinate)).getId();
+        Camp camp = campRepository.save(campSaveRequestDto.toEntity(member, coordinate));
+        for(String fileName : fileNameList) {
+            String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
+            imageRepository.save(Image.builder().camp(camp).fileName(fileName).path(fileUrl).build());
+        }
+        return camp.getId();
     }
 
     /**
@@ -97,13 +106,14 @@ public class CampService {
 
     /**
      * 캠핑장 정보 수정
-     * 이름, 연락처, 설명
+     * 이름, 연락처, 설명, 운영시간
      */
     public CampDto updateCamp(Long memberId, Long campId, CampUpdateRequestDto campUpdateRequestDto) {
         Camp camp = campRepository.findById(campId).get();
         Member member = memberRepository.findById(memberId).get();
         if (camp.getMember().equals(member)) {
-            campRepository.save(camp.update(campUpdateRequestDto));
+            camp.update(campUpdateRequestDto);
+            campRepository.save(updateOperatingHour(camp,campUpdateRequestDto.getCampOperationStart(), campUpdateRequestDto.getCampOperationEnd()));
             return new CampDto(camp);
         }
         throw new NoSuchElementException();
@@ -124,16 +134,17 @@ public class CampService {
     }
 
     /**
-     * 캠핑장 운영시간 변경
+     * 캠핑장 이미지 변경
      */
-    public CampDto updateOperatingHours(Long memberId, Long campId, int startHours, int startMinutes, int endHours, int endMinutes) {
+    public CampDto updateCampImages(Long memberId, Long campId, List<String> fileNameList) {
         Camp camp = campRepository.findById(campId).get();
         Member member = memberRepository.findById(memberId).get();
         if (camp.getMember().equals(member)) {
-            LocalTime startTime = LocalTime.of(startHours, startMinutes);
-            LocalTime endTime = LocalTime.of(endHours, endMinutes);
-            campRepository.save(camp.updateOperatingHours(startTime, endTime));
-            return new CampDto(camp);
+            for(String fileName : fileNameList) {
+                String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
+                imageRepository.save(Image.builder().camp(camp).fileName(fileName).path(fileUrl).build());
+            }
+            return new CampDto(campRepository.findById(campId).get());
         }
         throw new NoSuchElementException();
     }
@@ -155,16 +166,67 @@ public class CampService {
         throw new NoSuchElementException();
     }
 
-    /**
-     * 캠핑장 운영시간 삭제
-     */
-    public void deleteOperatingHours(Long memberId, Long campId) {
+    protected Camp updateOperatingHour(Camp camp, String start, String end) {
+        if (start != null && end != null) {
+            LocalTime startTime = LocalTime.of(Integer.parseInt(start.substring(0, start.indexOf(":"))), Integer.parseInt(start.substring(start.indexOf(":")+1)));
+            LocalTime endTime = LocalTime.of(Integer.parseInt(end.substring(0, end.indexOf(":"))), Integer.parseInt(end.substring(end.indexOf(":")+1)));
+            camp.updateOperatingHours(startTime, endTime);
+        } else {
+            camp.updateOperatingHours(null, null);
+        }
+        return camp;
+    }
+
+    public List<Image> findCampImages(Long memberId, Long campId) {
         Camp camp = campRepository.findById(campId).get();
         Member member = memberRepository.findById(memberId).get();
         if (camp.getMember().equals(member)) {
-            campRepository.save(camp.updateOperatingHours(null, null));
-            return;
+            List<Image> images = imageRepository.findAllByCamp(camp);
+            return images;
         }
         throw new NoSuchElementException();
     }
+
+//    /**
+//     * 캠핑장 정보 수정
+//     * 이름, 연락처, 설명
+//     */
+//    public CampDto updateCamp(Long memberId, Long campId, CampUpdateRequestDto campUpdateRequestDto) {
+//        Camp camp = campRepository.findById(campId).get();
+//        Member member = memberRepository.findById(memberId).get();
+//        if (camp.getMember().equals(member)) {
+//            campRepository.save(camp.update(campUpdateRequestDto));
+//            return new CampDto(camp);
+//        }
+//        throw new NoSuchElementException();
+//    }
+
+//    /**
+//     * 캠핑장 운영시간 변경
+//     */
+//    public CampDto updateOperatingHours(Long memberId, Long campId, int startHours, int startMinutes, int endHours, int endMinutes) {
+//        Camp camp = campRepository.findById(campId).get();
+//        Member member = memberRepository.findById(memberId).get();
+//        if (camp.getMember().equals(member)) {
+//            LocalTime startTime = LocalTime.of(startHours, startMinutes);
+//            LocalTime endTime = LocalTime.of(endHours, endMinutes);
+//            campRepository.save(camp.updateOperatingHours(startTime, endTime));
+//            return new CampDto(camp);
+//        }
+//        throw new NoSuchElementException();
+//    }
+
+//    /**
+//     * 캠핑장 운영시간 삭제
+//     */
+//    public void deleteOperatingHours(Long memberId, Long campId) {
+//        Camp camp = campRepository.findById(campId).get();
+//        Member member = memberRepository.findById(memberId).get();
+//        if (camp.getMember().equals(member)) {
+//            campRepository.save(camp.updateOperatingHours(null, null));
+//            return;
+//        }
+//        throw new NoSuchElementException();
+//    }
+
 }
