@@ -50,7 +50,7 @@ public class PostServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.ROLE_CUSTOMER).build());
         GeneralPostSaveRequestDto generalPostSaveRequestDto = GeneralPostSaveRequestDto.builder().title("제목").content("내용").images(images).build();
 
-        Long postId = postService.saveGeneralPost(member.getId(), generalPostSaveRequestDto);
+        Long postId = postService.saveGeneralPost(member.getId(), generalPostSaveRequestDto, null);
 
         Post post = postRepository.findById(postId).get();
         assertThat(post.getWriter().getId()).isEqualTo(member.getId());
@@ -82,7 +82,7 @@ public class PostServiceTest {
     @Test
     void 자유게시판목록_없음() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<SimpleGeneralPostResponseDto> posts = postService.findGeneralPostList(23L, pageable);
+        Page<SimpleGeneralPostResponseDto> posts = postService.findGeneralPostList(23L);
         assertThat(posts.getContent()).isEmpty();
     }
 
@@ -114,19 +114,19 @@ public class PostServiceTest {
 
 
         System.out.println("Page1");
-        Page<SimpleGeneralPostResponseDto> posts = postService.findGeneralPostList(23L, pageable);
+        Page<SimpleGeneralPostResponseDto> posts = postService.findGeneralPostList(23L);
         for (SimpleGeneralPostResponseDto post : posts.getContent()) {
             System.out.println("[" + post.getId() + "] - " + post.getTitle());
         }
 
         System.out.println("Page2");
-        posts = postService.findGeneralPostList(13L, pageable);
+        posts = postService.findGeneralPostList(13L);
         for (SimpleGeneralPostResponseDto post : posts.getContent()) {
             System.out.println("[" + post.getId() + "] - " + post.getTitle());
         }
 
         System.out.println("Page3");
-        posts = postService.findGeneralPostList(3L, pageable);
+        posts = postService.findGeneralPostList(3L);
         for (SimpleGeneralPostResponseDto post : posts.getContent()) {
             System.out.println("[" + post.getId() + "] - " + post.getTitle());
         }
@@ -173,7 +173,7 @@ public class PostServiceTest {
         Post post = postRepository.save(Post.builder().writer(member).title("제목").content("내용").type(PostType.GENERAL).images(images).build());
         GeneralPostUpdateRequestDto generalPostUpdateRequestDto = GeneralPostUpdateRequestDto.builder().title("수정된제목").content("수정된내용").images(updateImages).build();
 
-        GeneralPostDto generalPostDto = postService.updateGeneralPost(member.getId(), post.getId(), generalPostUpdateRequestDto);
+        GeneralPostDto generalPostDto = postService.updateGeneralPost(member.getId(), post.getId(), generalPostUpdateRequestDto, null);
 
         assertThat(generalPostDto.getId()).isEqualTo(post.getId());
         assertThat(generalPostDto.getMemberId()).isEqualTo(member.getId());
@@ -226,13 +226,13 @@ public class PostServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         System.out.println("Page1");
-        Page<SimpleGeneralPostResponseDto> posts = postService.search(25L, "key", pageable);
+        Page<SimpleGeneralPostResponseDto> posts = postService.search(25L, "key");
         for (SimpleGeneralPostResponseDto post : posts.getContent()) {
             System.out.println("[" + post.getId() + "] - " + post.getTitle()+ " : " + post.getContent());
         }
 
         System.out.println("Page2");
-        posts = postService.search(6L, "key", pageable);
+        posts = postService.search(6L, "key");
         for (SimpleGeneralPostResponseDto post : posts.getContent()) {
             System.out.println("[" + post.getId() + "] - " + post.getTitle()+ " : " + post.getContent());
         }
