@@ -1,7 +1,6 @@
 package whyzpotato.gamjacamp.domain.chat;
 
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.BaseTimeEntity;
@@ -16,6 +15,7 @@ public class Message extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
+    @Column(name = "message_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,7 +29,6 @@ public class Message extends BaseTimeEntity {
     @Column(length = 1000)
     private String content;
 
-    @Builder
     public Message(Chat chat, Member from, String content) {
         this.chat = chat;
         this.from = from;

@@ -67,4 +67,16 @@ public class ChatController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{roomId}")
+    public ResponseEntity<?> getMassages(@LoginMember SessionMember member,
+                            @PathVariable Long roomId,
+                            @RequestParam(required = false) Long start){
+
+        if(start == null)
+            return ResponseEntity.ok(chatService.findMessages(roomId, member.getId()));
+
+        return ResponseEntity.ok(chatService.findMessages(roomId, member.getId(), start));
+
+    }
+
 }
