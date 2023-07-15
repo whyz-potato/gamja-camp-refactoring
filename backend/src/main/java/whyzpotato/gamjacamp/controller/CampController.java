@@ -31,9 +31,9 @@ public class CampController {
         return new ResponseEntity(new createdBodyDto(campService.register(memberId, requestDto, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
     }
 
-    @GetMapping("/v1/camp/{memberId}")
-    public ResponseEntity<CampDto> readCamp(@PathVariable("memberId") Long memberId) {
-        return new ResponseEntity<>(campService.findCamp(memberId), HttpStatus.OK);
+    @GetMapping("/v1/camp/{campId}")
+    public ResponseEntity<CampDto> detailCamp(@PathVariable("campId") Long campId) {
+        return new ResponseEntity<>(campService.findCamp(campId), HttpStatus.OK);
     }
 
     @PutMapping("/v1/camp/update/{memberId}/{campId}")

@@ -4,8 +4,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.Camp;
+import whyzpotato.gamjacamp.domain.Image;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,9 +23,10 @@ public class CampDto {
     private Float campY;
     private LocalTime campOperationStart;
     private LocalTime campOperationEnd;
+    private List<Image> images;
 
     @Builder
-    public CampDto(Long id, Long memberId, String name, String address, String phone, String campIntroduction, Float campX, Float campY, LocalTime campOperationStart, LocalTime campOperationEnd) {
+    public CampDto(Long id, Long memberId, String name, String address, String phone, String campIntroduction, Float campX, Float campY, LocalTime campOperationStart, LocalTime campOperationEnd, List<Image> images) {
         this.id = id;
         this.memberId = memberId;
         this.name = name;
@@ -34,6 +37,7 @@ public class CampDto {
         this.campY = campY;
         this.campOperationStart = campOperationStart;
         this.campOperationEnd = campOperationEnd;
+        this.images = images;
     }
 
     public CampDto(Camp camp) {
@@ -47,6 +51,7 @@ public class CampDto {
         this.campY = camp.getCampY();
         this.campOperationStart = camp.getCampOperationStart();
         this.campOperationEnd = camp.getCampOperationEnd();
+        this.images = camp.getImages();
     }
 
 }

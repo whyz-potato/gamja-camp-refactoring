@@ -98,8 +98,8 @@ public class CampService {
      * 캠핑장 정보 불러오기
      */
     @Transactional(readOnly = true)
-    public CampDto findCamp(Long memberId) {
-        Optional<Camp> optionalCamp = campRepository.findByMember(memberRepository.findById(memberId).get());
+    public CampDto findCamp(Long campId) {
+        Optional<Camp> optionalCamp = campRepository.findById(campId);
         Camp camp = optionalCamp.orElseThrow(() -> new NoSuchElementException("등록된 캠핑장이 없습니다."));
         return new CampDto(camp);
     }
