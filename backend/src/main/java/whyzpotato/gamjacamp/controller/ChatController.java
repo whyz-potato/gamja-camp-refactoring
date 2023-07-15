@@ -54,14 +54,14 @@ public class ChatController {
 
     @PostMapping("/{roomId}/members")
     public ResponseEntity<?> enterChat(@LoginMember SessionMember member,
-                                       @PathVariable Long roomId){
+                                       @PathVariable Long roomId) {
         return ResponseEntity.ok(chatService.enter(roomId, member.getId())); //TODO : 201 채팅 메세지 내역
     }
 
     @PostMapping("/{roomId}/last-read/{messageId}")
     public ResponseEntity<?> updateLastReadMessage(@LoginMember SessionMember member,
-                                            @PathVariable Long roomId,
-                                            @PathVariable Long messageId){
+                                                   @PathVariable Long roomId,
+                                                   @PathVariable Long messageId) {
 
         chatMemberService.updateLastReadMessage(roomId, member.getId(), messageId);
         return ResponseEntity.ok().build();
@@ -69,10 +69,10 @@ public class ChatController {
 
     @GetMapping("/{roomId}")
     public ResponseEntity<?> getMassages(@LoginMember SessionMember member,
-                            @PathVariable Long roomId,
-                            @RequestParam(required = false) Long start){
+                                         @PathVariable Long roomId,
+                                         @RequestParam(required = false) Long start) {
 
-        if(start == null)
+        if (start == null)
             return ResponseEntity.ok(chatService.findMessages(roomId, member.getId()));
 
         return ResponseEntity.ok(chatService.findMessages(roomId, member.getId(), start));
