@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.Image;
+import whyzpotato.gamjacamp.domain.post.Comment;
 import whyzpotato.gamjacamp.domain.post.Post;
 import whyzpotato.gamjacamp.domain.post.PostType;
 
@@ -19,6 +20,7 @@ public class GeneralPostDto {
     private String content;
     private PostType postType;
     private List<Image> images;
+    private List<Comment> comments;
 
     @Builder
     public GeneralPostDto(Long id, Long memberId, String title, String content, PostType postType, List<Image> images) {

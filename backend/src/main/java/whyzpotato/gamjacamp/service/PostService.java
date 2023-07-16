@@ -46,6 +46,7 @@ public class PostService {
 
     /**
      * 자유게시판 글 불러오기
+     * TODO comment list 조회
      */
     @Transactional(readOnly = true)
     public GeneralPostDto findGeneralPost(Long postId) {
