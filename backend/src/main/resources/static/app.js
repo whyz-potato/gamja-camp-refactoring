@@ -35,10 +35,10 @@ function connect() {
 //        });
 
         //여러개의 채팅방 구독(입장)
-        stompClient.subscribe('/topic/group-chat/1', function (message) {
+        stompClient.subscribe('/topic/1', function (message) {
             showMessages(JSON.parse(message.body).content); //json 으로 주고 받는 경우
         });
-        stompClient.subscribe('/topic/group-chat/2', function (message) {
+        stompClient.subscribe('/topic/2', function (message) {
             showMessages(JSON.parse(message.body).content); //json 으로 주고 받는 경우
         });
 
@@ -63,7 +63,7 @@ function sendMessage() {
 //    stompClient.send("/app/group-chat", {}, JSON.stringify({'content': $("#message").val()}));
 
     //JSON 으로 메세지 주고 받는 경우 & 채팅방 구별 o
-    stompClient.send("/app/group-chat/"+pubRoomId, {}, JSON.stringify({'content': $("#message").val()}));
+    stompClient.send("/app/"+pubRoomId, {}, JSON.stringify({'content': $("#message").val()}));
 }
 
 function showMessages(message) {
