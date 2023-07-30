@@ -3,6 +3,7 @@ package whyzpotato.gamjacamp.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import whyzpotato.gamjacamp.config.auth.LoginMemberArgumentResolver;
 
@@ -23,5 +24,15 @@ public class WebConfig implements WebMvcConfigurer {
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(loginMemberArgumentResolver);
     }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("*")
+//                .allowedOrigins("http://localhost:7777")
+//                .allowedOrigins("http://localhost:8080")
+                .allowedMethods("*")
+                .allowCredentials(true);
+    }
+
 
 }
