@@ -33,7 +33,7 @@ public class OAuthAttributes {
     }
 
     // OAuth2 에서 가져온 Map 형태의 데이터를 dto에 담아 반환
-    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes, String role) {
+    public static OAuthAttributes of(String registrationId, String userNameAttributeName, Map<String, Object> attributes, Role role) {
         log.info("로그인 시도 {}", attributes.get("email"));
 
         if ("naver".equals(registrationId))
@@ -44,18 +44,18 @@ public class OAuthAttributes {
     }
 
 
-    private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes, String role) {
+    private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes, Role role) {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
                 .picture((String) attributes.get("picture"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
-                .role(Role.valueOf(role))
+                .role(role)
                 .build();
     }
 
-    private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes, String role) {
+    private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes, Role role) {
 
         // 네이버로그인 API 명세 : response/{name, email, profile_image}
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
@@ -66,11 +66,11 @@ public class OAuthAttributes {
                 .picture((String) response.get("profile_image"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
-                .role(Role.valueOf(role))
+                .role(role)
                 .build();
     }
 
-    private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes, String role) {
+    private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes, Role role) {
 
         // 카카오로그인 API 명세 : kakao_account/profile/{profile_nickname, profile_image, account_email}
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
@@ -82,7 +82,7 @@ public class OAuthAttributes {
                 .picture((String) profile.get("thumbnail_image_url"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
-                .role(Role.valueOf(role))
+                .role(role)
                 .build();
     }
 
