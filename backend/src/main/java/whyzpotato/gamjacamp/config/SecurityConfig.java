@@ -58,9 +58,14 @@ public class SecurityConfig {
 
         http
                 .oauth2Login()//oauth2 설정
-                .loginPage("/login")//TODO ?type= 해결
+                .authorizationEndpoint().baseUri("/oauth2/authorization")
+                .and()
+                .redirectionEndpoint().baseUri("/login/oauth2/code/*")
+                .and()
                 .userInfoEndpoint()
-                .userService(customOAuth2UserService); // 소셜로그인 성공 후 조치
+                .userService(customOAuth2UserService) // 소셜로그인 성공 후 조치
+                .and()
+                .defaultSuccessUrl("http://localhost:7777", true);
 
         return http.build();
     }
