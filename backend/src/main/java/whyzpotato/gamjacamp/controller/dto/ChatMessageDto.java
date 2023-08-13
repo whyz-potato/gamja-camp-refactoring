@@ -13,7 +13,7 @@ import java.util.List;
 public class ChatMessageDto {
 
     @Data
-    public static class MessageTestDto {
+    public static class MessageDto {
         String content;
     }
 

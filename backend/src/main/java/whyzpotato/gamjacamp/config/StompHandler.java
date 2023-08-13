@@ -1,5 +1,6 @@
 package whyzpotato.gamjacamp.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -9,10 +10,18 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
+import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
+import whyzpotato.gamjacamp.service.ChatMemberService;
+
+import javax.servlet.http.HttpSession;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class StompHandler implements ChannelInterceptor {
+
+    private final ChatMemberService chatMemberService;
+    private final HttpSession httpSession;
 
 
 //    @Override
@@ -40,10 +49,11 @@ public class StompHandler implements ChannelInterceptor {
 //    }
 
     @Override
-    public Message<?> preSend(Message<?> message, MessageChannel channel){
+    public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
         StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         String sessionId = accessor.getSessionId();
+        String destination;
 
         switch (accessor.getCommand()) {
             case CONNECT:
@@ -53,17 +63,26 @@ public class StompHandler implements ChannelInterceptor {
                 log.debug("Stomp Log : Session {} disconnect", sessionId);
                 break;
             case SUBSCRIBE:
-                String destination = accessor.getDestination();
-                if(isIllegalDestination(destination)){
-                    log.debug("Stomp Log : Session {} subscribe destination {} fail", sessionId, destination);
+                destination = accessor.getDestination();
+                if (isIllegalDestination(destination)) {
+                    log.info("Stomp Subscribe Failed : Session {} tried subscription destination {}", sessionId, destination);
                     StompHeaderAccessor errorAccessor = StompHeaderAccessor.create(StompCommand.ERROR);
                     errorAccessor.setMessage("Illegal Subscription");
                     errorAccessor.setSessionId(accessor.getSessionId());
                     return MessageBuilder.createMessage(new byte[0], errorAccessor.getMessageHeaders());
                 }
-                log.debug("Stomp Log : Session {} subscribe destination {} success", sessionId, destination);
+                log.debug("Stomp Log : Session {} subscribed destination {}", sessionId, destination);
                 break;
             case SEND:
+                destination = accessor.getDestination();
+                if (isIllegalDestination(destination)) {
+                    log.info("Stomp Send Failed : Session {} tried sending messaged to illegal destination {}", sessionId, destination);
+                    StompHeaderAccessor errorAccessor = StompHeaderAccessor.create(StompCommand.ERROR);
+                    errorAccessor.setMessage("Illegal Sending");
+                    errorAccessor.setSessionId(accessor.getSessionId());
+                    return MessageBuilder.createMessage(new byte[0], errorAccessor.getMessageHeaders());
+                }
+                log.debug("Stomp Log : Session {} sent message to destination {}", sessionId, destination);
                 break;
 
         }
@@ -71,36 +90,18 @@ public class StompHandler implements ChannelInterceptor {
         return message;
     }
 
-    Boolean isIllegalDestination(String destination){
+    Boolean isIllegalDestination(String destination) {
 
         Long roomId;
-        try{
-             roomId = Long.parseLong(destination.replaceFirst("/topic/", ""));
-             //TODO db의 입장 내역 확인
-        }
-        catch (Exception e){
+        Long memberId = ((SessionMember) httpSession.getAttribute("member")).getId();
+
+        try {
+            roomId = Long.parseLong(destination.replaceFirst("/topic/", ""));
+            return !chatMemberService.isEnteredChat(roomId, memberId);
+        } catch (Exception e) {
             return true;
         }
-        return (roomId != 1L);
 
     }
-
-//    @Override
-//    public void postSend(Message<?> message, MessageChannel channel, boolean sent) {
-//        StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-//        String sessionId = accessor.getSessionId();
-//
-//        log.debug("postSend : command - {}, session - {}", accessor.getCommand().toString(), accessor.getSessionId());
-//
-//        switch (accessor.getCommand()) {
-//            case CONNECT:
-//                break;
-//            case DISCONNECT:
-//                log.debug("Disconnect Session {}", sessionId);
-//                break;
-//
-//        }
-//    }
-
 
 }

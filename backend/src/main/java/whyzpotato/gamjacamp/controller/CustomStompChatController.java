@@ -10,7 +10,7 @@ import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.MessageTestDto;
+import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.MessageDto;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -40,27 +40,28 @@ public class CustomStompChatController {
      */
     @MessageMapping("/group-chat")  // STOMP메세지의 헤더가 "/app/group-chat"로 시작하는 메세지를 처리
     @SendTo("/topic/group-chat") // 컨트롤러 처리 후 "/topic/group-chat" 을 처리하는 메세지 브로커에 ??? 전달
-    public MessageTestDto groupChat(@Payload MessageTestDto message) {
+    public MessageDto groupChat(@Payload MessageDto message) {
         String content = message.getContent();
         log.debug("message : {}", content);
         //message.setContent("???: " + content); //메세지 변경 가능
         return message;
     }
 
-    @MessageMapping("/{roomId}")  // STOMP메세지의 헤더가 "/app/{roomId}"로 시작하는 메세지를 처리
-    @SendTo("/topic/{roomId}") // 컨트롤러 처리 후 "/topic/group-chat" 을 처리하는 메세지 브로커에 ??? 전달
-    public MessageTestDto groupChatRoom(@Payload MessageTestDto message, @DestinationVariable String roomId) {
-        String content = message.getContent();
-        log.debug("roomId : {}, payload : {}, message : {}", roomId, message.toString(), content);
-        return message;
-    }
-
-    @GetMapping("/csrf")
-    public @ResponseBody CsrfToken csrf(HttpServletRequest request) {
-        CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
-        log.debug("csrf token : {}", csrf.getToken().toString());
-        return csrf;
-    }
+//    @MessageMapping("/{roomId}")  // STOMP메세지의 헤더가 "/app/{roomId}"로 시작하는 메세지를 처리
+//    @SendTo("/topic/{roomId}") // 컨트롤러 처리 후 "/topic/group-chat" 을 처리하는 메세지 브로커에 ??? 전달
+//    public MessageDto groupChatRoom(@Payload MessageDto message, @DestinationVariable String roomId) {
+//        String content = message.getContent();
+//        log.debug("roomId : {}, payload : {}, message : {}", roomId, message.toString(), content);
+//        return message;
+//    }
+//
+//    @GetMapping("/csrf")
+//    public @ResponseBody
+//    CsrfToken csrf(HttpServletRequest request) {
+//        CsrfToken csrf = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+//        log.debug("csrf token : {}", csrf.getToken().toString());
+//        return csrf;
+//    }
 
 
 }
