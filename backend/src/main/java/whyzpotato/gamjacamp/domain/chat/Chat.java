@@ -8,7 +8,6 @@ import whyzpotato.gamjacamp.domain.member.Member;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +32,8 @@ public class Chat {
     @Column(length = 20)
     private String title;
 
-    @Max(10) @Min(2)
+    @Max(10)
+    @Min(2)
     private int capacity;
 
     @OneToOne
@@ -73,7 +73,7 @@ public class Chat {
         this.capacity = capacity;
     }
 
-    public boolean isParticipant(Member member){
+    public boolean isParticipant(Member member) {
         List<Member> members = chatMemberList.stream().map(cm -> cm.getMember()).collect(Collectors.toList());
         return members.contains(member);
     }
@@ -81,10 +81,11 @@ public class Chat {
     public Chat enter(Member member) {
         if (this.capacity >= chatMemberList.size())
             throw new IllegalStateException();
-        if(isParticipant(member))
+        if (isParticipant(member))
             throw new IllegalStateException();
 
         chatMemberList.add(new ChatMember(this, member, this.title));
         return this;
     }
+
 }
