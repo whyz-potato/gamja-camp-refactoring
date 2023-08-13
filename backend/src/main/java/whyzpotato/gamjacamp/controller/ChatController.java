@@ -84,5 +84,14 @@ public class ChatController {
         return ResponseEntity.ok(chatService.findMessages(roomId, member.getId(), start));
 
     }
-    
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> chatList(@LoginMember SessionMember member) {
+
+        List<EnteredChat> chats = chatMemberService.enteredChatList(member.getId());
+        return ResponseEntity.ok(new HashMap<>() {{
+            put("chats", chats);
+        }});
+    }
+
 }

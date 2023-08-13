@@ -49,5 +49,9 @@ public class ChatMember extends BaseTimeEntity {
         this.title = title;
     }
 
+    public String getUsername() {
+        return this.member.getUsername();
+    }
+
 
 }
