@@ -6,15 +6,17 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.ChatDto.PrivateChatResponse;
+import whyzpotato.gamjacamp.controller.dto.ChatDto.PublicChatRequest;
+import whyzpotato.gamjacamp.controller.dto.ChatDto.PublicChatResponse;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.DetailMessageDto;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.MessageListDto;
 import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.chat.Message;
 import whyzpotato.gamjacamp.domain.member.Member;
+import whyzpotato.gamjacamp.domain.post.Post;
 import whyzpotato.gamjacamp.exception.NotFoundException;
-import whyzpotato.gamjacamp.repository.ChatRepository;
-import whyzpotato.gamjacamp.repository.MemberRepository;
-import whyzpotato.gamjacamp.repository.MessageRepository;
+import whyzpotato.gamjacamp.repository.*;
 
 @RequiredArgsConstructor
 @Service
@@ -24,19 +26,28 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
+    private final ChatMemberRepository chatMemberRepository;
+    private final PostRepository postRepository;
 
-    public Chat createPublicChat(Long hostId, String title, int capacity) {
-        Member host = memberRepository.findById(hostId).get();
-        return chatRepository.save(Chat.createPublicChat(host, title, capacity));
+
+    public PrivateChatResponse createPrivateChat(Long senderId, Long receiverId) {
+        Member sender = memberRepository.findById(senderId).get();
+        Member receiver = memberRepository.findById(receiverId).get();
+        Chat privateChat = chatRepository.save(Chat.createPrivateChat(sender, receiver));
+        return new PrivateChatResponse(privateChat, receiverId);
     }
 
-    public Chat createPrivateChat(Long hostId, Long customerId) {
+    public PublicChatResponse createPublicChat(Long hostId, PublicChatRequest request) {
         Member host = memberRepository.findById(hostId).get();
-        Member customer = memberRepository.findById(customerId).get();
-        return chatRepository.save(Chat.createPrivateChat(host, customer));
+        Post post = postRepository.findById(request.getPostId()).get();
+
+        Chat publicChat = chatRepository.save(Chat.createPublicChat(host, post.getTitle(), request.getCapacity()));
+
+        return new PublicChatResponse(publicChat, post.getId());
     }
 
-    public Chat enter(Long chatId, Long memberId) {
+
+    public Chat enterChat(Long chatId, Long memberId) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
         Member member = memberRepository.findById(memberId).get();
         return chat.enter(member);
@@ -47,7 +58,7 @@ public class ChatService {
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
         Member member = memberRepository.findById(memberId).get();
 
-        if (!chat.isParticipant(member)) {
+        if (!chatMemberRepository.existsByChatAndMember(chat, member)) {
             throw new NotFoundException();
         }
 
@@ -63,7 +74,7 @@ public class ChatService {
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
         Member member = memberRepository.findById(memberId).get();
 
-        if (!chat.isParticipant(member)) {
+        if (!chatMemberRepository.existsByChatAndMember(chat, member)) {
             throw new NotFoundException();
         }
 
