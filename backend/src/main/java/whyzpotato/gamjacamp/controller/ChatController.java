@@ -94,4 +94,12 @@ public class ChatController {
         }});
     }
 
+    @MessageMapping("/{roomId}")
+    @SendTo("/topic/{roomId}")
+    public DetailMessageDto messageSend(@LoginMember SessionMember member, @DestinationVariable Long roomId, @Payload MessageDto message) {
+
+        return messageService.createMessage(roomId, member.getId(), message.getContent());
+    }
+
+
 }
