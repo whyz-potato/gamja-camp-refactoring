@@ -27,7 +27,7 @@ public class WebSocketConfig extends AbstractSecurityWebSocketMessageBrokerConfi
                 .withSockJS(); //SockJS 라이브러리 확장
 
         // 실제 채팅 엔드포인트 등록 (authenticated)
-        registry.addEndpoint("/chats") // WebSocket handshake endpoint (HTTP URL)
+        registry.addEndpoint("/socket") // WebSocket handshake endpoint (HTTP URL)
                 .setAllowedOriginPatterns("*")
                 .withSockJS(); //SockJS 라이브러리 확장
 

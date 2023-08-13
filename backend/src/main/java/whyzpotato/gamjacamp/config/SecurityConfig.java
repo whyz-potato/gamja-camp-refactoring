@@ -32,9 +32,11 @@ public class SecurityConfig {
                         .ignoringAntMatchers("/prototype/**", "/chats/**"));
 
         //allow frame-option for sockJS
+//        http
+//                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions
+//                        .sameOrigin()))
         http
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions
-                        .sameOrigin()));
+                .headers().frameOptions().disable();
 
         http
                 .authorizeRequests()
@@ -50,7 +52,7 @@ public class SecurityConfig {
                 .antMatchers("/owner").hasRole(Role.OWNER.name())
                 .antMatchers("/csrf/**").authenticated() //csrf token for sock js & spring security
                 .antMatchers("/prototype/**").permitAll() //websocket test endpoint
-                .antMatchers("/chats/**").authenticated() //websocket endpoint
+                .antMatchers("/socket/**").authenticated() //websocket endpoint
                 .anyRequest().permitAll(); //TODO denyAll();
 
         http

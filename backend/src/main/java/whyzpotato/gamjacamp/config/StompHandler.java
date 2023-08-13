@@ -92,15 +92,17 @@ public class StompHandler implements ChannelInterceptor {
 
     Boolean isIllegalDestination(String destination) {
 
-        Long roomId;
-        Long memberId = ((SessionMember) httpSession.getAttribute("member")).getId();
+        return false;
 
-        try {
-            roomId = Long.parseLong(destination.replaceFirst("/topic/", ""));
-            return !chatMemberService.isEnteredChat(roomId, memberId);
-        } catch (Exception e) {
-            return true;
-        }
+//        Long roomId;
+//        Long memberId = ((SessionMember) httpSession.getAttribute("member")).getId();
+//
+//        try {
+//            roomId = Long.parseLong(destination.replaceFirst("/topic/", ""));
+//            return !chatMemberService.isEnteredChat(roomId, memberId);
+//        } catch (Exception e) {
+//            return true;
+//        }
 
     }
 
