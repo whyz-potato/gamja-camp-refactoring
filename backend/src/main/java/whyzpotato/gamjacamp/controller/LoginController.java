@@ -1,35 +1,57 @@
 package whyzpotato.gamjacamp.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
+import whyzpotato.gamjacamp.config.auth.LoginMember;
+import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.swing.text.html.parser.Entity;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
-@Controller
+@RestController
+//@CrossOrigin(origins = "http://localhost:7777", allowedHeaders = "*")
 public class LoginController {
 
     private final ClientRegistrationRepository clientRegistrationRepository;
+    private HashMap<String, String> paramRole = new HashMap<>() {{
+        put("C", "CUSTOMER");
+        put("c", "CUSTOMER");
+        put("O", "OWNER");
+        put("o", "OWNER");
+    }};
 
-
-    //TODO : 프론트 연결되면 clientRegistrationRepository에서 google/naver/kakao 키로 리턴
     @GetMapping("/login")
-    public String getLoginPage(Model model) {
-        Iterable<ClientRegistration> clientRegistrations = (Iterable<ClientRegistration>) clientRegistrationRepository;
+    public List<String> login(HttpSession httpSession, @RequestParam(required = false, defaultValue = "c") String type) {
 
-        Map<String, String> oauth2AuthenticationUrls = new HashMap<>();
-        clientRegistrations.forEach(registration ->
-                oauth2AuthenticationUrls.put(registration.getClientName(),
-                        "oauth2/authorization/" + registration.getRegistrationId()));
-        model.addAttribute("urls", oauth2AuthenticationUrls);
-        return "oauth_login";
+        log.debug("login controller");
+
+
+        //회원 구분 값이 잘못된 경우
+        String role = (String) Optional.ofNullable(paramRole.get(type))
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 인자"));
+
+        //회원 타입을 세션에 저장하여 회원가입시 role 구분이 가능하게 한다.
+        httpSession.setAttribute("type", role);
+
+        //TODO
+        //return oauth provider urls
+        return new ArrayList<String>(List.of("/oauth2/authorization/google", "/oauth2/authorization/naver", "/oauth2/authorization/kakao"));
+    }
+
+    @GetMapping("/login-member")
+    public ResponseEntity<?> loginMember(@LoginMember SessionMember member){
+        return ResponseEntity.ok(member);
     }
 
 }

@@ -1,11 +1,15 @@
 package whyzpotato.gamjacamp.domain;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import whyzpotato.gamjacamp.utils.Utils;
 
 import javax.persistence.*;
-import java.sql.Date;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,16 +22,29 @@ public class PeakPrice {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="room_id")
+    @JoinColumn(name = "room_id")
     private Room room;
 
-    @Column
-    private Integer peakPrice;
+    @Min(1)
+    private int peakPrice;
 
-    @Column
-    private Date peakStart;
+    @NotNull
+    private LocalDate peakStart;
 
-    @Column
-    private Date peakEnd;
+    @NotNull
+    private LocalDate peakEnd;
+
+    @Builder
+    public PeakPrice(Room room, Integer peakPrice, LocalDate peakStart, LocalDate peakEnd) {
+        this.room = room;
+        this.peakPrice = peakPrice;
+        this.peakStart = peakStart;
+        this.peakEnd = peakEnd;
+    }
+
+    public boolean isPeakDate(LocalDate date) {
+        return Utils.isBetween(date, peakStart, peakEnd);
+    }
+
 
 }
