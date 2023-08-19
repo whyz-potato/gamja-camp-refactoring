@@ -13,7 +13,7 @@ public class ChatMemberDto {
         private String username;
 
         public SimpleChatMember(ChatMember chatMember) {
-            this.id = chatMember.getId();
+            this.id = chatMember.getMember().getId();
             this.username = chatMember.getUsername();
         }
     }
@@ -23,14 +23,15 @@ public class ChatMemberDto {
         private Long roomId;
         private String title;
         private int nUnreadMessages;
-        private DetailMessageDto lastMessage;
+        private DetailMessageDto lastMessage = null;
         private int nParticipants;
 
         public EnteredChat(ChatMember chatMember, Long count) {
             this.roomId = chatMember.getChat().getId();
             this.title = chatMember.getTitle();
             this.nUnreadMessages = count.intValue();
-            this.lastMessage = new DetailMessageDto(chatMember.getLastReadMessage());
+            if(chatMember.getLastReadMessage()!=null)
+                this.lastMessage = new DetailMessageDto(chatMember.getLastReadMessage());
             this.nParticipants = chatMember.getChat().getChatMemberList().size();
         }
     }

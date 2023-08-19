@@ -56,10 +56,10 @@ public class Chat {
     }
 
     // camp host - camp customer
-    public static Chat createPrivateChat(Member host, Member customer) {
-        Chat chat = new Chat(host, "", 2);
-        chat.chatMemberList.add(new ChatMember(chat, host, customer.getUsername()));
-        chat.chatMemberList.add(new ChatMember(chat, customer, host.getUsername()));
+    public static Chat createPrivateChat(Member sender, Member receiver) {
+        Chat chat = new Chat(sender, receiver.getUsername(), 2);
+        chat.chatMemberList.add(new ChatMember(chat, sender, receiver.getUsername()));
+        chat.chatMemberList.add(new ChatMember(chat, receiver, sender.getUsername()));
         return chat;
     }
 
@@ -79,7 +79,7 @@ public class Chat {
     }
 
     public Chat enter(Member member) {
-        if (this.capacity >= chatMemberList.size())
+        if (this.capacity <= chatMemberList.size())
             throw new IllegalStateException();
         if (isParticipant(member))
             throw new IllegalStateException();
