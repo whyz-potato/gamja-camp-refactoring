@@ -3,6 +3,7 @@ package whyzpotato.gamjacamp.controller.dto;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.data.domain.Slice;
 import whyzpotato.gamjacamp.domain.chat.Message;
 import whyzpotato.gamjacamp.domain.member.Member;
@@ -21,6 +22,7 @@ public class ChatMessageDto {
     @NoArgsConstructor
     public static class MessageListDto {
 
+        @Accessors(fluent = true)
         private boolean hasNext;
         private int numberOfElements;
         private List<DetailMessageDto> messages;
@@ -54,17 +56,17 @@ public class ChatMessageDto {
             this.from = new Sender(message.getFrom());
         }
 
-        @Getter
-        @NoArgsConstructor
-        private static class Sender {
-            private Long id;
-            private String username;
+    }
 
-            public Sender(Member member) {
-                this.id = member.getId();
-                this.username = member.getUsername();
-            }
+    @Getter
+    @NoArgsConstructor
+    public static class Sender {
+        private Long id;
+        private String username;
 
+        public Sender(Member member) {
+            this.id = member.getId();
+            this.username = member.getUsername();
         }
 
     }
