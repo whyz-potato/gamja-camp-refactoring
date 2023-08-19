@@ -1,5 +1,6 @@
 package whyzpotato.gamjacamp.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class ChatMessageDto {
     public static class MessageListDto {
 
         @Accessors(fluent = true)
+        @JsonProperty("hasNext")
         private boolean hasNext;
         private int numberOfElements;
         private List<DetailMessageDto> messages;

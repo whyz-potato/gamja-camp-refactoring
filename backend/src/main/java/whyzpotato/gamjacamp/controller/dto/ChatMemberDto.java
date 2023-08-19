@@ -13,7 +13,7 @@ public class ChatMemberDto {
         private String username;
 
         public SimpleChatMember(ChatMember chatMember) {
-            this.id = chatMember.getId();
+            this.id = chatMember.getMember().getId();
             this.username = chatMember.getUsername();
         }
     }

@@ -1,6 +1,9 @@
 package whyzpotato.gamjacamp.controller.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.controller.dto.ChatMemberDto.SimpleChatMember;
 import whyzpotato.gamjacamp.domain.chat.Chat;
 
@@ -10,13 +13,16 @@ import java.util.stream.Collectors;
 
 public class ChatDto {
 
-    @Data
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PrivateChatRequest {
         @NotNull
         private Long to;
     }
 
-    @Data
+    @Getter
+    @NoArgsConstructor
     public static class PrivateChatResponse {
         private Long roomId;
         private Long to;
@@ -37,7 +43,9 @@ public class ChatDto {
         }
     }
 
-    @Data
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PublicChatRequest {
         @NotNull
         private Long postId;
@@ -45,7 +53,8 @@ public class ChatDto {
         private int capacity;
     }
 
-    @Data
+    @Getter
+    @NoArgsConstructor
     public static class PublicChatResponse {
         private Long roomId;
         private Long postId;

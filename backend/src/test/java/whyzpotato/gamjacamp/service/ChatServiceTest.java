@@ -85,13 +85,4 @@ class ChatServiceTest {
         });
     }
 
-    //TODO
-    @Test
-    void findMessages() {
-    }
-
-    //TODO
-    @Test
-    void findMessagesFromStart() {
-    }
 }
