@@ -79,9 +79,9 @@ public class ChatController {
                                          @RequestParam(required = false) Long start) {
 
         if (start == null)
-            return ResponseEntity.ok(chatService.findMessages(roomId, member.getId()));
+            return ResponseEntity.ok(messageService.findMessages(roomId, member.getId()));
 
-        return ResponseEntity.ok(chatService.findMessages(roomId, member.getId(), start));
+        return ResponseEntity.ok(messageService.findMessages(roomId, member.getId(), start));
 
     }
 
