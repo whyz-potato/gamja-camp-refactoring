@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.controller.dto.ChatDto.PrivateChatResponse;
+import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
 
@@ -22,6 +23,9 @@ class ChatServiceTest {
 
     @Autowired
     private ChatService chatService;
+
+    @Autowired
+    private ChatMemberService chatMemberService;
 
     @PersistenceContext
     private EntityManager em;
@@ -83,6 +87,27 @@ class ChatServiceTest {
         assertThrows(IllegalStateException.class, () -> {
             chatService.enterChat(chat.getRoomId(), host.getId());
         });
+    }
+
+    @Test
+    void isHost() {
+
+        PrivateChatResponse dto = chatService.createPrivateChat(host.getId(), receiver.getId());
+
+        assertThat(chatService.isHost(dto.getRoomId(), host.getId())).isEqualTo(true);
+        assertThat(chatService.isHost(dto.getRoomId(), receiver.getId())).isEqualTo(false);
+    }
+
+    @Test
+    void 채팅방삭제() {
+
+        PrivateChatResponse dto = chatService.createPrivateChat(host.getId(), receiver.getId());
+
+        chatService.removeChat(dto.getRoomId());
+
+        assertThat(em.find(Chat.class, dto.getRoomId())).isNull();
+        assertThat(chatMemberService.enteredChatList(host.getId())).isEmpty();
+
     }
 
 }

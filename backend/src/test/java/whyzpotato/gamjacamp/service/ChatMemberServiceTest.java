@@ -64,4 +64,27 @@ class ChatMemberServiceTest {
         assertThat(chatMemberService.enteredChatList(outsider.getId())).isEmpty();
 
     }
+
+    @Test
+    void 채팅방나가기_채팅방멤버목록() {
+
+        chat.enter(newParticipant);
+
+        chatMemberService.removeChatMember(chat.getId(), newParticipant.getId());
+
+        assertThat(chat.getChatMemberList().size()).isEqualTo(1);
+        assertThat(chat.getChatMemberList().get(0).getMember()).isEqualTo(host);
+    }
+
+    @Test
+    void 채팅방나가기_참여중인채팅방목록() {
+
+        chat.enter(newParticipant);
+
+        chatMemberService.removeChatMember(chat.getId(), newParticipant.getId());
+
+        assertThat(chatMemberService.enteredChatList(newParticipant.getId())).isEmpty();
+    }
+
+
 }

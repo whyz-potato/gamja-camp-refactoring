@@ -8,6 +8,7 @@ import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.chat.ChatMember;
 import whyzpotato.gamjacamp.domain.chat.Message;
 import whyzpotato.gamjacamp.domain.member.Member;
+import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.ChatMemberRepository;
 import whyzpotato.gamjacamp.repository.ChatRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
@@ -30,8 +31,8 @@ public class ChatMemberService {
     public void updateLastReadMessage(Long chatId, Long memberId, Long messageId) {
 
         Member member = memberRepository.findById(memberId).get();
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
-        Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException());
+        Chat chat = chatRepository.findById(chatId).orElseThrow(NotFoundException::new);
+        Message message = messageRepository.findById(messageId).orElseThrow(NotFoundException::new);
 
         ChatMember chatMember = chatMemberRepository.findByChatAndMember(chat, member).get();
         chatMember.updateLastReadMessage(message);
@@ -39,13 +40,17 @@ public class ChatMemberService {
     }
 
     public boolean isEnteredChat(Long chatId, Long memberId) {
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
-        Member member = memberRepository.findById(memberId).get();
+        Chat chat = chatRepository.findById(chatId).orElseThrow(NotFoundException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundException::new);
+        return chatMemberRepository.existsByChatAndMember(chat, member);
+    }
+
+    public boolean isEnteredChat(Chat chat, Member member) {
         return chatMemberRepository.existsByChatAndMember(chat, member);
     }
 
     public List<EnteredChat> enteredChatList(Long memberId) {
-        Member member = memberRepository.findById(memberId).get();
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundException::new);
 
         List<EnteredChat> chats = chatMemberRepository.findByMember(member)
                 .stream()
@@ -59,6 +64,17 @@ public class ChatMemberService {
                 })
                 .collect(Collectors.toList());
         return chats;
+    }
+
+    public void removeChatMember(Long chatId, Long memberId) {
+        Chat chat = chatRepository.findById(chatId).orElseThrow(NotFoundException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundException::new);
+
+        if (isEnteredChat(chat, member)) {
+            ChatMember chatMember = chatMemberRepository.findByChatAndMember(chat, member).get();
+            chat.getChatMemberList().remove(chatMember);
+            chatMemberRepository.delete(chatMember);
+        }
     }
 
 
