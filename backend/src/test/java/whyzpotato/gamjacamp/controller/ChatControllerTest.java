@@ -205,4 +205,19 @@ class ChatControllerTest {
                 .andDo(print());
 
     }
+
+    @Test
+    void 안읽은메세지() throws Exception {
+
+        Chat chat = Chat.createPrivateChat(sender, receiver);
+        em.persist(chat);
+
+        String uri = "/chats/num-unread";
+        session.setAttribute("member", new SessionMember(receiver));
+        mockMvc.perform(get(uri).session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("numUnread").value(0))
+                .andDo(print());
+
+    }
 }

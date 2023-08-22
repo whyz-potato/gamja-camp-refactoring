@@ -1,6 +1,7 @@
 package whyzpotato.gamjacamp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.controller.dto.ChatMemberDto.EnteredChat;
@@ -15,9 +16,11 @@ import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.MessageRepository;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -27,6 +30,9 @@ public class ChatMemberService {
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm:ss.SSSSSS");
+
 
     public void updateLastReadMessage(Long chatId, Long memberId, Long messageId) {
 
@@ -55,12 +61,14 @@ public class ChatMemberService {
         List<EnteredChat> chats = chatMemberRepository.findByMember(member)
                 .stream()
                 .map(cm -> {
-                    LocalDateTime after;
+                    LocalDateTime latest;
                     if (cm.getLastReadMessage() != null)
-                        after = cm.getLastReadMessage().getCreatedTime();
+                        latest = cm.getLastReadMessage().getCreatedTime();
                     else
-                        after = cm.getCreatedTime();
-                    return new EnteredChat(cm, messageRepository.countByCreatedTimeAfter(after));
+                        latest = cm.getCreatedTime();
+
+                    LocalDateTime formattedLatest = LocalDateTime.parse(latest.plusNanos(500).format(formatter), formatter);
+                    return new EnteredChat(cm, messageRepository.countByCreatedTimeAfter(cm.getChat(), formattedLatest));
                 })
                 .collect(Collectors.toList());
         return chats;
@@ -75,6 +83,28 @@ public class ChatMemberService {
             chat.getChatMemberList().remove(chatMember);
             chatMemberRepository.delete(chatMember);
         }
+    }
+
+
+    public int countUnreadMessages(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundException::new);
+
+        return chatMemberRepository.findByMember(member)
+                .stream()
+                .mapToInt(cm -> {
+                    LocalDateTime latest;
+                    if (cm.getLastReadMessage() != null)
+                        latest = cm.getLastReadMessage().getCreatedTime();
+                    else
+                        latest = cm.getCreatedTime();
+
+                    LocalDateTime formattedLatest = LocalDateTime.parse(latest.plusNanos(500).format(formatter), formatter);
+                    log.debug("latest : {}", latest);
+                    log.debug("time : {}", formattedLatest);
+
+                    return messageRepository.countByCreatedTimeAfter(cm.getChat(), formattedLatest).intValue();
+                }).sum();
+
     }
 
 

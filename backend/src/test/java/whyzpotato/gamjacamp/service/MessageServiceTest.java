@@ -1,5 +1,6 @@
 package whyzpotato.gamjacamp.service;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ class MessageServiceTest {
         em.persist(chat);
     }
 
+    @AfterEach
+    void tearDown() {
+        em.clear();
+    }
+
     @Test
     void createMessage() {
 
@@ -86,7 +92,6 @@ class MessageServiceTest {
         assertThat(slice.hasNext()).isEqualTo(false);
         assertThat(slice.getNumberOfElements()).isEqualTo(5);
         assertThat(slice.getMessages().get(0).getContent()).isEqualTo(fourth.getContent());
-
 
     }
 }

@@ -4,6 +4,8 @@ package whyzpotato.gamjacamp.repository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.chat.Message;
 
@@ -15,6 +17,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Slice<Message> findSliceByChatAndIdLessThanEqual(Chat chat, Long id, Pageable pageable);
 
-    Long countByCreatedTimeAfter(LocalDateTime lastReadDateTime);
+    @Query("select count(*) from Message m where m.chat = :chat and m.createdTime > :lastReadDateTime")
+    Long countByCreatedTimeAfter(@Param("chat") Chat chat, @Param("lastReadDateTime") LocalDateTime lastReadDateTime);
 
 }

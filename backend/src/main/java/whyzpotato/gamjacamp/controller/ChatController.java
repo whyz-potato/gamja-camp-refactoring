@@ -152,6 +152,14 @@ public class ChatController {
     }
 
 
+    @GetMapping("/num-unread")
+    public ResponseEntity<?> countUnreadMessages(@LoginMember SessionMember member) {
+        return ResponseEntity.ok(new HashMap<String, Object>() {{
+            put("numUnread", chatMemberService.countUnreadMessages(member.getId()));
+        }});
+    }
+
+
     @GetMapping("/test")
     public ResponseEntity<?> uriBuilderTest() {
         log.debug("fromCurrentRequest : {}", ServletUriComponentsBuilder.fromCurrentRequest().build().toUriString());
