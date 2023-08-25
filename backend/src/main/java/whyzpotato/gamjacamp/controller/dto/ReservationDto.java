@@ -1,5 +1,6 @@
 package whyzpotato.gamjacamp.controller.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampInfo;
@@ -63,6 +64,7 @@ public class ReservationDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReservationSimple {
         @NotNull
         private int numGuest;
@@ -73,7 +75,14 @@ public class ReservationDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ReservationRequest {
+
+        @NotNull
+        private Long campId;
+
+        @NotNull
+        private Long roomId;
 
         @NotNull
         private LocalDate checkIn;

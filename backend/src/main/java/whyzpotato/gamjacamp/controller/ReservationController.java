@@ -1,10 +1,10 @@
 package whyzpotato.gamjacamp.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import whyzpotato.gamjacamp.config.auth.LoginMember;
 import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
@@ -14,6 +14,7 @@ import whyzpotato.gamjacamp.service.ReservationService;
 import javax.validation.Valid;
 import java.net.URI;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 public class ReservationController {
@@ -24,20 +25,20 @@ public class ReservationController {
     @GetMapping("/reservations/{id}")
     public ReservationDetail reservationDetail(@LoginMember SessionMember sessionMember,
                                                @PathVariable Long id) {
-        return reservationService.findByIdAndMember(id, sessionMember.getId());
+        return reservationService.findReservation(id, sessionMember.getId());
     }
 
 
     @PostMapping("/reservations")
     public ResponseEntity<?> book(@LoginMember SessionMember sessionMember,
-                                  @RequestParam("camp") Long campId,
-                                  @RequestParam("room") Long roomId,
                                   @Valid @RequestBody ReservationRequest request) {
 
-        Long id = reservationService.createReservation(sessionMember.getId(), campId, roomId, request);
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(URI.create("/reservations/" + id));
-        return new ResponseEntity<>(httpHeaders, HttpStatus.FOUND);
+        Long id = reservationService.createReservation(sessionMember.getId(), request);
+        URI uri = ServletUriComponentsBuilder.fromUriString("/reservations")
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri();
+        return ResponseEntity.created(uri).build();
     }
 }

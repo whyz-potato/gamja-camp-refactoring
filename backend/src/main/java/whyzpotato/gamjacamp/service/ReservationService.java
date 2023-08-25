@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import whyzpotato.gamjacamp.controller.dto.ReservationDto;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
 import whyzpotato.gamjacamp.domain.Camp;
@@ -27,17 +26,10 @@ public class ReservationService {
     private final MemberService memberService;
     private final RoomService roomService;
 
-    public Reservation findById(Long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException());
-    }
-
     //RQ31 : 예약 상세 정보
-    public ReservationDetail findByIdAndMember(Long id, Long memberId) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException());
-
-        if(reservation.getMember().getId() != memberId)
+    public ReservationDetail findReservation(Long reservationId, Long memberId) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NotFoundException::new);
+        if (!reservation.getMember().getId().equals(memberId))
             throw new NotFoundException();
 
         return new ReservationDetail(reservation);
@@ -63,11 +55,12 @@ public class ReservationService {
 
     //RQ06 : 고객 예약
     @Transactional
-    public Long createReservation(Long memberId, Long campId, Long roomId, ReservationRequest request) {
+    public Long createReservation(Long memberId, ReservationRequest request) {
         Member member = memberService.findById(memberId);
-        Room room = roomService.findById(roomId);
+        Room room = roomService.findById(request.getRoomId());
         Camp camp = room.getCamp();
-        if(camp.getId()!=campId)
+
+        if (!camp.getId().equals(request.getCampId()))
             throw new IllegalArgumentException("잘못된 접근입니다.");
 
         Reservation reservation = Reservation.builder()

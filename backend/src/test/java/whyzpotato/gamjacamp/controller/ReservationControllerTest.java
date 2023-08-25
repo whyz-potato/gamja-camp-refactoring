@@ -1,55 +1,157 @@
 package whyzpotato.gamjacamp.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
-import whyzpotato.gamjacamp.repository.CampRepository;
-import whyzpotato.gamjacamp.service.MemberService;
-import whyzpotato.gamjacamp.service.ReservationService;
-import whyzpotato.gamjacamp.service.RoomService;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
+import whyzpotato.gamjacamp.controller.dto.MemberDto;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
+import whyzpotato.gamjacamp.domain.Camp;
+import whyzpotato.gamjacamp.domain.Reservation;
+import whyzpotato.gamjacamp.domain.Room;
+import whyzpotato.gamjacamp.domain.member.Member;
+import whyzpotato.gamjacamp.domain.member.Role;
 
-import static org.junit.jupiter.api.Assertions.*;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.time.LocalDate;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ReservationController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
 class ReservationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private MemberService memberService;
+    private MockHttpSession session;
 
-    @MockBean
-    private ReservationService reservationService;
+    @PersistenceContext
+    private EntityManager em;
 
-    @MockBean
-    private CampRepository campRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-    @MockBean
-    private RoomService roomService;
+    private Member host, customer, reservedCustomer;
+    private Camp camp;
+    private Room room;
+    private Reservation reservation1;
+    private int weekPrice = 30000, weekendPrice = 50000;
+
 
     @BeforeEach
     void setUp() {
 
+        session = new MockHttpSession();
+
+        host = new Member("a", "host", "p", Role.OWNER);
+        customer = new Member("a", "customer", "p", Role.CUSTOMER);
+        reservedCustomer = new Member("a", "reservedCustomer", "p", Role.CUSTOMER);
+        camp = Camp.builder()
+                .member(host).name("감자캠핑").address("서울특별시 광진구 동일로40길 25-1").phone("010-1234-1234").campIntroduction("캠프소개").longitude(126.1332152f).latitude(92.1234455)
+                .build();
+        room = Room.builder()
+                .camp(camp).name("typeA").weekPrice(weekPrice).weekendPrice(weekendPrice).cnt(2).capacity(2)
+                .build();
+
+        em.persist(host);
+        em.persist(customer);
+        em.persist(reservedCustomer);
+        em.persist(camp);
+        em.persist(room);
+
+        reservation1 = Reservation.builder()
+                .member(reservedCustomer)
+                .numGuest(2)
+                .stayStarts(LocalDate.of(2023, 8, 21))
+                .stayEnds(LocalDate.of(2023, 8, 23))
+                .camp(camp)
+                .room(room)
+                .prices(List.of(weekPrice, weekPrice))
+                .build();
+        em.persist(reservation1);
+        em.persist(Reservation.builder()
+                .member(reservedCustomer)
+                .numGuest(2)
+                .stayStarts(LocalDate.of(2023, 8, 26))
+                .stayEnds(LocalDate.of(2023, 8, 27))
+                .camp(camp)
+                .room(room)
+                .prices(List.of(weekendPrice))
+                .build());
+        em.persist(Reservation.builder()
+                .member(reservedCustomer)
+                .numGuest(2)
+                .stayStarts(LocalDate.of(2023, 9, 1))
+                .stayEnds(LocalDate.of(2023, 9, 3))
+                .camp(camp)
+                .room(room)
+                .prices(List.of(weekPrice, weekendPrice))
+                .build());
+
     }
 
-//    @Test
-//    public void reservationDetail(){
-//        when(service.greet()).thenReturn("Hello, Mock");
-//        this.mockMvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk())
-//                .andExpect(content().string(containsString("Hello, Mock")));
-//
-//    }
+    int getTodayPrice() {
+        if (LocalDate.now().getDayOfWeek().getValue() < 6)
+            return weekPrice;
+        return weekendPrice;
+    }
+
+    @AfterEach
+    void tearDown() {
+        em.clear();
+    }
+
 
     @Test
-    public void book(){
+    public void reservationDetail() throws Exception {
+
+        session.setAttribute("member", new SessionMember(reservedCustomer));
+
+
+        mockMvc.perform(get("/reservations/"+reservation1.getId()).session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.checkIn").value(reservation1.getStayStarts().toString()))
+                .andExpect(jsonPath("$.reservation.reservationDate").value(LocalDate.now().toString()))
+                .andExpect(jsonPath("$.guest.name").value(reservedCustomer.getUsername()))
+                .andDo(print());
+    }
+
+    @Test
+    public void book() throws Exception {
+
+        session.setAttribute("member", new SessionMember(customer));
+        String content = objectMapper.writeValueAsString(
+                new ReservationRequest(camp.getId(), room.getId(), LocalDate.now(), LocalDate.now().plusDays(1),
+                        new MemberDto.MemberSimple(customer),
+                        new ReservationDto.ReservationSimple(2, List.of(getTodayPrice()))));
+        System.out.println("content = " + content);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/reservations")
+                        .session(session)
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated())
+                .andExpect(redirectedUrlPattern("/reservations/*"))
+                .andDo(print());
+
 
     }
 

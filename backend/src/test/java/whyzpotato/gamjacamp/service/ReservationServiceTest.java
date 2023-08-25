@@ -1,12 +1,13 @@
 package whyzpotato.gamjacamp.service;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.MemberDto;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
 import whyzpotato.gamjacamp.domain.ReservationStatus;
@@ -47,6 +48,11 @@ class ReservationServiceTest {
         em.persist(room);
     }
 
+    @AfterEach
+    void tearDown() {
+        em.clear();
+    }
+
     @DisplayName("객실 예약 성공 -> 영속엔티티 생성")
     @Test
     public void reserve() {
@@ -58,6 +64,22 @@ class ReservationServiceTest {
 
         assertThat(reservation.getId()).isNotNull();
     }
+
+    @DisplayName("객실 예약 DTO 성공 -> 영속엔티티 생성")
+    @Test
+    public void reserveDto() {
+        LocalDate start = LocalDate.now(), end = LocalDate.now().plusDays(1);
+        List<Integer> prices = room.getPrices(start, end);
+        int numGuest = 2;
+        ReservationRequest dto = new ReservationRequest(camp.getId(), room.getId(), start, end, new MemberDto.MemberSimple(member), new ReservationDto.ReservationSimple(numGuest, List.copyOf(room.getPrices(start, end))));
+
+        Long reservationId = reservationService.createReservation(member.getId(), dto);
+
+        assertThat(reservationId).isNotNull();
+
+    }
+
+
 
     @DisplayName("객실 예약 성공 -> 정보 확인")
     @Test
