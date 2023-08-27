@@ -26,6 +26,9 @@ public class Chat {
     @JoinColumn(name = "member_id")
     private Member host;
 
+    @Enumerated(EnumType.STRING)
+    private ChatType type;
+
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
     private List<ChatMember> chatMemberList = new ArrayList<ChatMember>();
 
@@ -40,8 +43,9 @@ public class Chat {
     @JoinColumn(name = "last_message_id")
     private Message lastMessage = null;
 
-    private Chat(Member host, String title, int capacity) {
+    private Chat(Member host, ChatType type, String title, int capacity) {
         this.host = host;
+        this.type = type;
         this.title = title;
         this.capacity = capacity;
     }
@@ -50,14 +54,14 @@ public class Chat {
     public static Chat createPublicChat(Member host, String title, int capacity) {
         if (capacity > 10)
             throw new IllegalArgumentException();
-        Chat chat = new Chat(host, title, capacity);
+        Chat chat = new Chat(host, ChatType.GROUP, title, capacity);
         chat.chatMemberList.add(new ChatMember(chat, host, title));
         return chat;
     }
 
     // camp host - camp customer
     public static Chat createPrivateChat(Member sender, Member receiver) {
-        Chat chat = new Chat(sender, receiver.getUsername(), 2);
+        Chat chat = new Chat(sender, ChatType.SINGLE, receiver.getUsername(), 2);
         chat.chatMemberList.add(new ChatMember(chat, sender, receiver.getUsername()));
         chat.chatMemberList.add(new ChatMember(chat, receiver, sender.getUsername()));
         return chat;

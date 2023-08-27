@@ -23,8 +23,7 @@ import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,7 +55,6 @@ class ChatControllerTest {
         em.persist(receiver);
 
         session = new MockHttpSession();
-        session.setAttribute("member", new SessionMember(sender));
     }
 
     @AfterEach
@@ -70,6 +68,7 @@ class ChatControllerTest {
 
         String request = objectMapper.writeValueAsString(new ChatDto.PrivateChatRequest(receiver.getId()));
 
+        session.setAttribute("member", new SessionMember(sender));
         mockMvc.perform(post("/chats/single").session(session)
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -111,6 +110,7 @@ class ChatControllerTest {
         }
 
         String uri = String.format("/chats/%d", chat.getId());
+        session.setAttribute("member", new SessionMember(sender));
         mockMvc.perform(get(uri).session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("numberOfElements").value(10))
@@ -134,6 +134,7 @@ class ChatControllerTest {
         String fifthId = messages.get(5).getId().toString();
 
         String uri = String.format("/chats/%d", chat.getId());
+        session.setAttribute("member", new SessionMember(sender));
         mockMvc.perform(get(uri).session(session)
                         .param("start", fifthId))
                 .andExpect(status().isOk())
@@ -144,11 +145,79 @@ class ChatControllerTest {
 
     }
 
+
     @Test
-    void chatList() {
+    void 채팅방나가기() throws Exception {
+
+        Chat chat = Chat.createPrivateChat(sender, receiver);
+        em.persist(chat);
+
+        String uri = String.format("/chats/%d/members", chat.getId());
+        session.setAttribute("member", new SessionMember(receiver));
+        mockMvc.perform(delete(uri).session(session))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print());
+
+
     }
 
     @Test
-    void messageSend() {
+    void 채팅방나가기_방장() throws Exception {
+
+        Chat chat = Chat.createPrivateChat(sender, receiver);
+        em.persist(chat);
+
+        String uri = String.format("/chats/%d/members", chat.getId());
+        session.setAttribute("member", new SessionMember(sender));
+        mockMvc.perform(delete(uri).session(session))
+                .andExpect(status().is3xxRedirection())
+                .andDo(print());
+
+
+    }
+
+
+    @Test
+    void 채팅방삭제_방장() throws Exception {
+
+        Chat chat = Chat.createPrivateChat(sender, receiver);
+        em.persist(chat);
+
+        String uri = String.format("/chats/%d", chat.getId());
+        session.setAttribute("member", new SessionMember(sender));
+        mockMvc.perform(delete(uri).session(session))
+                .andExpect(status().is2xxSuccessful())
+                .andDo(print());
+
+    }
+
+
+    @Test
+    void 채팅방삭제_방장아님_실패() throws Exception {
+
+        Chat chat = Chat.createPrivateChat(sender, receiver);
+        em.persist(chat);
+
+        String uri = String.format("/chats/%d", chat.getId());
+        session.setAttribute("member", new SessionMember(receiver));
+        mockMvc.perform(delete(uri).session(session))
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+
+    }
+
+    @Test
+    void 안읽은메세지() throws Exception {
+
+        Chat chat = Chat.createPrivateChat(sender, receiver);
+        em.persist(chat);
+
+        String uri = "/chats/num-unread";
+        session.setAttribute("member", new SessionMember(receiver));
+        mockMvc.perform(get(uri).session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("numUnread").value(0))
+                .andDo(print());
+
     }
 }
