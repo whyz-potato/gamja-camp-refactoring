@@ -29,6 +29,7 @@ import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -117,6 +118,7 @@ class ReservationControllerTest {
     @AfterEach
     void tearDown() {
         em.clear();
+        session.clearAttributes();
     }
 
 
@@ -145,6 +147,7 @@ class ReservationControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/customer/reservations")
                         .session(session)
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
@@ -164,6 +167,7 @@ class ReservationControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/owner/reservations/status")
                         .session(session)
+                        .with(csrf())
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
