@@ -17,6 +17,57 @@ import static java.util.Optional.ofNullable;
 
 public class RoomDto {
 
+    @Getter
+    @NoArgsConstructor
+    public static class RoomSimple {
+        private Long id;
+        private String name;
+
+        public RoomSimple(Room room) {
+            this.id = room.getId();
+            this.name = room.getName();
+        }
+    }
+
+
+    @Getter
+    @NoArgsConstructor
+    public static class RoomReserved{
+        private Long id;
+        private String name;
+        private int capacity;
+        private List<String> images;
+
+        public RoomReserved(Room room) {
+            this.id = room.getId();
+            this.name = room.getName();
+            this.capacity = room.getCapacity();
+            //this.images = room.getImages(); //TODO 이미지
+
+        }
+    }
+
+
+    @Getter
+    @NoArgsConstructor
+    public static class RoomDetail {
+        private Long id;
+        private String name;
+        private int capacity;
+        private List<String> images;
+        private PriceDto priceDto;
+
+        public RoomDetail(Room room, LocalDate stayStarts, LocalDate stayEnds) {
+            this.id = room.getId();
+            this.name = room.getName();
+            this.capacity = room.getCapacity();
+            //this.images = room.getImages(); //TODO 이미지
+            this.priceDto = new PriceDto(room.getPrices(stayStarts, stayEnds));
+        }
+    }
+
+
+
 
     @Getter
     @NoArgsConstructor
@@ -73,19 +124,19 @@ public class RoomDto {
 
     @Getter
     @NoArgsConstructor
-    public static class RoomResponse {
+    public static class RoomSearchResponse {
 
         private String name;
         private List<Integer> prices;
         private int minPrice;
         private int capacity;
 
-        public RoomResponse(Room room) {
+        public RoomSearchResponse(Room room) {
             this.name = room.getName();
             this.capacity = room.getCapacity();
         }
 
-        public RoomResponse(Room room, LocalDate start, LocalDate end) {
+        public RoomSearchResponse(Room room, LocalDate start, LocalDate end) {
             this.name = room.getName();
             this.prices = room.getPrices(start, end);
             this.minPrice = Collections.min(prices);
@@ -109,6 +160,5 @@ public class RoomDto {
             this.stayStarts = ofNullable(stayStarts).orElse(LocalDate.now());
             this.stayEnds = ofNullable(stayStarts).orElse(LocalDate.now().plusDays(1));
         }
-
     }
 }

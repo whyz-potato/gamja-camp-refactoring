@@ -10,6 +10,7 @@ import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.controller.dto.camp.CampDto;
 import whyzpotato.gamjacamp.controller.dto.camp.CampSaveRequestDto;
 import whyzpotato.gamjacamp.controller.dto.camp.CampUpdateRequestDto;
+import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.RoomRepository;
@@ -167,5 +168,15 @@ public class CampService {
             return;
         }
         throw new NoSuchElementException();
+    }
+
+    /**
+     * @param campId
+     * @return camp
+     */
+    public Camp findById(Long campId){
+        return campRepository.findById(campId)
+                .orElseThrow(() -> new NotFoundException());
+
     }
 }

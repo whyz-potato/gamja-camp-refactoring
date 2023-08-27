@@ -37,7 +37,7 @@ public class Camp {
 
     @Column
     private String campIntroduction;
-
+    
     @Column(nullable = false)
     private double longitude;
 
@@ -53,9 +53,11 @@ public class Camp {
     @OneToMany(mappedBy="camp")
     private List<Room> rooms = new ArrayList<Room>();
 
-    // reviews
-    // images
+    @OneToMany(mappedBy="camp")
+    private List<Review> reviews = new ArrayList<>();
 
+    // images
+    
     @Builder
     public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd) {
         this.member = member;
@@ -88,4 +90,11 @@ public class Camp {
         this.campOperationEnd = end;
         return this;
     }
+    
+    public double getRate(){
+        return reviews.stream()
+                .mapToInt(r -> r.getRate())
+                .average().orElse(0);
+    }
+
 }
