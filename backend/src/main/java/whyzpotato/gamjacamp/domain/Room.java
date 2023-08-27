@@ -81,7 +81,7 @@ public class Room {
                 }
             }
             if (!isPeak) {
-                if ((date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.THURSDAY)) {
+                if ((date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY)) {
                     prices.add(weekendPrice);
                 } else {
                     prices.add(weekPrice);

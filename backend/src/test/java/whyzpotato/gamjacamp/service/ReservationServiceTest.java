@@ -1,6 +1,5 @@
 package whyzpotato.gamjacamp.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,9 @@ import whyzpotato.gamjacamp.domain.member.Role;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,18 +35,30 @@ class ReservationServiceTest {
     @PersistenceContext
     private EntityManager em;
 
-    private Member member;
+    private Member owner, customer;
     private Camp camp;
     private Room room;
+    private List<Reservation> reservations;
 
     @BeforeEach
     void setUp() {
-        member = Member.builder().account("account@mail.com").role(Role.OWNER).username("tester").picture("img").build();
-        em.persist(member);
-        camp = Camp.builder().member(member).name("tester camp").address("경기도 남양주시").longitude(1.1).latitude(1.1).build();
+        owner = Member.builder().account("owner@mail.com").role(Role.OWNER).username("owner").picture("img").build();
+        customer = Member.builder().account("customer@mail.com").role(Role.CUSTOMER).username("customer").picture("img").build();
+        camp = Camp.builder().member(owner).name("tester camp").address("경기도 남양주시").longitude(1.1).latitude(1.1).build();
+        room = Room.builder().camp(camp).name("room").cnt(4).capacity(3).weekendPrice(1000).weekPrice(1200).build();
+        em.persist(owner);
+        em.persist(customer);
         em.persist(camp);
-        room = Room.builder().camp(camp).name("room").cnt(2).capacity(3).weekendPrice(1000).weekPrice(1200).build();
         em.persist(room);
+
+        //Member member, Camp camp, Room room, int numGuest, LocalDate stayStarts, LocalDate stayEnds, List<Integer> prices
+        reservations = new ArrayList<>();
+        reservations.add(Reservation.builder().member(customer).camp(camp).room(room).numGuest(2).stayStarts(LocalDate.now()).stayEnds(LocalDate.now().plusDays(1)).prices(room.getPrices(LocalDate.now(), LocalDate.now().plusDays(1))).build());
+        reservations.add(Reservation.builder().member(customer).camp(camp).room(room).numGuest(2).stayStarts(LocalDate.now()).stayEnds(LocalDate.now().plusDays(3)).prices(room.getPrices(LocalDate.now(), LocalDate.now().plusDays(3))).build());
+        reservations.add(Reservation.builder().member(customer).camp(camp).room(room).numGuest(2).stayStarts(LocalDate.now()).stayEnds(LocalDate.now().plusDays(5)).prices(room.getPrices(LocalDate.now(), LocalDate.now().plusDays(5))).build());
+        for (Reservation reservation : reservations) {
+            em.persist(reservation);
+        }
     }
 
     @AfterEach
@@ -60,7 +73,7 @@ class ReservationServiceTest {
         List<Integer> prices = room.getPrices(start, end);
         int numGuest = 2;
 
-        Reservation reservation = reservationService.createReservation(member, camp, room, numGuest, start, end, prices);
+        Reservation reservation = reservationService.createReservation(customer, camp, room, numGuest, start, end, prices);
 
         assertThat(reservation.getId()).isNotNull();
     }
@@ -71,14 +84,13 @@ class ReservationServiceTest {
         LocalDate start = LocalDate.now(), end = LocalDate.now().plusDays(1);
         List<Integer> prices = room.getPrices(start, end);
         int numGuest = 2;
-        ReservationRequest dto = new ReservationRequest(camp.getId(), room.getId(), start, end, new MemberDto.MemberSimple(member), new ReservationDto.ReservationSimple(numGuest, List.copyOf(room.getPrices(start, end))));
+        ReservationRequest dto = new ReservationRequest(camp.getId(), room.getId(), start, end, new MemberDto.MemberSimple(customer), new ReservationDto.ReservationSimple(numGuest, List.copyOf(room.getPrices(start, end))));
 
-        Long reservationId = reservationService.createReservation(member.getId(), dto);
+        Long reservationId = reservationService.createReservation(customer.getId(), dto);
 
         assertThat(reservationId).isNotNull();
 
     }
-
 
 
     @DisplayName("객실 예약 성공 -> 정보 확인")
@@ -88,7 +100,7 @@ class ReservationServiceTest {
         List<Integer> prices = room.getPrices(start, end);
         int numGuest = 2;
 
-        Reservation reservation = reservationService.createReservation(member, camp, room, numGuest, start, end, prices);
+        Reservation reservation = reservationService.createReservation(customer, camp, room, numGuest, start, end, prices);
 
         assertThat(reservation.getPrice()).isEqualTo(prices.stream().mapToInt(Integer::intValue).sum());
         assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.PENDING);
@@ -98,7 +110,6 @@ class ReservationServiceTest {
     @Test
     public void reserve_fullReserve_fail() {
         //TODO
-        //illegalStatementException
 
     }
 
@@ -111,7 +122,7 @@ class ReservationServiceTest {
 
         //when - then
         assertThrows(IllegalArgumentException.class,
-                () -> reservationService.createReservation(member, camp, room, room.getCapacity() + 1, start, end, prices));
+                () -> reservationService.createReservation(customer, camp, room, room.getCapacity() + 1, start, end, prices));
     }
 
     @DisplayName("객실 예약 실패 <- 검색과 저장 사이에 가격변동이 발생한 경우 예약할 수 없다")
@@ -127,8 +138,36 @@ class ReservationServiceTest {
 
         //then
         assertThrows(IllegalStateException.class,
-                () -> reservationService.createReservation(member, camp, room, room.getCapacity() - 1, start, end, prices));
+                () -> reservationService.createReservation(customer, camp, room, room.getCapacity() - 1, start, end, prices));
 
+    }
+
+    @DisplayName("객실 예약 수락")
+    @Test
+    public void updateStatusBooked() {
+
+        List<Long> ids = reservations.stream()
+                .map(r -> r.getId())
+                .collect(Collectors.toList());
+
+        reservationService.updateStatus(owner.getId(), ReservationStatus.BOOKED, ids);
+
+        assertThat(reservations.get(2).getStatus()).isEqualTo(ReservationStatus.BOOKED);
+        assertThat(em.find(Reservation.class, reservations.get(0).getId()).getStatus()).isEqualTo(ReservationStatus.BOOKED);
+    }
+
+    @DisplayName("객실 예약 거절")
+    @Test
+    public void updateStatusCanceled() {
+
+        List<Long> ids = reservations.stream()
+                .map(r -> r.getId())
+                .collect(Collectors.toList());
+
+        reservationService.updateStatus(owner.getId(), ReservationStatus.CANCELED, ids);
+
+        assertThat(reservations.get(2).getStatus()).isEqualTo(ReservationStatus.CANCELED);
+        assertThat(em.find(Reservation.class, reservations.get(0).getId()).getStatus()).isEqualTo(ReservationStatus.CANCELED);
     }
 
 }

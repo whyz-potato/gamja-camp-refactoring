@@ -64,12 +64,21 @@ public class Reservation extends BaseTimeEntity {
         return new ReservationBuilder();
     }
 
-    public void cancel() {
+    public void cancel(Member requester) {
+        if (requester.equals(member)) {
+            if (LocalDate.now().isAfter(this.stayStarts.minusDays(3)))
+                throw new IllegalStateException("");
+        } else if (!requester.equals(camp.getMember())) {
+            throw new IllegalStateException();
+        }
         this.status = ReservationStatus.CANCELED;
     }
 
-    public void confirm() {
-        this.status = ReservationStatus.BOOKED;
+    public void confirm(Member requester){
+        if(requester.equals(camp.getMember()))
+            this.status = ReservationStatus.BOOKED;
+        else
+            throw new IllegalStateException();
     }
 
     public void complete() {

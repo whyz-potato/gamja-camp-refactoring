@@ -8,6 +8,7 @@ import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
+import whyzpotato.gamjacamp.domain.ReservationStatus;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.exception.NotFoundException;
@@ -15,6 +16,7 @@ import whyzpotato.gamjacamp.repository.ReservationRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -73,6 +75,26 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
         return reservation.getId();
+    }
+
+
+    @Transactional
+    public void updateStatus(Long memberId, ReservationStatus status, List<Long> reservationId) {
+
+        Member member = memberService.findById(memberId);
+        List<Reservation> reservations = reservationId.stream()
+                .map(id -> reservationRepository.findById(id).orElseThrow(NotFoundException::new))
+                .collect(Collectors.toList());
+
+        if (status.equals(ReservationStatus.BOOKED)) {
+            for (Reservation reservation : reservations) {
+                reservation.confirm(member);
+            }
+        } else if (status.equals(ReservationStatus.CANCELED)) {
+            for (Reservation reservation : reservations) {
+                reservation.cancel(member);
+            }
+        }
     }
 
 

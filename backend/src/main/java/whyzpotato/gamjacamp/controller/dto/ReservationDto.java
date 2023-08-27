@@ -7,6 +7,7 @@ import whyzpotato.gamjacamp.controller.dto.CampDto.CampInfo;
 import whyzpotato.gamjacamp.controller.dto.MemberDto.MemberSimple;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomReserved;
 import whyzpotato.gamjacamp.domain.Reservation;
+import whyzpotato.gamjacamp.domain.ReservationStatus;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public class ReservationDto {
         private Long id;
         private LocalDate reservationDate;
         private int numGuest;
-        private String status;
+        private ReservationStatus status;
         private LocalDate stayStarts;
         private LocalDate stayEnds;
         private int price;
@@ -33,7 +34,7 @@ public class ReservationDto {
             this.id = reservation.getId();
             this.reservationDate = reservation.getCreatedTime().toLocalDate();
             this.numGuest = reservation.getNumGuest();
-            this.status = reservation.getStatus().toString();
+            this.status = reservation.getStatus();
             this.stayStarts = reservation.getStayStarts();
             this.stayEnds = reservation.getStayEnds();
             this.price = reservation.getPrice();
@@ -96,6 +97,28 @@ public class ReservationDto {
         @NotNull
         private ReservationSimple reservation;
 
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class StatusMultipleRequest {
+        @NotNull
+        private Long camp;
+
+        @NotNull
+        private ReservationStatus status;
+
+        @NotNull
+        private List<Long> reservations;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class StatusRequest {
+        private Long reservation;
+        private ReservationStatus status;
     }
 
 

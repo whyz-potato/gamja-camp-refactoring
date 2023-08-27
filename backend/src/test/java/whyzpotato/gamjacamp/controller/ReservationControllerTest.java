@@ -16,8 +16,10 @@ import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.MemberDto;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto.StatusMultipleRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
+import whyzpotato.gamjacamp.domain.ReservationStatus;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
@@ -124,7 +126,7 @@ class ReservationControllerTest {
         session.setAttribute("member", new SessionMember(reservedCustomer));
 
 
-        mockMvc.perform(get("/reservations/"+reservation1.getId()).session(session))
+        mockMvc.perform(get("/customer/reservations/"+reservation1.getId()).session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.checkIn").value(reservation1.getStayStarts().toString()))
                 .andExpect(jsonPath("$.reservation.reservationDate").value(LocalDate.now().toString()))
@@ -140,19 +142,35 @@ class ReservationControllerTest {
                 new ReservationRequest(camp.getId(), room.getId(), LocalDate.now(), LocalDate.now().plusDays(1),
                         new MemberDto.MemberSimple(customer),
                         new ReservationDto.ReservationSimple(2, List.of(getTodayPrice()))));
-        System.out.println("content = " + content);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/reservations")
+        mockMvc.perform(MockMvcRequestBuilders.post("/customer/reservations")
                         .session(session)
                         .content(content)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isCreated())
-                .andExpect(redirectedUrlPattern("/reservations/*"))
+                .andExpect(redirectedUrlPattern("/customer/reservations/*"))
                 .andDo(print());
 
 
+    }
+
+    @Test
+    public void changeStatusConfirm() throws Exception {
+
+        session.setAttribute("member", new SessionMember(host));
+        String content = objectMapper.writeValueAsString(new StatusMultipleRequest(camp.getId(), ReservationStatus.BOOKED, List.of(reservation1.getId())));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/owner/reservations/status")
+                        .session(session)
+                        .content(content)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/owner/reservations"))
+                .andDo(print());
     }
 
 
