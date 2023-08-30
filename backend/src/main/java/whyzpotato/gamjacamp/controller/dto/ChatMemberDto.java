@@ -4,16 +4,20 @@ import lombok.Data;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.DetailMessageDto;
 import whyzpotato.gamjacamp.domain.chat.ChatMember;
 
+import java.util.List;
+
 public class ChatMemberDto {
 
     @Data
     public static class SimpleChatMember {
 
         private Long id;
+        private String picture;
         private String username;
 
         public SimpleChatMember(ChatMember chatMember) {
             this.id = chatMember.getMember().getId();
+            this.picture = chatMember.getMember().getPicture();
             this.username = chatMember.getUsername();
         }
     }
