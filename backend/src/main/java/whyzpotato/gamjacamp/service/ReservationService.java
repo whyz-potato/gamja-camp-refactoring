@@ -97,5 +97,14 @@ public class ReservationService {
         }
     }
 
+    @Transactional
+    public void cancel(Long memberId, Long reservationId){
+
+        Member member = memberService.findById(memberId);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NotFoundException::new);
+        reservation.cancel(member);
+
+    }
+
 
 }

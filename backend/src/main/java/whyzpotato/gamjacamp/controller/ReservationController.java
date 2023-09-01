@@ -54,5 +54,14 @@ public class ReservationController {
                 .location(URI.create("/owner/reservations")).build();
     }
 
+    @DeleteMapping("/customer/reservations/{id}")
+    public ResponseEntity cancelReservation(@LoginMember SessionMember sessionMember,
+                                            @PathVariable Long id){
+
+        reservationService.cancel(sessionMember.getId(), id);
+        return ResponseEntity.ok().build();
+
+    }
+
 
 }

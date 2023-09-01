@@ -53,7 +53,7 @@ class ReservationControllerTest {
     private Member host, customer, reservedCustomer;
     private Camp camp;
     private Room room;
-    private Reservation reservation1;
+    private Reservation reservation1, reservationAfterWeek;
     private int weekPrice = 30000, weekendPrice = 50000;
 
 
@@ -87,7 +87,17 @@ class ReservationControllerTest {
                 .room(room)
                 .prices(List.of(weekPrice, weekPrice))
                 .build();
+        reservationAfterWeek = Reservation.builder()
+                .member(reservedCustomer)
+                .numGuest(2)
+                .stayStarts(LocalDate.now().plusDays(7))
+                .stayEnds(LocalDate.now().plusDays(8))
+                .camp(camp)
+                .room(room)
+                .prices(List.of(weekPrice, weekPrice))
+                .build();
         em.persist(reservation1);
+        em.persist(reservationAfterWeek);
         em.persist(Reservation.builder()
                 .member(reservedCustomer)
                 .numGuest(2)
@@ -174,6 +184,34 @@ class ReservationControllerTest {
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/owner/reservations"))
+                .andDo(print());
+    }
+
+    @Test
+    public void cancel() throws Exception {
+
+        session.setAttribute("member", new SessionMember(reservedCustomer));
+        String url = "/customer/reservations/" + reservationAfterWeek.getId();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(url)
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    public void cancelFail() throws Exception {
+
+        session.setAttribute("member", new SessionMember(reservedCustomer));
+        String url = "/customer/reservations/" + reservation1.getId();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(url)
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().is4xxClientError())
                 .andDo(print());
     }
 

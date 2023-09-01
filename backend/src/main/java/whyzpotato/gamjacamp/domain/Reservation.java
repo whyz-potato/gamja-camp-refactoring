@@ -67,7 +67,7 @@ public class Reservation extends BaseTimeEntity {
     public void cancel(Member requester) {
         if (requester.equals(member)) {
             if (LocalDate.now().isAfter(this.stayStarts.minusDays(3)))
-                throw new IllegalStateException("");
+                throw new IllegalStateException("방문일이 3일 이내인 예약은 취소할 수 없습니다.");
         } else if (!requester.equals(camp.getMember())) {
             throw new IllegalStateException();
         }
