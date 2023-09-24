@@ -63,5 +63,14 @@ public class ReservationController {
 
     }
 
+    @GetMapping("/customer/reservations/my")
+    public ResponseEntity<?> reservationList(@LoginMember SessionMember sessionMember,
+                                             @RequestParam(required = false, defaultValue = "5") int limit,
+                                             @RequestParam(required = false, defaultValue = "0") int offset){
+
+        return ResponseEntity.ok(reservationService.findReservations(sessionMember.getId(), limit, offset));
+
+    }
+
 
 }

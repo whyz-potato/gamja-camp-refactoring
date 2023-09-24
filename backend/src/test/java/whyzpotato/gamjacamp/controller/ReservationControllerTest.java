@@ -215,5 +215,18 @@ class ReservationControllerTest {
                 .andDo(print());
     }
 
+    @Test void getReservationList() throws Exception{
+
+        session.setAttribute("member", new SessionMember(reservedCustomer));
+        String url = "/customer/reservations/my";
+
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
 
 }
