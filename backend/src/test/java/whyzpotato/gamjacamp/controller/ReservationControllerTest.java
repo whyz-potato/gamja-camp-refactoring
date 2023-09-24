@@ -85,7 +85,7 @@ class ReservationControllerTest {
                 .stayEnds(LocalDate.of(2023, 8, 23))
                 .camp(camp)
                 .room(room)
-                .prices(List.of(weekPrice, weekPrice))
+                .prices(room.getPrices(LocalDate.of(2023, 8, 21), LocalDate.of(2023, 8, 23)))
                 .build();
         reservationAfterWeek = Reservation.builder()
                 .member(reservedCustomer)
@@ -94,7 +94,7 @@ class ReservationControllerTest {
                 .stayEnds(LocalDate.now().plusDays(8))
                 .camp(camp)
                 .room(room)
-                .prices(List.of(weekPrice, weekPrice))
+                .prices(room.getPrices(LocalDate.now().plusDays(7), LocalDate.now().plusDays(8)))
                 .build();
         em.persist(reservation1);
         em.persist(reservationAfterWeek);
@@ -105,7 +105,7 @@ class ReservationControllerTest {
                 .stayEnds(LocalDate.of(2023, 8, 27))
                 .camp(camp)
                 .room(room)
-                .prices(List.of(weekendPrice))
+                .prices(room.getPrices(LocalDate.of(2023, 8, 26), LocalDate.of(2023, 8, 27)))
                 .build());
         em.persist(Reservation.builder()
                 .member(reservedCustomer)
@@ -114,7 +114,7 @@ class ReservationControllerTest {
                 .stayEnds(LocalDate.of(2023, 9, 3))
                 .camp(camp)
                 .room(room)
-                .prices(List.of(weekPrice, weekendPrice))
+                .prices(room.getPrices(LocalDate.of(2023, 9, 1), LocalDate.of(2023, 9, 3)))
                 .build());
 
     }
@@ -215,7 +215,8 @@ class ReservationControllerTest {
                 .andDo(print());
     }
 
-    @Test void getReservationList() throws Exception{
+    @Test
+    void getReservationList() throws Exception{
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
         String url = "/customer/reservations/my";
@@ -227,6 +228,5 @@ class ReservationControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
-
-
+    
 }
