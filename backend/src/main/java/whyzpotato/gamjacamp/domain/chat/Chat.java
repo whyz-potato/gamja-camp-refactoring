@@ -3,6 +3,7 @@ package whyzpotato.gamjacamp.domain.chat;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import whyzpotato.gamjacamp.domain.BaseTimeEntity;
 import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class Chat {
+public class Chat extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

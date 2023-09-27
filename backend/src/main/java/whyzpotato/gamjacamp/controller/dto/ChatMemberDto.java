@@ -3,6 +3,7 @@ package whyzpotato.gamjacamp.controller.dto;
 import lombok.Data;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.DetailMessageDto;
 import whyzpotato.gamjacamp.domain.chat.ChatMember;
+import whyzpotato.gamjacamp.domain.member.Member;
 
 import java.util.List;
 
@@ -20,6 +21,12 @@ public class ChatMemberDto {
             this.picture = chatMember.getMember().getPicture();
             this.username = chatMember.getUsername();
         }
+
+        public SimpleChatMember(Member member) {
+            this.id = member.getId();
+            this.picture = member.getPicture();
+            this.username = member.getUsername();
+        }
     }
 
     @Data
@@ -27,15 +34,14 @@ public class ChatMemberDto {
         private Long roomId;
         private String title;
         private int nUnreadMessages;
-        private DetailMessageDto lastMessage = null;
+        private DetailMessageDto lastMessage;
         private int nParticipants;
 
         public EnteredChat(ChatMember chatMember, Long count) {
             this.roomId = chatMember.getChat().getId();
             this.title = chatMember.getTitle();
             this.nUnreadMessages = count.intValue();
-            if(chatMember.getLastReadMessage()!=null)
-                this.lastMessage = new DetailMessageDto(chatMember.getLastReadMessage());
+            this.lastMessage = new DetailMessageDto(chatMember.getChat().getLastMessage());
             this.nParticipants = chatMember.getChat().getChatMemberList().size();
         }
     }

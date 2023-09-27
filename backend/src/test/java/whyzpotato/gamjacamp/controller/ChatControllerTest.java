@@ -3,6 +3,7 @@ package whyzpotato.gamjacamp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -217,6 +218,25 @@ class ChatControllerTest {
         mockMvc.perform(get(uri).session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("numUnread").value(0))
+                .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("채팅방 목록")
+    void chats() throws Exception {
+
+        Chat chat1 = Chat.createPrivateChat(sender, receiver);
+        Chat chat2 = Chat.createPublicChat(sender, "chat2", 10);
+        em.persist(chat1);
+        em.persist(chat2);
+
+        String uri = "/chats";
+        session.setAttribute("member", new SessionMember(sender));
+        mockMvc.perform(get(uri).session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("numberOfElements").value(6))
+                .andExpect(jsonPath("hasNext").value("false"))
                 .andDo(print());
 
     }
