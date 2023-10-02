@@ -139,7 +139,7 @@ class ChatControllerTest {
         mockMvc.perform(get(uri).session(session)
                         .param("start", fifthId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("numberOfElements").value(6))
+                .andExpect(jsonPath("numberOfElements").value(5))
                 .andExpect(jsonPath("hasNext").value("false"))
                 .andDo(print());
 

@@ -15,7 +15,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Slice<Message> findSliceByChat(Chat chat, Pageable pageable);
 
-    Slice<Message> findSliceByChatAndIdLessThanEqual(Chat chat, Long id, Pageable pageable);
+    Slice<Message> findSliceByChatAndIdLessThan(Chat chat, Long id, Pageable pageable);
 
     @Query("select count(*) from Message m where m.chat = :chat and m.createdTime > :lastReadDateTime")
     Long countByCreatedTimeAfter(@Param("chat") Chat chat, @Param("lastReadDateTime") LocalDateTime lastReadDateTime);
