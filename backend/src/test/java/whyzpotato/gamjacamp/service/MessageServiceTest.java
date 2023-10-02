@@ -72,7 +72,7 @@ class MessageServiceTest {
 
         assertThat(slice.hasNext()).isEqualTo(true);
         assertThat(slice.getNumberOfElements()).isEqualTo(10);
-        assertThat(slice.getMessages().get(0).getContent()).isEqualTo("20번 메세지");
+        assertThat(slice.getMessages().get(0).getContent()).isEqualTo("11번 메세지");
 
     }
 
@@ -87,11 +87,12 @@ class MessageServiceTest {
         }
 
         Message fourth = messages.get(4);
-
         ChatMessageDto.MessageListDto slice = messageService.findMessages(chat.getId(), host.getId(), fourth.getId());
+
         assertThat(slice.hasNext()).isEqualTo(false);
-        assertThat(slice.getNumberOfElements()).isEqualTo(5);
-        assertThat(slice.getMessages().get(0).getContent()).isEqualTo(fourth.getContent());
+        assertThat(slice.getNumberOfElements()).isEqualTo(4);
+        assertThat(slice.getMessages().get(0).getContent()).isEqualTo(messages.get(0).getContent());
+        assertThat(slice.getMessages().get(1).getContent()).isEqualTo(messages.get(1).getContent());
 
     }
 }

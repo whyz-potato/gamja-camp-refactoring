@@ -48,8 +48,8 @@ public class MessageService {
         }
 
         Slice<Message> slice = messageRepository.findSliceByChat(chat, pageRequest);
+//        slice.getContent().sort(Comparator.comparing(Message::getCreatedTime, Comparator.naturalOrder())); # E :UnmodifiableList.sort
         Slice<DetailMessageDto> result = slice.map(m -> new DetailMessageDto(m));
-
         return new MessageListDto(result);
     }
 
@@ -62,9 +62,8 @@ public class MessageService {
             throw new NotFoundException();
         }
 
-        Slice<Message> slice = messageRepository.findSliceByChatAndIdLessThanEqual(chat, start, pageRequest);
+        Slice<Message> slice = messageRepository.findSliceByChatAndIdLessThan(chat, start, pageRequest);
         Slice<DetailMessageDto> result = slice.map(m -> new DetailMessageDto(m));
-
         return new MessageListDto(result);
     }
 
