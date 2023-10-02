@@ -235,9 +235,51 @@ class ChatControllerTest {
         session.setAttribute("member", new SessionMember(sender));
         mockMvc.perform(get(uri).session(session))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("numberOfElements").value(6))
-                .andExpect(jsonPath("hasNext").value("false"))
+                .andExpect(jsonPath("$.chats").exists())
+                .andExpect(jsonPath("$.chats[0]").exists())
+                .andExpect(jsonPath("$.chats[1]").exists())
                 .andDo(print());
-
     }
+
+    @Test
+    @DisplayName("채팅방 목록 순서1_마지막메세지 역순, 채팅방 생성 역순")
+    void chatsSorted() throws Exception {
+
+        Chat chat1 = Chat.createPrivateChat(sender, receiver);
+        Chat chat2 = Chat.createPublicChat(sender, "chat2", 10);
+        em.persist(chat1);
+        em.persist(chat2);
+
+        String uri = "/chats";
+        session.setAttribute("member", new SessionMember(sender));
+        mockMvc.perform(get(uri).session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.chats").exists())
+                .andExpect(jsonPath("$.chats[0].title").value("chat2"))
+                .andExpect(jsonPath("$.chats[1].title").value("receiver"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("채팅방 목록 순서2_마지막메세지순,생성순")
+    void chatsSorted2() throws Exception {
+
+        Chat chat1 = Chat.createPrivateChat(sender, receiver);
+        Chat chat2 = Chat.createPublicChat(sender, "chat2", 10);
+        em.persist(chat1);
+        em.persist(chat2);
+        em.persist(new Message(chat1, sender, "hello"));
+
+
+        String uri = "/chats";
+        session.setAttribute("member", new SessionMember(sender));
+        mockMvc.perform(get(uri).session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.chats").exists())
+                .andExpect(jsonPath("$.chats[0].title").value("receiver"))
+                .andExpect(jsonPath("$.chats[1].title").value("chat2"))
+                .andDo(print());
+    }
+
+
 }

@@ -58,7 +58,7 @@ public class ChatMemberService {
     public List<EnteredChat> enteredChatList(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundException::new);
 
-        List<EnteredChat> chats = chatMemberRepository.findByMember(member)
+        List<EnteredChat> chats = chatMemberRepository.findByMemberOrderByChatLastModified(member)
                 .stream()
                 .map(cm -> {
                     LocalDateTime latest;
