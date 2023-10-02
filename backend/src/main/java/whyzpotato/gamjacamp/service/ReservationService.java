@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import whyzpotato.gamjacamp.domain.ReservationStatus;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.exception.NotFoundException;
+import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.ReservationRepository;
 
 import java.time.LocalDate;
@@ -31,6 +33,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final MemberService memberService;
     private final RoomService roomService;
+    private final CampRepository campRepository;
 
     //RQ31 : 예약 상세 정보
     public ReservationDetail findReservation(Long reservationId, Long memberId) {
@@ -111,9 +114,16 @@ public class ReservationService {
     }
 
 
-    public Page<ReservationInfo> findReservations(Long memberId, int limit, int offset) {
+    public Page<ReservationInfo> findReservations(Long memberId, Pageable pageable) {
         Member member = memberService.findById(memberId);
-        return reservationRepository.findByMember(member, PageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "stayStarts")))
+        return reservationRepository.findByMemberOrderByStayStartsDesc(member, pageable)
                 .map(ReservationInfo::new);
     }
+
+    public Page<ReservationInfo> findReservations(Long ownerId, ReservationStatus status, Pageable pageable) {
+        Camp camp = campRepository.findByMember(memberService.findById(ownerId)).orElseThrow(NotFoundException::new);
+        return reservationRepository.findByCampAndStatusOrderByStayStartsDesc(camp, status, pageable)
+                .map(ReservationInfo::new);
+    }
+
 }
