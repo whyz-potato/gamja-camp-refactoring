@@ -2,9 +2,13 @@ package whyzpotato.gamjacamp.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationInfo;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
@@ -97,5 +101,19 @@ public class ReservationService {
         }
     }
 
+    @Transactional
+    public void cancel(Long memberId, Long reservationId) {
 
+        Member member = memberService.findById(memberId);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(NotFoundException::new);
+        reservation.cancel(member);
+
+    }
+
+
+    public Page<ReservationInfo> findReservations(Long memberId, int limit, int offset) {
+        Member member = memberService.findById(memberId);
+        return reservationRepository.findByMember(member, PageRequest.of(offset, limit, Sort.by(Sort.Direction.DESC, "stayStarts")))
+                .map(ReservationInfo::new);
+    }
 }
