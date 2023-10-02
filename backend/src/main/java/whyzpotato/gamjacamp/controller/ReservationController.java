@@ -2,6 +2,7 @@ package whyzpotato.gamjacamp.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.StatusMultipleRequest;
+import whyzpotato.gamjacamp.domain.ReservationStatus;
 import whyzpotato.gamjacamp.service.ReservationService;
 
 import javax.validation.Valid;
@@ -56,7 +58,7 @@ public class ReservationController {
 
     @DeleteMapping("/customer/reservations/{id}")
     public ResponseEntity cancelReservation(@LoginMember SessionMember sessionMember,
-                                            @PathVariable Long id){
+                                            @PathVariable Long id) {
 
         reservationService.cancel(sessionMember.getId(), id);
         return ResponseEntity.ok().build();
@@ -65,10 +67,18 @@ public class ReservationController {
 
     @GetMapping("/customer/reservations/my")
     public ResponseEntity<?> reservationList(@LoginMember SessionMember sessionMember,
-                                             @RequestParam(required = false, defaultValue = "5") int limit,
-                                             @RequestParam(required = false, defaultValue = "0") int offset){
+                                             Pageable pageable) {
 
-        return ResponseEntity.ok(reservationService.findReservations(sessionMember.getId(), limit, offset));
+        return ResponseEntity.ok(reservationService.findReservations(sessionMember.getId(), pageable));
+
+    }
+
+    @GetMapping("/owner/reservations")
+    public ResponseEntity<?> campReservationList(@LoginMember SessionMember sessionMember,
+                                                 @RequestParam(value = "status") ReservationStatus status,
+                                                 Pageable pageable) {
+
+        return ResponseEntity.ok(reservationService.findReservations(sessionMember.getId(), status, pageable));
 
     }
 

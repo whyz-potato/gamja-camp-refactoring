@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.controller.dto.camp.CampUpdateRequestDto;
+import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="camp")
+@Table(name = "camp")
 public class Camp {
 
     @Id
@@ -23,7 +23,7 @@ public class Camp {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name="memberId")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Column(nullable = false)
@@ -37,7 +37,7 @@ public class Camp {
 
     @Column
     private String campIntroduction;
-    
+
     @Column(nullable = false)
     private double longitude;
 
@@ -50,14 +50,14 @@ public class Camp {
     @Column
     private LocalTime campOperationEnd;
 
-    @OneToMany(mappedBy="camp")
+    @OneToMany(mappedBy = "camp")
     private List<Room> rooms = new ArrayList<Room>();
 
-    @OneToMany(mappedBy="camp")
+    @OneToMany(mappedBy = "camp")
     private List<Review> reviews = new ArrayList<>();
 
     // images
-    
+
     @Builder
     public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd) {
         this.member = member;
@@ -90,8 +90,8 @@ public class Camp {
         this.campOperationEnd = end;
         return this;
     }
-    
-    public double getRate(){
+
+    public double getRate() {
         return reviews.stream()
                 .mapToInt(r -> r.getRate())
                 .average().orElse(0);

@@ -138,7 +138,7 @@ class ReservationControllerTest {
         session.setAttribute("member", new SessionMember(reservedCustomer));
 
 
-        mockMvc.perform(get("/customer/reservations/"+reservation1.getId()).session(session))
+        mockMvc.perform(get("/customer/reservations/" + reservation1.getId()).session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.checkIn").value(reservation1.getStayStarts().toString()))
                 .andExpect(jsonPath("$.reservation.reservationDate").value(LocalDate.now().toString()))
@@ -216,7 +216,7 @@ class ReservationControllerTest {
     }
 
     @Test
-    void getReservationList() throws Exception{
+    void getReservationList() throws Exception {
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
         String url = "/customer/reservations/my";
@@ -228,5 +228,43 @@ class ReservationControllerTest {
                 .andExpect(status().isOk())
                 .andDo(print());
     }
-    
+
+    @Test
+    void getPendingReservationList() throws Exception {
+
+        session.setAttribute("member", new SessionMember(host));
+        String url = "/owner/reservations";
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .param("status", "pending")
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].stayStarts").value(reservationAfterWeek.getStayStarts().toString()))
+                .andExpect(jsonPath("$.content[0].status").value("대기"))
+                .andDo(print());
+    }
+
+    @Test
+    void getBookedReservationList() throws Exception {
+
+        reservationAfterWeek.confirm(host);
+
+        session.setAttribute("member", new SessionMember(host));
+        String url = "/owner/reservations";
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .param("status", "booked")
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].stayStarts").value(reservationAfterWeek.getStayStarts().toString()))
+                .andExpect(jsonPath("$.content[0].status").value("확정"))
+                .andDo(print());
+    }
+
 }
