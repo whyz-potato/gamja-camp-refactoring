@@ -3,8 +3,7 @@ package whyzpotato.gamjacamp.controller.dto;
 import lombok.Data;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.DetailMessageDto;
 import whyzpotato.gamjacamp.domain.chat.ChatMember;
-
-import java.util.List;
+import whyzpotato.gamjacamp.domain.member.Member;
 
 public class ChatMemberDto {
 
@@ -20,23 +19,29 @@ public class ChatMemberDto {
             this.picture = chatMember.getMember().getPicture();
             this.username = chatMember.getUsername();
         }
+
+        public SimpleChatMember(Member member) {
+            this.id = member.getId();
+            this.picture = member.getPicture();
+            this.username = member.getUsername();
+        }
     }
 
     @Data
     public static class EnteredChat {
         private Long roomId;
         private String title;
-        private int nUnreadMessages;
+        private int numUnreadMessages;
         private DetailMessageDto lastMessage = null;
-        private int nParticipants;
+        private int numParticipants;
 
         public EnteredChat(ChatMember chatMember, Long count) {
             this.roomId = chatMember.getChat().getId();
             this.title = chatMember.getTitle();
-            this.nUnreadMessages = count.intValue();
-            if(chatMember.getLastReadMessage()!=null)
-                this.lastMessage = new DetailMessageDto(chatMember.getLastReadMessage());
-            this.nParticipants = chatMember.getChat().getChatMemberList().size();
+            this.numUnreadMessages = count.intValue();
+            if (chatMember.getChat().getLastMessage() != null)
+                this.lastMessage = new DetailMessageDto(chatMember.getChat().getLastMessage());
+            this.numParticipants = chatMember.getChat().getChatMemberList().size();
         }
     }
 

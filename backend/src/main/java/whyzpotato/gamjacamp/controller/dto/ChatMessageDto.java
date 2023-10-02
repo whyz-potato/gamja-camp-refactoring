@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springframework.data.domain.Slice;
+import whyzpotato.gamjacamp.controller.dto.ChatMemberDto.SimpleChatMember;
 import whyzpotato.gamjacamp.domain.chat.Message;
 import whyzpotato.gamjacamp.domain.member.Member;
 
@@ -49,29 +50,15 @@ public class ChatMessageDto {
         private Long id;
         private String content;
         private LocalDateTime time;
-        private Sender from;
+        private SimpleChatMember from;
 
         public DetailMessageDto(Message message) {
             this.id = message.getId();
             this.content = message.getContent();
             this.time = message.getCreatedTime();
-            this.from = new Sender(message.getFrom());
+            this.from = new SimpleChatMember(message.getFrom());
         }
 
     }
-
-    @Getter
-    @NoArgsConstructor
-    public static class Sender {
-        private Long id;
-        private String username;
-
-        public Sender(Member member) {
-            this.id = member.getId();
-            this.username = member.getUsername();
-        }
-
-    }
-
 
 }
