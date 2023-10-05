@@ -8,8 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationInfo;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationListItem;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
@@ -114,13 +116,13 @@ public class ReservationService {
     }
 
 
-    public Page<ReservationInfo> findReservations(Long memberId, Pageable pageable) {
+    public Page<ReservationListItem> findCustomerReservations(Long memberId, Pageable pageable) {
         Member member = memberService.findById(memberId);
         return reservationRepository.findByMemberOrderByStayStartsDesc(member, pageable)
-                .map(ReservationInfo::new);
+                .map(ReservationListItem::new);
     }
 
-    public Page<ReservationInfo> findReservations(Long ownerId, ReservationStatus status, Pageable pageable) {
+    public Page<ReservationInfo> findCampReservations(Long ownerId, ReservationStatus status, Pageable pageable) {
         Camp camp = campRepository.findByMember(memberService.findById(ownerId)).orElseThrow(NotFoundException::new);
         return reservationRepository.findByCampAndStatusOrderByStayStartsDesc(camp, status, pageable)
                 .map(ReservationInfo::new);

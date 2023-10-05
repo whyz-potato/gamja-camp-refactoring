@@ -2,16 +2,17 @@ package whyzpotato.gamjacamp.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import whyzpotato.gamjacamp.config.auth.LoginMember;
 import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
-import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
-import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
-import whyzpotato.gamjacamp.controller.dto.ReservationDto.StatusMultipleRequest;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto.*;
+import whyzpotato.gamjacamp.controller.dto.Utility.PageResult;
 import whyzpotato.gamjacamp.domain.ReservationStatus;
 import whyzpotato.gamjacamp.service.ReservationService;
 
@@ -67,19 +68,20 @@ public class ReservationController {
 
     @GetMapping("/customer/reservations/my")
     public ResponseEntity<?> reservationList(@LoginMember SessionMember sessionMember,
-                                             Pageable pageable) {
+                                             @PageableDefault(size = 10) Pageable pageable) {
 
-        return ResponseEntity.ok(reservationService.findReservations(sessionMember.getId(), pageable));
+        Page<ReservationListItem> customerReservations = reservationService.findCustomerReservations(sessionMember.getId(), pageable);
+        return ResponseEntity.ok(new PageResult(customerReservations));
 
     }
 
     @GetMapping("/owner/reservations")
     public ResponseEntity<?> campReservationList(@LoginMember SessionMember sessionMember,
                                                  @RequestParam(value = "status") ReservationStatus status,
-                                                 Pageable pageable) {
+                                                 @PageableDefault(size = 10) Pageable pageable) {
 
-        return ResponseEntity.ok(reservationService.findReservations(sessionMember.getId(), status, pageable));
-
+        Page<ReservationInfo> campReservations = reservationService.findCampReservations(sessionMember.getId(), status, pageable);
+        return ResponseEntity.ok(new PageResult(campReservations));
     }
 
 

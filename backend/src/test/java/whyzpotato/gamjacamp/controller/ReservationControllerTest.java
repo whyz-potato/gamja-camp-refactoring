@@ -226,6 +226,26 @@ class ReservationControllerTest {
                         .with(csrf())
                 )
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(4))
+                .andExpect(jsonPath("$.numberOfElements").value(4))
+                .andDo(print());
+    }
+
+    @Test
+    void getReservationPageableList() throws Exception {
+
+        session.setAttribute("member", new SessionMember(reservedCustomer));
+        String url = "/customer/reservations/my?page=1&size=3";
+
+        mockMvc.perform(MockMvcRequestBuilders.get(url)
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(4))
+                .andExpect(jsonPath("$.page").value(1))
+                .andExpect(jsonPath("$.size").value(3))
+                .andExpect(jsonPath("$.numberOfElements").value(1))
                 .andDo(print());
     }
 

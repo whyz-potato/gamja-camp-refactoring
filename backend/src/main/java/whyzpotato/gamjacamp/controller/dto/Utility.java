@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -38,5 +39,33 @@ public class Utility {
         private String description;
         private URI url;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PageResult<T> {
+        private int numberOfElements;
+        private long totalElements;
+        private int totalPages;
+        private int page;
+        private int size;
+        private long offset;
+        private boolean isFirst;
+        private boolean isLast;
+        private List<T> content;
+
+        public PageResult(Page<T> page) {
+            this.numberOfElements = page.getNumberOfElements();
+            this.totalElements = page.getTotalElements();
+            this.totalPages = page.getTotalPages();
+            this.page = page.getPageable().getPageNumber();
+            this.size = page.getPageable().getPageSize();
+            this.offset = page.getPageable().getOffset();
+            this.isFirst = page.isFirst();
+            this.isLast = page.isLast();
+            this.content = page.getContent();
+        }
+    }
+
 
 }
