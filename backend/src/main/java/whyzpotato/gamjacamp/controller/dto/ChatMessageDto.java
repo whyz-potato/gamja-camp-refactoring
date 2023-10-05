@@ -9,7 +9,8 @@ import org.springframework.data.domain.Slice;
 import whyzpotato.gamjacamp.controller.dto.ChatMemberDto.SimpleChatMember;
 import whyzpotato.gamjacamp.domain.chat.Message;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,16 +46,17 @@ public class ChatMessageDto {
 
         private Long id;
         private String content;
-        private LocalDateTime time;
+        private LocalDate date;
+        private LocalTime time;
         private SimpleChatMember from;
 
         public DetailMessageDto(Message message) {
             this.id = message.getId();
             this.content = message.getContent();
-            this.time = message.getCreatedTime();
+            this.date = message.getCreatedTime().toLocalDate();
+            this.time = message.getCreatedTime().toLocalTime();
             this.from = new SimpleChatMember(message.getFrom());
         }
-
     }
 
 }
