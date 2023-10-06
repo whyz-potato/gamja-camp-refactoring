@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampInfo;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampSimple;
 import whyzpotato.gamjacamp.controller.dto.MemberDto.MemberSimple;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomReserved;
+import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomSimple;
 import whyzpotato.gamjacamp.domain.Reservation;
 import whyzpotato.gamjacamp.domain.ReservationStatus;
 
@@ -40,6 +42,20 @@ public class ReservationDto {
             this.price = reservation.getPrice();
         }
 
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class ReservationListItem {
+        private CampSimple camp;
+        private RoomSimple room;
+        private ReservationInfo reservation;
+
+        public ReservationListItem(Reservation reservation) {
+            this.camp = new CampSimple(reservation.getCamp());
+            this.room = new RoomSimple(reservation.getRoom());
+            this.reservation = new ReservationInfo(reservation);
+        }
     }
 
     @Getter

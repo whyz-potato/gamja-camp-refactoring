@@ -8,8 +8,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationDetail;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationInfo;
+import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationListItem;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
@@ -20,8 +22,10 @@ import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.ReservationRepository;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -114,16 +118,28 @@ public class ReservationService {
     }
 
 
-    public Page<ReservationInfo> findReservations(Long memberId, Pageable pageable) {
+    public Page<ReservationListItem> findCustomerReservations(Long memberId, Pageable pageable) {
         Member member = memberService.findById(memberId);
         return reservationRepository.findByMemberOrderByStayStartsDesc(member, pageable)
-                .map(ReservationInfo::new);
+                .map(ReservationListItem::new);
     }
 
-    public Page<ReservationInfo> findReservations(Long ownerId, ReservationStatus status, Pageable pageable) {
+    public Page<ReservationInfo> findCampReservations(Long ownerId, ReservationStatus status, Pageable pageable) {
         Camp camp = campRepository.findByMember(memberService.findById(ownerId)).orElseThrow(NotFoundException::new);
         return reservationRepository.findByCampAndStatusOrderByStayStartsDesc(camp, status, pageable)
                 .map(ReservationInfo::new);
     }
+
+    public ReservationDetail findCampReservation(Long reservationId, Long ownerId){
+
+        //값이 있는 경우에는 -> 해당 예약을 조회할 수 있는 경우에만 값을 통과
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .filter(r -> r.getCamp().getMember().getId() == ownerId)
+                .orElseThrow(NotFoundException::new);
+
+        return new ReservationDetail(reservation);
+    }
+
+
 
 }

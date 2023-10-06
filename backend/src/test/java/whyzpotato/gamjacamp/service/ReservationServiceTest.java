@@ -172,7 +172,7 @@ class ReservationServiceTest {
 
     @DisplayName("객실 예약 취소")
     @Test
-    public void cancel(){
+    public void cancel() {
 
         Reservation reservationAfterWeek = reservations.get(2);
 
@@ -184,7 +184,7 @@ class ReservationServiceTest {
 
     @DisplayName("객실예약취소_3일이내_실패")
     @Test
-    public void cancelLate(){
+    public void cancelLate() {
 
         Reservation reservation = reservations.get(0);
 
@@ -193,4 +193,17 @@ class ReservationServiceTest {
 
     }
 
+
+    @DisplayName("캠핑주인 예약상세조회")
+    @Test
+    public void campReservation() {
+
+        Reservation reservation = reservations.get(0);
+
+        ReservationDto.ReservationDetail detail = reservationService.findCampReservation(reservation.getId(), owner.getId());
+
+        assertThat(detail.getReservation().getStatus()).isEqualTo(reservation.getStatus());
+        assertThat(detail.getCamp().getName()).isEqualTo(camp.getName());
+        assertThat(detail.getRoom().getName()).isEqualTo(room.getName());
+    }
 }
