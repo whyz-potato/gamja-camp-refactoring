@@ -22,8 +22,10 @@ import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.ReservationRepository;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -127,5 +129,17 @@ public class ReservationService {
         return reservationRepository.findByCampAndStatusOrderByStayStartsDesc(camp, status, pageable)
                 .map(ReservationInfo::new);
     }
+
+    public ReservationDetail findCampReservation(Long reservationId, Long ownerId){
+
+        //값이 있는 경우에는 -> 해당 예약을 조회할 수 있는 경우에만 값을 통과
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .filter(r -> r.getCamp().getMember().getId() == ownerId)
+                .orElseThrow(NotFoundException::new);
+
+        return new ReservationDetail(reservation);
+    }
+
+
 
 }

@@ -16,10 +16,8 @@ import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.MemberDto;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto;
 import whyzpotato.gamjacamp.controller.dto.ReservationDto.ReservationRequest;
-import whyzpotato.gamjacamp.controller.dto.ReservationDto.StatusMultipleRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
-import whyzpotato.gamjacamp.domain.ReservationStatus;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
@@ -27,6 +25,7 @@ import whyzpotato.gamjacamp.domain.member.Role;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -173,7 +172,14 @@ class ReservationControllerTest {
     public void changeStatusConfirm() throws Exception {
 
         session.setAttribute("member", new SessionMember(host));
-        String content = objectMapper.writeValueAsString(new StatusMultipleRequest(camp.getId(), ReservationStatus.BOOKED, List.of(reservation1.getId())));
+
+//        String content = objectMapper.writeValueAsString(new StatusMultipleRequest(camp.getId(), ReservationStatus.BOOKED, List.of(reservation1.getId())));
+
+        HashMap<String, Object> request = new HashMap<>();
+        request.put("camp", camp.getId());
+        request.put("status", "confirm");
+        request.put("reservations", List.of(reservation1.getId()));
+        String content = objectMapper.writeValueAsString(request);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/owner/reservations/status")
                         .session(session)
@@ -285,6 +291,44 @@ class ReservationControllerTest {
                 .andExpect(jsonPath("$.content[0].stayStarts").value(reservationAfterWeek.getStayStarts().toString()))
                 .andExpect(jsonPath("$.content[0].status").value("확정"))
                 .andDo(print());
+    }
+
+    @Test
+    void getCampReservationDetail() throws Exception {
+
+        session.setAttribute("member", new SessionMember(host));
+        String url = "/owner/reservations/" + reservation1.getId();
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.checkIn").exists())
+                .andExpect(jsonPath("$.guest").exists())
+                .andExpect(jsonPath("$.camp").exists())
+                .andExpect(jsonPath("$.room").exists())
+                .andExpect(jsonPath("$.guest.name").value(reservedCustomer.getUsername()))
+                .andExpect(jsonPath("$.room.name").value(room.getName()))
+                .andDo(print());
+
+    }
+
+    @Test
+    void getCampReservation_NotHost_Fail() throws Exception {
+
+        session.setAttribute("member", new SessionMember(reservedCustomer));
+        String url = "/owner/reservations/" + reservation1.getId();
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(url)
+                        .session(session)
+                        .with(csrf())
+                )
+                .andExpect(status().is4xxClientError())
+                .andDo(print());
+
     }
 
 }

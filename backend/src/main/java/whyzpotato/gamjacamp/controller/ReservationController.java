@@ -47,15 +47,6 @@ public class ReservationController {
         return ResponseEntity.created(uri).build();
     }
 
-    @PostMapping("/owner/reservations/status")
-    public ResponseEntity changeReservationStatus(@LoginMember SessionMember sessionMember,
-                                                  @Valid @RequestBody StatusMultipleRequest request) {
-
-        reservationService.updateStatus(sessionMember.getId(), request.getStatus(), request.getReservations());
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .location(URI.create("/owner/reservations")).build();
-    }
 
     @DeleteMapping("/customer/reservations/{id}")
     public ResponseEntity cancelReservation(@LoginMember SessionMember sessionMember,
@@ -84,5 +75,21 @@ public class ReservationController {
         return ResponseEntity.ok(new PageResult(campReservations));
     }
 
+    @GetMapping("/owner/reservations/{id}")
+    public ResponseEntity<?> campReservationDetail(@LoginMember SessionMember sessionMember,
+                                                   @PathVariable Long id) {
+
+        return ResponseEntity.ok(reservationService.findCampReservation(id, sessionMember.getId()));
+    }
+
+    @PostMapping("/owner/reservations/status")
+    public ResponseEntity changeReservationStatus(@LoginMember SessionMember sessionMember,
+                                                  @Valid @RequestBody StatusMultipleRequest request) {
+
+        reservationService.updateStatus(sessionMember.getId(), request.getStatus(), request.getReservations());
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .location(URI.create("/owner/reservations")).build();
+    }
 
 }
