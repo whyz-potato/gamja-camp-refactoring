@@ -8,9 +8,9 @@ import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Coordinate;
 import whyzpotato.gamjacamp.domain.Image;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.dto.camp.CampDto;
-import whyzpotato.gamjacamp.dto.camp.CampSaveRequestDto;
-import whyzpotato.gamjacamp.dto.camp.CampUpdateRequestDto;
+import whyzpotato.gamjacamp.dto.camp.CampDto.CampDetail;
+import whyzpotato.gamjacamp.dto.camp.CampDto.CampSaveRequest;
+import whyzpotato.gamjacamp.dto.camp.CampDto.CampUpdateRequest;
 import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.ImageRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
@@ -83,10 +83,12 @@ public class CampService {
     /**
      * 캠핑장 등록
      */
-    public Long register(Long memberId, CampSaveRequestDto campSaveRequestDto, List<String> fileNameList) {
+    public Long register(Long memberId, CampSaveRequest request, List<String> fileNameList) {
         Member member = memberRepository.findById(memberId).get();
-        Coordinate coordinate = findCoordinate(campSaveRequestDto.getAddress());
-        Camp camp = campRepository.save(campSaveRequestDto.toEntity(member, coordinate));
+        Coordinate coordinate = findCoordinate(request.getAddress());
+        Camp camp = campRepository.save(request.toEntity(member, coordinate));
+        if (fileNameList == null)
+            return camp.getId();
         for(String fileName : fileNameList) {
             String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
             imageRepository.save(Image.builder().camp(camp).fileName(fileName).path(fileUrl).build());
@@ -98,23 +100,23 @@ public class CampService {
      * 캠핑장 정보 불러오기
      */
     @Transactional(readOnly = true)
-    public CampDto findCamp(Long campId) {
+    public CampDetail findCamp(Long campId) {
         Optional<Camp> optionalCamp = campRepository.findById(campId);
         Camp camp = optionalCamp.orElseThrow(() -> new NoSuchElementException("등록된 캠핑장이 없습니다."));
-        return new CampDto(camp);
+        return new CampDetail(camp);
     }
 
     /**
      * 캠핑장 정보 수정
      * 이름, 연락처, 설명, 운영시간
      */
-    public CampDto updateCamp(Long memberId, Long campId, CampUpdateRequestDto campUpdateRequestDto) {
+    public CampDetail updateCamp(Long memberId, Long campId, CampUpdateRequest request) {
         Camp camp = campRepository.findById(campId).get();
         Member member = memberRepository.findById(memberId).get();
         if (camp.getMember().equals(member)) {
-            camp.update(campUpdateRequestDto);
-            campRepository.save(updateOperatingHour(camp,campUpdateRequestDto.getCampOperationStart(), campUpdateRequestDto.getCampOperationEnd()));
-            return new CampDto(camp);
+            camp.update(request);
+            campRepository.save(updateOperatingHour(camp,request.getCampOperationStart(), request.getCampOperationEnd()));
+            return new CampDetail(camp);
         }
         throw new NoSuchElementException();
     }
@@ -122,13 +124,13 @@ public class CampService {
     /**
      * 캠핑장 주소 변경
      */
-    public CampDto updateCampAddress(Long memberId, Long campId, String address) {
+    public CampDetail updateCampAddress(Long memberId, Long campId, String address) {
         Camp camp = campRepository.findById(campId).get();
         Member member = memberRepository.findById(memberId).get();
         if (camp.getMember().equals(member)) {
             Coordinate coordinate = findCoordinate(address);
             campRepository.save(camp.updateAddress(address, coordinate));
-            return new CampDto(camp);
+            return new CampDetail(camp);
         }
         throw new NoSuchElementException();
     }
@@ -136,7 +138,7 @@ public class CampService {
     /**
      * 캠핑장 이미지 변경
      */
-    public CampDto updateCampImages(Long memberId, Long campId, List<String> fileNameList) {
+    public CampDetail updateCampImages(Long memberId, Long campId, List<String> fileNameList) {
         Camp camp = campRepository.findById(campId).get();
         Member member = memberRepository.findById(memberId).get();
         if (camp.getMember().equals(member)) {
@@ -144,7 +146,7 @@ public class CampService {
                 String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
                 imageRepository.save(Image.builder().camp(camp).fileName(fileName).path(fileUrl).build());
             }
-            return new CampDto(campRepository.findById(campId).get());
+            return new CampDetail(campRepository.findById(campId).get());
         }
         throw new NoSuchElementException();
     }
@@ -181,8 +183,7 @@ public class CampService {
         Camp camp = campRepository.findById(campId).get();
         Member member = memberRepository.findById(memberId).get();
         if (camp.getMember().equals(member)) {
-            List<Image> images = imageRepository.findAllByCamp(camp);
-            return images;
+            return imageRepository.findAllByCamp(camp);
         }
         throw new NoSuchElementException();
     }

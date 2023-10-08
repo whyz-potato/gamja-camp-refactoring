@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.dto.camp.CampUpdateRequestDto;
+import whyzpotato.gamjacamp.dto.camp.CampDto.CampUpdateRequest;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -39,10 +39,10 @@ public class Camp {
     private String campIntroduction;
 
     @Column(nullable = false)
-    private Float campX;
+    private double latitude;
 
     @Column(nullable = false)
-    private Float campY;
+    private double longitude;
 
     @Column
     private LocalTime campOperationStart;
@@ -51,38 +51,41 @@ public class Camp {
     private LocalTime campOperationEnd;
 
     @OneToMany(mappedBy="camp")
-    private List<Room> rooms = new ArrayList<Room>();
+    private List<Room> rooms = new ArrayList<>();
+
+    @OneToMany(mappedBy="camp")
+    private List<Review> reviews = new ArrayList<>();
 
     // reviews
 
     @OneToMany(mappedBy = "camp")
-    private List<Image> images = new ArrayList<Image>();
+    private List<Image> images = new ArrayList<>();
 
     @Builder
-    public Camp(Member member, String name, String address, String phone, String campIntroduction, Float campX, Float campY, LocalTime campOperationStart, LocalTime campOperationEnd, List<Image> images) {
+    public Camp(Member member, String name, String address, String phone, String campIntroduction, double latitude, double longitude, LocalTime campOperationStart, LocalTime campOperationEnd, List<Image> images) {
         this.member = member;
         this.name = name;
         this.address = address;
         this.phone = phone;
         this.campIntroduction = campIntroduction;
-        this.campX = campX;
-        this.campY = campY;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.campOperationStart = campOperationStart;
         this.campOperationEnd = campOperationEnd;
         this.images = images;
     }
 
-    public Camp update(CampUpdateRequestDto campUpdateRequestDto) {
-        this.name = campUpdateRequestDto.getName();
-        this.phone = campUpdateRequestDto.getPhone();
-        this.campIntroduction = campUpdateRequestDto.getCampIntroduction();
+    public Camp update(CampUpdateRequest request) {
+        this.name = request.getName();
+        this.phone = request.getPhone();
+        this.campIntroduction = request.getCampIntroduction();
         return this;
     }
 
     public Camp updateAddress(String address, Coordinate coordinate) {
         this.address = address;
-        this.campX = coordinate.getCampX();
-        this.campY = coordinate.getCampY();
+        this.latitude = coordinate.getCampX();
+        this.longitude = coordinate.getCampY();
         return this;
     }
 
