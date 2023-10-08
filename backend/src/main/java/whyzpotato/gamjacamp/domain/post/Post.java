@@ -60,11 +60,6 @@ public class Post extends BaseTimeEntity {
     public Post update(GeneralPostUpdateRequestDto generalPostUpdateRequestDto) {
         this.title = generalPostUpdateRequestDto.getTitle();
         this.content = generalPostUpdateRequestDto.getContent();
-        this.images = generalPostUpdateRequestDto.getImages();
         return this;
-    }
-
-    public void addComment(Comment comment) {
-        comments.add(comment);
     }
 }
