@@ -1,11 +1,11 @@
 package whyzpotato.gamjacamp.controller.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.controller.dto.ChatMemberDto.SimpleChatMember;
 import whyzpotato.gamjacamp.domain.chat.Chat;
+import whyzpotato.gamjacamp.domain.chat.ChatType;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -30,6 +30,7 @@ public class ChatDto {
         private String title;
         private int nParticipants;
         private int capacity;
+        private ChatType type;
 
         public PrivateChatResponse(Chat chat, Long to) {
             this.roomId = chat.getId();
@@ -40,6 +41,7 @@ public class ChatDto {
             this.title = chat.getTitle();
             this.nParticipants = chat.getChatMemberList().size();
             this.capacity = chat.getCapacity();
+            this.type = chat.getType();
         }
     }
 
@@ -62,6 +64,7 @@ public class ChatDto {
         private String title;
         private int nParticipants;
         private int capacity;
+        private ChatType type;
 
         public PublicChatResponse(Chat chat, Long postId) {
             this.roomId = chat.getId();
@@ -72,6 +75,7 @@ public class ChatDto {
             this.title = chat.getTitle();
             this.nParticipants = chat.getChatMemberList().size();
             this.capacity = chat.getCapacity();
+            this.type = chat.getType();
         }
 
     }

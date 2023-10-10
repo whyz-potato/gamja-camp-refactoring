@@ -34,6 +34,7 @@ public class ChatMemberDto {
         private int numUnreadMessages;
         private DetailMessageDto lastMessage = null;
         private int numParticipants;
+        private String picture = null;
 
         public EnteredChat(ChatMember chatMember, Long count) {
             this.roomId = chatMember.getChat().getId();
@@ -42,6 +43,9 @@ public class ChatMemberDto {
             if (chatMember.getChat().getLastMessage() != null)
                 this.lastMessage = new DetailMessageDto(chatMember.getChat().getLastMessage());
             this.numParticipants = chatMember.getChat().getChatMemberList().size();
+            if (chatMember.getReceiver() != null) {
+                this.picture = chatMember.getReceiver().getPicture();
+            }
         }
     }
 
