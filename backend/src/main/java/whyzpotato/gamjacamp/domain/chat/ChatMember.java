@@ -29,7 +29,7 @@ public class ChatMember extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_id")
+    @JoinColumn(name = "last_read_message_id")
     private Message lastReadMessage = null;
 
     @NotNull
