@@ -56,7 +56,8 @@ public class SecurityConfig {
                 .anyRequest().permitAll(); //TODO denyAll();
 
         http
-                .logout().logoutSuccessUrl("/"); // 로그아웃 성공시 "/" 주소로 이동
+                .logout()
+                .logoutSuccessUrl("http://localhost:7777"); // 로그아웃 성공시 "/" 주소로 이동
 
         http
                 .oauth2Login()//oauth2 설정

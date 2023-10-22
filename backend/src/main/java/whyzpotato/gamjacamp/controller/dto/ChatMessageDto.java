@@ -29,15 +29,30 @@ public class ChatMessageDto {
         @Accessors(fluent = true)
         @JsonProperty("hasNext")
         private boolean hasNext;
+
         private int numberOfElements;
         private List<DetailMessageDto> messages;
+        private Boolean isStacked = false;
 
-        public MessageListDto(Slice<DetailMessageDto> result) {
-            this.hasNext = result.hasNext();
-            this.numberOfElements = result.getNumberOfElements();
-            this.messages = new ArrayList<>(result.getContent());
-            Collections.reverse(this.messages);
+        protected MessageListDto(boolean hasNext, int numberOfElements, List<DetailMessageDto> messages, boolean isStacked) {
+            this.hasNext = hasNext;
+            this.numberOfElements = numberOfElements;
+            this.messages = messages;
+            this.isStacked = isStacked;
         }
+
+        public static MessageListDto naturalOrderMessageList(Slice<DetailMessageDto> result, boolean isStacked){
+            return new MessageListDto(result.hasNext(), result.getNumberOfElements(), result.getContent(), isStacked);
+        }
+
+        public static MessageListDto reverseOrderMessageList(Slice<DetailMessageDto> result){
+            ArrayList<DetailMessageDto> messages = new ArrayList<>(result.getContent());
+            Collections.reverse(messages);
+            return new MessageListDto(result.hasNext(), result.getNumberOfElements(), messages, false);
+        }
+
+
+
     }
 
     @Getter

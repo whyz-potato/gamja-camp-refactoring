@@ -33,6 +33,7 @@ public class Chat extends BaseTimeEntity {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
     private List<ChatMember> chatMemberList = new ArrayList<ChatMember>();
 
+
     @Column(length = 20)
     private String title;
 
@@ -63,8 +64,8 @@ public class Chat extends BaseTimeEntity {
     // camp host - camp customer
     public static Chat createPrivateChat(Member sender, Member receiver) {
         Chat chat = new Chat(sender, ChatType.SINGLE, receiver.getUsername(), 2);
-        chat.chatMemberList.add(new ChatMember(chat, sender, receiver.getUsername()));
-        chat.chatMemberList.add(new ChatMember(chat, receiver, sender.getUsername()));
+        chat.chatMemberList.add(new ChatMember(chat, sender, receiver));
+        chat.chatMemberList.add(new ChatMember(chat, receiver, sender));
         return chat;
     }
 

@@ -10,11 +10,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.ChatDto;
 import whyzpotato.gamjacamp.domain.chat.Chat;
+import whyzpotato.gamjacamp.domain.chat.ChatMember;
 import whyzpotato.gamjacamp.domain.chat.Message;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
@@ -95,14 +97,6 @@ class ChatControllerTest {
     }
 
     @Test
-    void enterChat() {
-    }
-
-    @Test
-    void updateLastReadMessage() {
-    }
-
-    @Test
     void getMassages() throws Exception {
         Chat chat = Chat.createPrivateChat(sender, receiver);
         em.persist(chat);
@@ -122,7 +116,7 @@ class ChatControllerTest {
     }
 
     @Test
-    void getMassagesFromStart() throws Exception {
+    void getMassagesBefore() throws Exception {
         Chat chat = Chat.createPrivateChat(sender, receiver);
         em.persist(chat);
         List<Message> messages = new ArrayList<>();
@@ -137,12 +131,41 @@ class ChatControllerTest {
         String uri = String.format("/chats/%d", chat.getId());
         session.setAttribute("member", new SessionMember(sender));
         mockMvc.perform(get(uri).session(session)
-                        .param("start", fifthId))
+                        .param("before", fifthId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("numberOfElements").value(5))
                 .andExpect(jsonPath("hasNext").value("false"))
                 .andDo(print());
 
+    }
+
+    @Test
+    @Rollback(false)
+    @DisplayName("안읽은메세지 쌓인 경우")
+    void getMassages_unread() throws Exception {
+        Chat chat = Chat.createPrivateChat(sender, receiver);
+        em.persist(chat);
+        List<Message> messages = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            Message message = new Message(chat, sender, (i + 1) + "번 메세지");
+            em.persist(message);
+            messages.add(message);
+        }
+        ChatMember chatMember = chat.getChatMemberList().get(1);
+        Message fifth = messages.get(5);
+        chatMember.updateLastReadMessage(fifth);
+
+
+        String uri = String.format("/chats/%d", chat.getId());
+        session.setAttribute("member", new SessionMember(receiver));
+        mockMvc.perform(get(uri).session(session)
+                        .param("max-unread", "15"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isStacked").value(true))
+                .andExpect(jsonPath("$.numberOfElements").value(10))
+                .andExpect(jsonPath("$.hasNext").value("true"))
+                .andExpect(jsonPath("$.messages[0].id").value(fifth.getId()))
+                .andDo(print());
 
     }
 

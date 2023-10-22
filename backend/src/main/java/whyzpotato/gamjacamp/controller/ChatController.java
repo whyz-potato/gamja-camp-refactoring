@@ -82,13 +82,22 @@ public class ChatController {
     @GetMapping("/{roomId}")
     public ResponseEntity<?> getMassages(@LoginMember SessionMember member,
                                          @PathVariable Long roomId,
-                                         @RequestParam(required = false) Long start) {
+                                         @RequestParam(required = false) Long before,
+                                         @RequestParam(required = false) Long after,
+                                         @RequestParam(value = "max_unread", required = false, defaultValue = "15") int max) {
 
-        if (start == null)
-            return ResponseEntity.ok(messageService.findMessages(roomId, member.getId()));
+//        if (start == null)
+//            return ResponseEntity.ok(messageService.findMessages(roomId, member.getId()));
+//        return ResponseEntity.ok(messageService.findMessages(roomId, member.getId(), start));
 
-        return ResponseEntity.ok(messageService.findMessages(roomId, member.getId(), start));
 
+        if (before == null && after == null) {
+            return ResponseEntity.ok(messageService.findMessages(roomId, member.getId(), max));
+        } else if (before != null) {
+            return ResponseEntity.ok(messageService.findMessagesBefore(roomId, member.getId(), before));
+        }
+        // after != null
+        return ResponseEntity.ok(messageService.findMessagesAfter(roomId, member.getId(), after));
     }
 
     @GetMapping
