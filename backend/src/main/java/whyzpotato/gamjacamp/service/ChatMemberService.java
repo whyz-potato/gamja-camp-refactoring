@@ -14,9 +14,9 @@ import whyzpotato.gamjacamp.repository.ChatMemberRepository;
 import whyzpotato.gamjacamp.repository.ChatRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.MessageRepository;
+import whyzpotato.gamjacamp.utils.Utils;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +31,7 @@ public class ChatMemberService {
     private final MemberRepository memberRepository;
     private final MessageRepository messageRepository;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm:ss.SSSSSS");
+//    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyy-MM-dd HH:mm:ss.SSSSSS");
 
 
     public void updateLastReadMessage(Long chatId, Long memberId, Long messageId) {
@@ -67,7 +67,7 @@ public class ChatMemberService {
                     else
                         latest = cm.getCreatedTime();
 
-                    LocalDateTime formattedLatest = LocalDateTime.parse(latest.plusNanos(500).format(formatter), formatter);
+                    LocalDateTime formattedLatest = Utils.toSqlDateTime(latest);
                     return new EnteredChat(cm, messageRepository.countByCreatedTimeAfter(cm.getChat(), formattedLatest));
                 })
                 .collect(Collectors.toList());
@@ -85,7 +85,7 @@ public class ChatMemberService {
         }
     }
 
-
+    // 사용자가 읽지 않은 전체 메세지 수
     public int countUnreadMessages(Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundException::new);
 
@@ -98,14 +98,12 @@ public class ChatMemberService {
                     else
                         latest = cm.getCreatedTime();
 
-                    LocalDateTime formattedLatest = LocalDateTime.parse(latest.plusNanos(500).format(formatter), formatter);
+                    LocalDateTime formattedLatest = Utils.toSqlDateTime(latest);
                     log.debug("latest : {}", latest);
                     log.debug("time : {}", formattedLatest);
 
                     return messageRepository.countByCreatedTimeAfter(cm.getChat(), formattedLatest).intValue();
                 }).sum();
-
     }
-
 
 }

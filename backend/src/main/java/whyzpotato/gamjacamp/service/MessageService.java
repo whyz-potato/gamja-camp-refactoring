@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.DetailMessageDto;
 import whyzpotato.gamjacamp.controller.dto.ChatMessageDto.MessageListDto;
 import whyzpotato.gamjacamp.domain.chat.Chat;
+import whyzpotato.gamjacamp.domain.chat.ChatMember;
 import whyzpotato.gamjacamp.domain.chat.Message;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.exception.NotFoundException;
@@ -16,6 +17,10 @@ import whyzpotato.gamjacamp.repository.ChatMemberRepository;
 import whyzpotato.gamjacamp.repository.ChatRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.MessageRepository;
+
+import static whyzpotato.gamjacamp.controller.dto.ChatMessageDto.MessageListDto.naturalOrderMessageList;
+import static whyzpotato.gamjacamp.controller.dto.ChatMessageDto.MessageListDto.reverseOrderMessageList;
+import static whyzpotato.gamjacamp.utils.Utils.toSqlDateTime;
 
 @RequiredArgsConstructor
 @Service
@@ -28,7 +33,8 @@ public class MessageService {
     private final ChatMemberRepository chatMemberRepository;
     private final ChatMemberService chatMemberService;
 
-    private PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdTime"));
+    private PageRequest backward = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdTime"));
+    private PageRequest forward = PageRequest.of(0, 10);
 
     // (채팅방 메세지 전송) 전송 및 읽음 처리
     public DetailMessageDto createMessage(Long chatId, Long memberId, String content) {
@@ -42,38 +48,67 @@ public class MessageService {
         return new DetailMessageDto(savedMessage);
     }
 
-    // (채팅방 윈도우 오픈) 가장 최근 메세지 반환 및 읽음 처리
-    public MessageListDto findMessages(Long chatId, Long memberId) {
 
-        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
-        Member member = memberRepository.findById(memberId).get();
+    public MessageListDto findMessages(Long chatId, Long memberId, int max) {
 
-        if (!chatMemberRepository.existsByChatAndMember(chat, member)) {
-            throw new NotFoundException();
+        ChatMember chatMember = chatMemberRepository.findByChatAndMember(chatId, memberId)
+                .orElseThrow(IllegalArgumentException::new);
+        Chat chat = chatMember.getChat();
+        Member member = chatMember.getMember();
+
+        //최근 메세지 반환
+        if (chatMember.getLastReadMessage() == null || countUnreadMessages(chat.getId(), member.getId()) < max) {
+            return reverseOrderMessageList(
+                    messageRepository.findSliceByChat(chat, backward)
+                            .map(m -> new DetailMessageDto(m))
+            );
         }
 
-        Slice<Message> slice = messageRepository.findSliceByChat(chat, pageRequest);
-        Slice<DetailMessageDto> result = slice.map(m -> new DetailMessageDto(m));
-
-        chatMemberService.updateLastReadMessage(chatId, memberId, result.getContent().get(0).getId());
-
-//        // 메세지 슬라이스 내부에서 역순으로 전달
-//        result.getContent().sort(Comparator.comparing(Message::getCreatedTime, Comparator.naturalOrder())); # E :UnmodifiableList.sort
-        return new MessageListDto(result);
+        //마지막으로 읽은 메세지부터 반환
+        return naturalOrderMessageList(
+                messageRepository.findSliceByChatAndIdGreaterThanEqual(chat, chatMember.getLastReadMessage().getId(), forward)
+                        .map(m -> new DetailMessageDto(m))
+                , true);
     }
 
-    public MessageListDto findMessages(Long chatId, Long memberId, Long start) {
+    public MessageListDto findMessagesBefore(Long chatId, Long memberId, Long before) {
 
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
         Member member = memberRepository.findById(memberId).get();
-
         if (!chatMemberRepository.existsByChatAndMember(chat, member)) {
             throw new NotFoundException();
         }
 
-        Slice<Message> slice = messageRepository.findSliceByChatAndIdLessThan(chat, start, pageRequest);
+        Slice<Message> slice = messageRepository.findSliceByChatAndIdLessThan(chat, before, backward);
         Slice<DetailMessageDto> result = slice.map(m -> new DetailMessageDto(m));
-        return new MessageListDto(result);
+        return reverseOrderMessageList(result);
+    }
+
+    public MessageListDto findMessagesAfter(Long chatId, Long memberId, Long after) {
+
+        Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new IllegalArgumentException());
+        Member member = memberRepository.findById(memberId).get();
+        if (!chatMemberRepository.existsByChatAndMember(chat, member)) {
+            throw new NotFoundException();
+        }
+
+        Slice<Message> slice = messageRepository.findSliceByChatAndIdGreaterThan(chat, after, forward);
+        Slice<DetailMessageDto> result = slice.map(m -> new DetailMessageDto(m));
+        return naturalOrderMessageList(result, false);
+    }
+
+    public int countUnreadMessages(Long chatId, Long memberId) {
+
+        ChatMember chatMember = chatMemberRepository.findByChatAndMember(chatId, memberId)
+                .orElseThrow(IllegalArgumentException::new);
+        Message last = chatMember.getLastReadMessage();
+
+
+        if (last == null) {
+            return messageRepository.countByCreatedTimeAfter(chatMember.getChat(), toSqlDateTime(chatMember.getCreatedTime())).intValue();
+        }
+        return messageRepository.countByCreatedTimeAfter(chatMember.getChat(), toSqlDateTime(last.getCreatedTime())).intValue();
+
     }
 
 }
