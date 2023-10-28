@@ -100,6 +100,7 @@ class ChatMemberServiceTest {
         for (int i = 0; i < 3; i++) {
             em.persist(new Message(chat, host, "message"));
         }
+        em.flush();
 
         chat.enter(newParticipant);
         chatMemberRepository.findByChatAndMember(chat, newParticipant).get().getCreatedTime();
@@ -121,6 +122,7 @@ class ChatMemberServiceTest {
             em.persist(message);
             chatMemberService.updateLastReadMessage(chat.getId(), newParticipant.getId(), message.getId());
         }
+        em.flush();
 
         for (int i = 0; i < 5; i++) {
             em.persist(new Message(chat, host, "message"));
@@ -150,7 +152,10 @@ class ChatMemberServiceTest {
         for (int i = 0; i < 10; i++) {
             em.persist(new Message(chat2, host, "message"));
         }
+
         chat2.enter(newParticipant);
+        em.flush();
+
         chatMemberRepository.findByChatAndMember(chat2, newParticipant).get().getCreatedTime();
         for (int i = 0; i < 7; i++) {
             em.persist(new Message(chat2, host, "message"));

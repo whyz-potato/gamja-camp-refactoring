@@ -284,7 +284,7 @@ class ChatControllerTest {
     }
 
     @Test
-    @DisplayName("채팅방 목록 순서2_마지막메세지순,생성순")
+    @DisplayName("채팅방 목록 순서2_마지막메세지 역순, 채팅방 생성 역순")
     void chatsSorted2() throws Exception {
 
         Chat chat1 = Chat.createPrivateChat(sender, receiver);
