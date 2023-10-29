@@ -50,8 +50,8 @@ public class Utility {
         private int page;
         private int size;
         private long offset;
-        private boolean isFirst;
-        private boolean isLast;
+        private Boolean isFirst;
+        private Boolean isLast;
         private List<T> content;
 
         public PageResult(Page<T> page) {
