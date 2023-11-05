@@ -20,6 +20,7 @@ public class Camp {
 
     @Id
     @GeneratedValue
+    @Column(name = "camp_id")
     private Long id;
 
     @OneToOne
