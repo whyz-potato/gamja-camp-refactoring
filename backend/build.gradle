@@ -44,6 +44,9 @@ dependencies {
 	implementation 'org.webjars:stomp-websocket:2.3.3'
 	implementation 'org.webjars:bootstrap:3.3.7'
 	implementation 'org.webjars:jquery:3.1.1-1'
+
+	//sql parameter binding
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.7'
 }
 
 tasks.named('test') {

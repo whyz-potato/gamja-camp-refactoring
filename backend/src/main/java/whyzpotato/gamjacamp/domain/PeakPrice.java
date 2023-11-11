@@ -19,6 +19,7 @@ public class PeakPrice {
 
     @Id
     @GeneratedValue
+    @Column(name = "peak_price_id")
     private Long id;
 
     @ManyToOne
