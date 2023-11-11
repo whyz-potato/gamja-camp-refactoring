@@ -39,3 +39,4 @@ out/
 ### oauth ###
 /src/main/resources/application-oauth.properties
 /src/main/java/whyzpotato/gamjacamp/service/Authority.java
+/spy.log
