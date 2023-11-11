@@ -20,10 +20,8 @@ public class PriceDto {
         if(dailyPrices.isEmpty())
             throw new IllegalArgumentException("dailyPrices는 숙박 기간만큼의 원소를 가져야한다.");
 
-        IntStream intStream = dailyPrices.stream().mapToInt(p -> p);
-
         this.dailyPrices = dailyPrices;
-        this.minOneNightPrice = intStream.min().getAsInt();
-        this.totalPrice = intStream.sum();
+        this.minOneNightPrice = dailyPrices.stream().mapToInt(Integer::intValue).min().orElseThrow(IllegalArgumentException::new);
+        this.totalPrice = dailyPrices.stream().mapToInt(Integer::intValue).sum();
     }
 }

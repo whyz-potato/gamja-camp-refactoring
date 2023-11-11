@@ -2,18 +2,24 @@ package whyzpotato.gamjacamp.service;
 
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import whyzpotato.gamjacamp.domain.Camp;
-import whyzpotato.gamjacamp.domain.Coordinate;
-import whyzpotato.gamjacamp.domain.member.Member;
+import whyzpotato.gamjacamp.controller.dto.CampDto.SearchItem;
+import whyzpotato.gamjacamp.controller.dto.CampDto.SearchResult;
+import whyzpotato.gamjacamp.controller.dto.Utility.PageResult;
 import whyzpotato.gamjacamp.controller.dto.camp.CampDto;
 import whyzpotato.gamjacamp.controller.dto.camp.CampSaveRequestDto;
 import whyzpotato.gamjacamp.controller.dto.camp.CampUpdateRequestDto;
+import whyzpotato.gamjacamp.domain.Camp;
+import whyzpotato.gamjacamp.domain.Coordinate;
+import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.RoomRepository;
+import whyzpotato.gamjacamp.repository.querydto.CampSearchResult;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -21,6 +27,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -143,6 +150,11 @@ public class CampService {
     /**
      * 캠핑장 검색
      */
+    //TODO 화면 내 검색 활성화
+    //TODO refactor (파라미터 줄이기)
+    public PageResult<CampSearchResult> search(String query, Double neLatitude, Double swLatitude, Double neLongitude, Double swLongitude, LocalDate checkIn, LocalDate checkOut, int numGuests, Pageable pageable) {
+        return new PageResult(campRepository.findAvailableCamp(query, checkIn, checkOut, numGuests, pageable));
+    }
 
     /**
      * 캠핑장 삭제
@@ -174,9 +186,18 @@ public class CampService {
      * @param campId
      * @return camp
      */
-    public Camp findById(Long campId){
+    public Camp findById(Long campId) {
         return campRepository.findById(campId)
                 .orElseThrow(() -> new NotFoundException());
+
+    }
+
+    public PageResult<SearchItem> findAll(LocalDate stayStart, LocalDate stayEnd, Pageable pageable) {
+        Page<Camp> all = campRepository.findAll(pageable);
+        return new SearchResult<>(all.map
+                (c -> new SearchItem(c, c.getRooms().get(0).getPrices(stayStart, stayEnd))),
+                stayStart, stayEnd);
+
 
     }
 }
