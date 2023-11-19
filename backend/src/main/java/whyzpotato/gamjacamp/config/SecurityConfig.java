@@ -48,6 +48,7 @@ public class SecurityConfig {
                         "/webjars/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/login/**").permitAll()
+                .antMatchers("/rooms/**").permitAll()
                 .antMatchers("/customer").hasRole(Role.CUSTOMER.name())
                 .antMatchers("/owner").hasRole(Role.OWNER.name())
                 .antMatchers("/csrf/**").authenticated() //csrf token for sock js & spring security
