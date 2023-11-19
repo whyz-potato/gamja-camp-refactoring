@@ -126,6 +126,7 @@ class MessageServiceTest {
         for (int i = 0; i < 20; i++) {
             em.persist(new Message(chat, host, (i + 1) + "번 메세지"));
         }
+        em.flush();
 
         ChatMessageDto.MessageListDto slice = messageService.findMessages(chat.getId(), participant.getId(), 15);
 
@@ -139,7 +140,6 @@ class MessageServiceTest {
     void findMessages_fromUnread() {
 
         chat.enter(participant);
-        em.flush();
 
         List<Message> messages = new ArrayList<>();
         for (int i = 0; i < 20; i++) {

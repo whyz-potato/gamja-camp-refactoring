@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.controller.dto.PeakPriceDto;
 import whyzpotato.gamjacamp.controller.dto.RoomDto;
+import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomSearchResponse;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
@@ -30,7 +31,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class RoomServiceTest {
-
     private static Validator validator;
 
     @Autowired
@@ -223,9 +223,24 @@ class RoomServiceTest {
 
     }
 
+    @DisplayName("예약가능한 객실 검색 성공")
+    @Test
+    public void findAvailableRooms() {
+        em.persist(Room.builder().name("room1").camp(camp).capacity(2).cnt(2).weekPrice(7_000).weekendPrice(10_000)
+                .build());
+        em.persist(Room.builder().name("room2").camp(camp).capacity(2).cnt(2).weekPrice(8_000).weekendPrice(12_000)
+                .build());
+        em.persist(Room.builder().name("room3").camp(camp).capacity(4).cnt(1).weekPrice(10_000).weekendPrice(15_000)
+                .build());
+        em.persist(Room.builder().name("room4").camp(camp).capacity(6).cnt(1).weekPrice(15_000).weekendPrice(20_000)
+                .build());
 
-//    @DisplayName("예약가능한 객실 검색 성공")
-//
+        RoomSearchResponse result = roomService.findCampAvailableRooms(camp.getId(), LocalDate.now(), LocalDate.now().plusDays(1), 2);
+
+        assertThat(result.getRooms().size()).isEqualTo(4);
+        assertThat(result.getRooms()).extracting("name").containsOnly("room1", "room2", "room3", "room4");
+    }
+
 //    @DisplayName("예약가능한 객실 검색 성공 : 날짜가 없는 경우 당일 1박 검색")
 //
 //    @DisplayName("예약가능한 객실 검색 성공 : 그러한 객실이 존재하지 않음")
