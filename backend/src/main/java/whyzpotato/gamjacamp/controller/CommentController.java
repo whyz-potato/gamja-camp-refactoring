@@ -6,13 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import whyzpotato.gamjacamp.dto.comment.CommentSaveRequestDto;
-import whyzpotato.gamjacamp.dto.comment.CommentUpdateRequestDto;
+import org.springframework.web.bind.annotation.*;
+import whyzpotato.gamjacamp.dto.comment.CommentDto.CommentSaveRequest;
+import whyzpotato.gamjacamp.dto.comment.CommentDto.CommentUpdateRequest;
 import whyzpotato.gamjacamp.service.CommentService;
+
+import java.util.List;
+
+import static whyzpotato.gamjacamp.dto.comment.CommentDto.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -23,28 +24,23 @@ public class CommentController {
     @PostMapping("/v1/post/general/comment/new/{memberId}/{postId}")
     public ResponseEntity createGeneralPostComment(@PathVariable("memberId") Long memberId,
                                                    @PathVariable("postId") Long postId,
-                                                   @RequestBody CommentSaveRequestDto requestDto) {
-        return new ResponseEntity(new createdBodyDto(commentService.save(memberId, postId, requestDto)), HttpStatus.CREATED);
+                                                   @RequestBody CommentSaveRequest request) {
+        return new ResponseEntity(new createdBodyDto(commentService.save(memberId, postId, request)), HttpStatus.CREATED);
     }
 
-    @PostMapping("/v1/post/general/recomment/new/{memberId}/{postId}/{upperComentId}")
-    public ResponseEntity createGeneralPostReComment(@PathVariable("memberId") Long memberId,
-                                                     @PathVariable("postId") Long postId,
-                                                     @PathVariable("upperComentId") Long upperCommentId,
-                                                     @RequestBody CommentSaveRequestDto requestDto) {
-        return new ResponseEntity(new createdBodyDto(commentService.saveReComment(memberId, postId, upperCommentId, requestDto)), HttpStatus.CREATED);
+    @GetMapping("/v1/post/general/comment/list/{postId}")
+    public ResponseEntity<List<CommentInfo>> commentList(@PathVariable Long postId) {
+        return new ResponseEntity<>(commentService.findCommentList(postId), HttpStatus.OK);
     }
 
     @PutMapping("/v1/post/general/comment/update/{memberId}/{commentId}")
-    public ResponseEntity updateGeneralPostComment(@PathVariable("memberId") Long memberId,
-                                                   @PathVariable("commentId") Long commentId,
-                                                   @RequestBody CommentUpdateRequestDto requestDto) {
-        // TODO return Dto
-        commentService.update(memberId, commentId, requestDto);
-        return new ResponseEntity(HttpStatus.OK);
+    public ResponseEntity<CommentDetail> updateGeneralPostComment(@PathVariable("memberId") Long memberId,
+                                                                  @PathVariable("commentId") Long commentId,
+                                                                  @RequestBody CommentUpdateRequest request) {
+        return new ResponseEntity<>(commentService.update(memberId, commentId, request),HttpStatus.OK);
     }
 
-    @PutMapping("/v1/post/general/comment/delete/{memberId}/{commentId}")
+    @DeleteMapping("/v1/post/general/comment/delete/{memberId}/{commentId}")
     public ResponseEntity deleteGeneralPostComment(@PathVariable("memberId") Long memberId,
                                                    @PathVariable("commentId") Long commentId) {
         commentService.delete(memberId, commentId);

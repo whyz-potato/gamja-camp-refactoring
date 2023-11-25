@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostSaveRequestDto;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostUpdateRequestDto;
-import whyzpotato.gamjacamp.dto.Post.SimpleGeneralPostResponseDto;
+import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostDetail;
+import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostSaveRequest;
+import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostSimple;
+import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostUpdateRequest;
 import whyzpotato.gamjacamp.service.AwsS3Service;
 import whyzpotato.gamjacamp.service.PostService;
 
@@ -27,29 +27,29 @@ public class PostController {
 
     @PostMapping("/v1/post/general/new/{memberId}")
     public ResponseEntity createGeneralPost(@PathVariable("memberId") Long memberId,
-                                            @RequestPart("request") GeneralPostSaveRequestDto requestDto,
+                                            @RequestPart("request") GeneralPostSaveRequest request,
                                             @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
-        return new ResponseEntity(new createdBodyDto(postService.saveGeneralPost(memberId, requestDto, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
+        return new ResponseEntity(new createdBodyDto(postService.saveGeneralPost(memberId, request, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
     }
 
     @GetMapping("/v1/post/general/{postId}")
-    public ResponseEntity<GeneralPostDto> detailGeneralPost(@PathVariable("postId") Long postId) {
+    public ResponseEntity<GeneralPostDetail> detailGeneralPost(@PathVariable("postId") Long postId) {
         return new ResponseEntity<>(postService.findGeneralPost(postId), HttpStatus.OK);
     }
 
     @GetMapping("/v1/post/general/list")
-    public ResponseEntity<List<SimpleGeneralPostResponseDto>> generalPostList(@RequestParam Long lastPostId) {
-        List<SimpleGeneralPostResponseDto> posts = postService.findGeneralPostList(lastPostId).getContent();
+    public ResponseEntity<List<GeneralPostSimple>> generalPostList(@RequestParam Long lastPostId) {
+        List<GeneralPostSimple> posts = postService.findGeneralPostList(lastPostId).getContent();
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @PutMapping("/v1/post/general/update/{memberId}/{postId}")
-    public ResponseEntity<GeneralPostDto> updateGeneralPost(@PathVariable("memberId") Long memberId,
+    public ResponseEntity<GeneralPostDetail> updateGeneralPost(@PathVariable("memberId") Long memberId,
                                                             @PathVariable("postId") Long postId,
-                                                            @RequestPart("request") GeneralPostUpdateRequestDto requestDto,
+                                                            @RequestPart("request") GeneralPostUpdateRequest request,
                                                             @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
         awsS3Service.removeImages(postService.findGeneralPostImages(memberId, postId));
-        return new ResponseEntity<>(postService.updateGeneralPost(memberId, postId, requestDto, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
+        return new ResponseEntity<>(postService.updateGeneralPost(memberId, postId, request, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
     }
 
     @DeleteMapping("/v1/post/general/delete/{memberId}/{postId}")
@@ -61,9 +61,9 @@ public class PostController {
     }
 
     @GetMapping("/v1/post/general/search")
-    public ResponseEntity<List<SimpleGeneralPostResponseDto>> searchGeneralPost(@RequestParam Long lastPostId,
-                                                                                @RequestParam String keyword) {
-        List<SimpleGeneralPostResponseDto> posts = postService.search(lastPostId, keyword).getContent();
+    public ResponseEntity<List<GeneralPostSimple>> searchGeneralPost(@RequestParam Long lastPostId,
+                                                                     @RequestParam String keyword) {
+        List<GeneralPostSimple> posts = postService.search(lastPostId, keyword).getContent();
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 

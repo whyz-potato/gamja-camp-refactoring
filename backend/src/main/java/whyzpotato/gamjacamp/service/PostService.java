@@ -11,10 +11,7 @@ import whyzpotato.gamjacamp.domain.Image;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.post.Post;
 import whyzpotato.gamjacamp.domain.post.PostType;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostSaveRequestDto;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostUpdateRequestDto;
-import whyzpotato.gamjacamp.dto.Post.SimpleGeneralPostResponseDto;
+import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostSaveRequest;
 import whyzpotato.gamjacamp.repository.ImageRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.PostRepository;
@@ -22,6 +19,8 @@ import whyzpotato.gamjacamp.repository.PostRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
+import static whyzpotato.gamjacamp.dto.Post.GeneralPostDto.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +33,14 @@ public class PostService {
     /**
      * 자유게시판 글 쓰기
      */
-    public Long saveGeneralPost(Long memberId, GeneralPostSaveRequestDto generalPostSaveRequestDto, List<String> fileNameList) {
+    public Long saveGeneralPost(Long memberId, GeneralPostSaveRequest request, List<String> fileNameList) {
         Member member = memberRepository.findById(memberId).get();
-        Post post = postRepository.save(generalPostSaveRequestDto.toEntity(member, PostType.GENERAL));
+        Post post = postRepository.save(request.toEntity(member, PostType.GENERAL));
+        if (fileNameList == null)
+            return post.getId();
         for(String fileName : fileNameList) {
             String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
-            imageRepository.save(Image.builder().post(post).fileName(fileName).path(fileUrl).build());
+            post.getImages().add(imageRepository.save(Image.builder().post(post).fileName(fileName).path(fileUrl).build()));
         }
         return post.getId();
     }
@@ -49,34 +50,38 @@ public class PostService {
      * TODO comment list 조회
      */
     @Transactional(readOnly = true)
-    public GeneralPostDto findGeneralPost(Long postId) {
+    public GeneralPostDetail findGeneralPost(Long postId) {
         Optional<Post> optionalPost = postRepository.findById(postId);
         Post generalPost = optionalPost.orElseThrow(() -> new NoSuchElementException());
-        return new GeneralPostDto(generalPost);
+        return new GeneralPostDetail(generalPost);
     }
 
     /**
      * 자유게시판 글 목록 불러오기
      */
-    public Page<SimpleGeneralPostResponseDto> findGeneralPostList(Long lastPostId) {
+    public Page<GeneralPostSimple> findGeneralPostList(Long lastPostId) {
         Pageable sortedByIdDesc = PageRequest.of(0, 10, Sort.by("id").descending());
         Page<Post> posts = postRepository.findByIdLessThanAndType(lastPostId, PostType.GENERAL, sortedByIdDesc);
-        Page<SimpleGeneralPostResponseDto> SimpleGeneralPostResponseDtoList = new SimpleGeneralPostResponseDto().toDtoList(posts);
-        return SimpleGeneralPostResponseDtoList;
+        Page<GeneralPostSimple> GeneralPostSimpleList = new GeneralPostSimple().toList(posts);
+        return GeneralPostSimpleList;
     }
 
     /**
      * 자유게시판 글 수정
      */
-    public GeneralPostDto updateGeneralPost(Long memberId, Long postId, GeneralPostUpdateRequestDto generalPostUpdateRequestDto, List<String> fileNameList) {
+    public GeneralPostDetail updateGeneralPost(Long memberId, Long postId, GeneralPostUpdateRequest request, List<String> fileNameList) {
         Member writer = memberRepository.findById(memberId).get();
         Post post = postRepository.findById(postId).get();
         if(post.getWriter().equals(writer)) {
-            for(String fileName : fileNameList) {
-                String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
-                imageRepository.save(Image.builder().post(post).fileName(fileName).path(fileUrl).build());
+            post.getImages().clear();
+            if(fileNameList != null) {
+                for(String fileName : fileNameList) {
+                    String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
+                    post.getImages().add(imageRepository.save(Image.builder().post(post).fileName(fileName).path(fileUrl).build()));
+                }
             }
-            return new GeneralPostDto(postRepository.save(post.update(generalPostUpdateRequestDto)));
+            postRepository.save(post.update(request));
+            return new GeneralPostDetail(post);
         }
         throw new NoSuchElementException();
     }
@@ -97,10 +102,10 @@ public class PostService {
     /**
      * 자유게시판 글 검색
      */
-    public Page<SimpleGeneralPostResponseDto> search(Long lastPostId, String keyword) {
+    public Page<GeneralPostSimple> search(Long lastPostId, String keyword) {
         Pageable sortedByIdDesc = PageRequest.of(0, 10, Sort.by("id").descending());
         Page<Post> posts = postRepository.findByTitleOrContentContainingAndIdLessThanAndType(keyword, keyword, lastPostId, PostType.GENERAL, sortedByIdDesc);
-        Page<SimpleGeneralPostResponseDto> SimpleGeneralPostResponseDtoList = new SimpleGeneralPostResponseDto().toDtoList(posts);
+        Page<GeneralPostSimple> SimpleGeneralPostResponseDtoList = new GeneralPostSimple().toList(posts);
         return SimpleGeneralPostResponseDtoList;
     }
 
@@ -108,8 +113,8 @@ public class PostService {
         Post post = postRepository.findById(postId).get();
         Member member = memberRepository.findById(memberId).get();
         if (post.getWriter().equals(member)) {
-            List<Image> images = imageRepository.findAllByPost(post);
-            return images;
+//            List<Image> images = imageRepository.findAllByPost(post);
+            return post.getImages();
         }
         throw new NoSuchElementException();
     }

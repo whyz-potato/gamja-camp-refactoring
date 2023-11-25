@@ -6,9 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.BaseTimeEntity;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.dto.comment.CommentUpdateRequestDto;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static whyzpotato.gamjacamp.dto.comment.CommentDto.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -32,6 +35,9 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name = "upper_comment_id")
     private Comment upperComment;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "upperComment")
+    private List<Comment> lowerComments = new ArrayList<Comment>();
+
     @Column(length = 300)
     private String content;
 
@@ -41,17 +47,22 @@ public class Comment extends BaseTimeEntity {
     // TODO : 삭제 이후에는 admin만 댓글 확인 할 수 있게 인가
 
     @Builder
-    public Comment(Post post, Member writer, Comment upperComment, String content, String deleteYn) {
+    public Comment(Post post, Member writer, Comment upperComment, List<Comment> lowerComments, String content, String deleteYn) {
         this.post = post;
         this.writer = writer;
         this.upperComment = upperComment;
+        this.lowerComments = lowerComments;
         this.content = content;
         this.deleteYn = deleteYn;
     }
 
-    public Comment update(CommentUpdateRequestDto commentUpdateRequestDto) {
-        this.content = commentUpdateRequestDto.getContent();
+    public Comment update(CommentUpdateRequest request) {
+        this.content = request.getContent();
         return this;
+    }
+
+    public void updateUpperComment(Comment upperComment) {
+        this.upperComment = upperComment;
     }
 
     public Comment delete() {
