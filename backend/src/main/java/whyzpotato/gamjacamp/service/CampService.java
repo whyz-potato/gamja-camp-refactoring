@@ -8,13 +8,12 @@ import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Coordinate;
 import whyzpotato.gamjacamp.domain.Image;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.dto.camp.CampDto.CampDetail;
-import whyzpotato.gamjacamp.dto.camp.CampDto.CampSaveRequest;
-import whyzpotato.gamjacamp.dto.camp.CampDto.CampUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampDetail;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampSaveRequest;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampUpdateRequest;
 import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.ImageRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
-import whyzpotato.gamjacamp.repository.RoomRepository;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -35,7 +34,6 @@ public class CampService {
 
     private final MemberRepository memberRepository;
     private final CampRepository campRepository;
-    private final RoomRepository roomRepository;
     private final ImageRepository imageRepository;
 
     /**

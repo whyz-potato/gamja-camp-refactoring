@@ -1,4 +1,4 @@
-package whyzpotato.gamjacamp.dto.review;
+package whyzpotato.gamjacamp.controller.dto.review;
 
 import lombok.Builder;
 import org.springframework.data.domain.Page;

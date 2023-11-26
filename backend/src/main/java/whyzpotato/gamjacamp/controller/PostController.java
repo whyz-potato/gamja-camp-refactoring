@@ -8,10 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostDetail;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostSaveRequest;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostSimple;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostDetail;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostSaveRequest;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostSimple;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostUpdateRequest;
 import whyzpotato.gamjacamp.service.AwsS3Service;
 import whyzpotato.gamjacamp.service.PostService;
 

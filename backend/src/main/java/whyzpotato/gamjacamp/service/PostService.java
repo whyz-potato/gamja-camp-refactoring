@@ -7,11 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostDetail;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostSimple;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostUpdateRequest;
 import whyzpotato.gamjacamp.domain.Image;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.post.Post;
 import whyzpotato.gamjacamp.domain.post.PostType;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostSaveRequest;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostSaveRequest;
 import whyzpotato.gamjacamp.repository.ImageRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.PostRepository;
@@ -19,8 +22,6 @@ import whyzpotato.gamjacamp.repository.PostRepository;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-
-import static whyzpotato.gamjacamp.dto.Post.GeneralPostDto.*;
 
 @Service
 @RequiredArgsConstructor

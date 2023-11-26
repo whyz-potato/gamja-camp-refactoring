@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.dto.camp.CampDto.CampUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampUpdateRequest;
 
 import javax.persistence.*;
 import java.time.LocalTime;

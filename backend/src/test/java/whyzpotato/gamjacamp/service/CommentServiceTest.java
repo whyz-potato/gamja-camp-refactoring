@@ -1,9 +1,10 @@
 package whyzpotato.gamjacamp.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentSaveRequest;
+import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentUpdateRequest;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
 import whyzpotato.gamjacamp.domain.post.Comment;
@@ -16,7 +17,6 @@ import whyzpotato.gamjacamp.repository.PostRepository;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.*;
-import static whyzpotato.gamjacamp.dto.comment.CommentDto.*;
 
 @SpringBootTest
 public class CommentServiceTest {

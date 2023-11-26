@@ -7,13 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import whyzpotato.gamjacamp.dto.comment.CommentDto.CommentSaveRequest;
-import whyzpotato.gamjacamp.dto.comment.CommentDto.CommentUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentDetail;
+import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentInfo;
+import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentSaveRequest;
+import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentUpdateRequest;
 import whyzpotato.gamjacamp.service.CommentService;
 
 import java.util.List;
-
-import static whyzpotato.gamjacamp.dto.comment.CommentDto.*;
 
 @RequiredArgsConstructor
 @Slf4j

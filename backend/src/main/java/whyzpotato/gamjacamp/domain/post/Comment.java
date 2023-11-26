@@ -4,14 +4,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentUpdateRequest;
 import whyzpotato.gamjacamp.domain.BaseTimeEntity;
 import whyzpotato.gamjacamp.domain.member.Member;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import static whyzpotato.gamjacamp.dto.comment.CommentDto.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter

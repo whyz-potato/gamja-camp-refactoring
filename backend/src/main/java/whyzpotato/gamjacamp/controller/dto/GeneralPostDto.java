@@ -1,4 +1,4 @@
-package whyzpotato.gamjacamp.dto.Post;
+package whyzpotato.gamjacamp.controller.dto;
 
 import lombok.Builder;
 import lombok.Data;

@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
-import whyzpotato.gamjacamp.dto.camp.CampDto.CampDetail;
-import whyzpotato.gamjacamp.dto.camp.CampDto.CampSaveRequest;
-import whyzpotato.gamjacamp.dto.camp.CampDto.CampUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampDetail;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampSaveRequest;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampUpdateRequest;
 import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 

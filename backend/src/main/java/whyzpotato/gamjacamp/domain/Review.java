@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.dto.review.ReviewUpdateRequestDto;
+import whyzpotato.gamjacamp.controller.dto.review.ReviewUpdateRequestDto;
 
 import javax.persistence.*;
 import java.util.ArrayList;

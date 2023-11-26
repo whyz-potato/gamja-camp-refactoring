@@ -8,7 +8,7 @@ import whyzpotato.gamjacamp.domain.BaseTimeEntity;
 import whyzpotato.gamjacamp.domain.Image;
 import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.dto.Post.GeneralPostDto.GeneralPostUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostUpdateRequest;
 
 import javax.persistence.*;
 import java.util.ArrayList;
