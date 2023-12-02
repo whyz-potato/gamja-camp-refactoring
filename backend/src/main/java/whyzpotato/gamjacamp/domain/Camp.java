@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import whyzpotato.gamjacamp.controller.dto.camp.CampUpdateRequestDto;
 import whyzpotato.gamjacamp.domain.member.Member;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampUpdateRequest;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -52,15 +52,16 @@ public class Camp {
     private LocalTime campOperationEnd;
 
     @OneToMany(mappedBy = "camp")
-    private List<Room> rooms = new ArrayList<Room>();
+    private List<Room> rooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "camp")
     private List<Review> reviews = new ArrayList<>();
 
-    // images
+    @OneToMany(mappedBy = "camp")
+    private List<Image> images = new ArrayList<>();
 
     @Builder
-    public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd) {
+    public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd, List<Image> images) {
         this.member = member;
         this.name = name;
         this.address = address;
@@ -70,12 +71,13 @@ public class Camp {
         this.latitude = latitude;
         this.campOperationStart = campOperationStart;
         this.campOperationEnd = campOperationEnd;
+        this.images = images;
     }
 
-    public Camp update(CampUpdateRequestDto campUpdateRequestDto) {
-        this.name = campUpdateRequestDto.getName();
-        this.phone = campUpdateRequestDto.getPhone();
-        this.campIntroduction = campUpdateRequestDto.getCampIntroduction();
+    public Camp update(CampUpdateRequest request) {
+        this.name = request.getName();
+        this.phone = request.getPhone();
+        this.campIntroduction = request.getCampIntroduction();
         return this;
     }
 
