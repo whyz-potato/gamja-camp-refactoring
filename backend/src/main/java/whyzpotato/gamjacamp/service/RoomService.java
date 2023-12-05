@@ -53,13 +53,14 @@ public class RoomService {
         return toRoomSearchResponse(camp, availRooms, checkIn, checkOut);
     }
 
-    public RoomSearchResponse toRoomSearchResponse(Camp camp, List<Room> rooms, LocalDate checkIn, LocalDate checkOut) {
-        CampDto.CampInfo campInfo = new CampDto.CampInfo(camp);
-        List<RoomDetail> roomDetails = rooms.stream().map(r -> toRoomDetail(r, checkIn, checkOut)).collect(Collectors.toList());
-        return new RoomSearchResponse(checkIn, checkOut, campInfo, roomDetails);
+    private RoomSearchResponse toRoomSearchResponse(Camp camp, List<Room> rooms, LocalDate checkIn, LocalDate checkOut) {
+        List<RoomDetail> roomDetails = rooms.stream()
+                .map(r -> toRoomDetail(r, checkIn, checkOut))
+                .collect(Collectors.toList());
+        return new RoomSearchResponse(checkIn, checkOut, camp.getId(), roomDetails);
     }
 
-    public RoomDetail toRoomDetail(Room room, LocalDate stayStarts, LocalDate stayEnds) {
+    private RoomDetail toRoomDetail(Room room, LocalDate stayStarts, LocalDate stayEnds) {
         PriceDto priceDto = new PriceDto(room.getPrices(stayStarts, stayEnds));
         return new RoomDetail(room.getId(), room.getName(), room.getCapacity(), priceDto);
     }

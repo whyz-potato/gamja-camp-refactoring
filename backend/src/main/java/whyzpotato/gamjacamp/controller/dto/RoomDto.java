@@ -121,13 +121,13 @@ public class RoomDto {
     public static class RoomSearchResponse {
         private LocalDate checkIn;
         private LocalDate checkOut;
-        private CampInfo camp;
+        private Long campId;
         private List<RoomDetail> rooms;
 
-        public RoomSearchResponse(LocalDate checkIn, LocalDate checkOut, CampInfo camp, List<RoomDetail> rooms) {
+        public RoomSearchResponse(LocalDate checkIn, LocalDate checkOut, Long campId, List<RoomDetail> rooms) {
             this.checkIn = checkIn;
             this.checkOut = checkOut;
-            this.camp = camp;
+            this.campId = campId;
             this.rooms = rooms;
         }
     }
@@ -137,13 +137,13 @@ public class RoomDto {
     public static class RoomResponse {
         private LocalDate checkIn;
         private LocalDate checkOut;
-        private CampInfo camp;
+        private Long campId;
         private RoomDetail room;
 
-        public RoomResponse(LocalDate checkIn, LocalDate checkOut, CampInfo camp, RoomDetail room) {
+        public RoomResponse(LocalDate checkIn, LocalDate checkOut, Long campId, RoomDetail room) {
             this.checkIn = checkIn;
             this.checkOut = checkOut;
-            this.camp = camp;
+            this.campId = campId;
             this.room = room;
         }
     }

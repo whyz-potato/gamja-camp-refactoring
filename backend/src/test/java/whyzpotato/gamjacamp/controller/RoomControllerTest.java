@@ -112,7 +112,7 @@ class RoomControllerTest {
                         .param("guests", String.valueOf(1))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.camp.name").value(camp.getName()))
+                .andExpect(jsonPath("$.campId").value(camp.getId()))
                 .andExpect(jsonPath("$.rooms.length()").value(2))
                 .andExpect(jsonPath("$.rooms[*].price").exists())
                 .andExpect(jsonPath("$.rooms[*].price.dailyPrices.length()", Matchers.everyItem(Matchers.is(3))))
