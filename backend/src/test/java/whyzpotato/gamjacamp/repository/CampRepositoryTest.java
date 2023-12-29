@@ -16,7 +16,7 @@ import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
-import whyzpotato.gamjacamp.repository.querydto.CampSearchResult;
+import whyzpotato.gamjacamp.repository.querydto.CampQueryDto;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -80,7 +80,7 @@ class CampRepositoryTest {
     @DisplayName("캠핑장 검색_전체")
     @Test
     public void search() {
-        Page<CampSearchResult> availableCamp = campRepository.searchAvailCamp("", start, end, 1, pageable);
+        Page<CampQueryDto> availableCamp = campRepository.searchAvailCamp("", start, end, 1, pageable);
 
         System.out.println(availableCamp.getContent().size());
 
@@ -92,7 +92,7 @@ class CampRepositoryTest {
     @ParameterizedTest
     @CsvSource(value = {"2,2", "4,1"})
     public void distinctCampSearch(int capacity, int expected) {
-        Page<CampSearchResult> availableCamp = campRepository.searchAvailCamp("", start, end, capacity, pageable);
+        Page<CampQueryDto> availableCamp = campRepository.searchAvailCamp("", start, end, capacity, pageable);
 
         availableCamp.forEach(c -> {
             System.out.println("c.campId = " + c.getCamp_Id());
@@ -101,6 +101,6 @@ class CampRepositoryTest {
         });
         assertThat(availableCamp.getTotalElements()).isEqualTo(expected);
         assertThat(availableCamp.getNumberOfElements()).isEqualTo(expected);
-        assertThat(availableCamp.getContent().stream().map(CampSearchResult::getCamp_Id).distinct().count()).isEqualTo(expected);
+        assertThat(availableCamp.getContent().stream().map(CampQueryDto::getCamp_Id).distinct().count()).isEqualTo(expected);
     }
 }

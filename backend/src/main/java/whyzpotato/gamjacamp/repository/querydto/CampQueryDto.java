@@ -1,6 +1,6 @@
 package whyzpotato.gamjacamp.repository.querydto;
 
-public interface CampSearchResult {
+public interface CampQueryDto {
 
     Long getCamp_Id();
 
@@ -9,5 +9,9 @@ public interface CampSearchResult {
     String getAddress();
 
     int getMin_Price();
+
+    Double getLatitude();
+
+    Double getLongitude();
 
 }

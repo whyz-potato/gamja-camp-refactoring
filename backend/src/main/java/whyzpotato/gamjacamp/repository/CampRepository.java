@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.repository.querydto.CampSearchResult;
+import whyzpotato.gamjacamp.repository.querydto.CampQueryDto;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -28,7 +28,7 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
                     "    WHERE" +
                     "        DATEADD(DAY, 1, dt) < :end" +
                     ")" +
-                    " SELECT c.camp_id, c.name, c.address, camp_price.min_price" +
+                    " SELECT c.camp_id, c.name, c.address, c.latitude, c.longitude, camp_price.min_price" +
                     " FROM camp c" +
                     " JOIN (" +
                     "     SELECT camp_id, MIN(price) as min_price " +
@@ -54,7 +54,7 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
                     " ON c.camp_id = camp_price.camp_id" +
                     " WHERE c.name LIKE %:query% OR c.address LIKE %:query%",
             countProjection = "c.camp_id")
-    Page<CampSearchResult> searchAvailCamp(@Param("query") String query,
+    Page<CampQueryDto> searchAvailCamp(@Param("query") String query,
                                            @Param("start") LocalDate start,
                                            @Param("end") LocalDate end,
                                            @Param("capacity") int capacity,
