@@ -2,14 +2,12 @@ package whyzpotato.gamjacamp.repository.querydto;
 
 public interface CampSearchResult {
 
-    Long getCampId();
+    Long getCamp_Id();
 
     String getName();
 
     String getAddress();
 
-    int getCapacity();
-
-//    int getNum_avail();
+    int getMin_Price();
 
 }
