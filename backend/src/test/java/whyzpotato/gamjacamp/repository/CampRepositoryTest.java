@@ -17,12 +17,10 @@ import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.member.Role;
 import whyzpotato.gamjacamp.repository.querydto.CampSearchResult;
-import whyzpotato.gamjacamp.repository.querydto.RoomSearchResult;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,39 +102,5 @@ class CampRepositoryTest {
         assertThat(availableCamp.getTotalElements()).isEqualTo(expected);
         assertThat(availableCamp.getNumberOfElements()).isEqualTo(expected);
         assertThat(availableCamp.getContent().stream().map(CampSearchResult::getCamp_Id).distinct().count()).isEqualTo(expected);
-    }
-
-
-    @DisplayName("검색 결과 리스트로 반환_캠핑장은 예약가능한 room이 여러개라도 하나씩만 반환되야한다.")
-    @ParameterizedTest
-    @CsvSource(value = {"2,2", "4,1"})
-    public void distinctCampSearch_List(int capacity, int expected) {
-        List<CampSearchResult> availableCamp = campRepository.searchAvailCampList("", start, end, capacity);
-
-        availableCamp.forEach(c -> {
-            System.out.println("c.campId = " + c.getCamp_Id() + ", c.name = " + c.getName() + ", price = " + c.getMin_Price());
-        });
-        assertThat(availableCamp.size()).isEqualTo(expected);
-    }
-
-    @DisplayName("검색 결과 리스트로 반환_이름 또는 지역으로 검색")
-    @ParameterizedTest
-    @CsvSource(value = {"감자,2", "고구마,0", "서울,2", "부산,0"})
-    public void 캠핑장_검색_리스트_query(String query, int expected) {
-        List<CampSearchResult> availableCamp = campRepository.searchAvailCampList(query, start, end, 1);
-
-        availableCamp.forEach(c -> {
-            System.out.println(c.getName());
-            System.out.println(c.getMin_Price());
-        });
-        assertThat(availableCamp.size()).isEqualTo(expected);
-    }
-
-    @Test
-    public void 방가격까지() {
-
-        List<RoomSearchResult> allRoom = campRepository.findAllRoom(start, end, 1);
-
-        allRoom.forEach(r -> System.out.println("roomId = " + r.getRoom_Id() + ", price = " + r.getPrice()));
     }
 }
