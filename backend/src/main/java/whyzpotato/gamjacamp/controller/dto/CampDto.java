@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import whyzpotato.gamjacamp.controller.dto.Utility.PageResult;
 import whyzpotato.gamjacamp.domain.Camp;
+import whyzpotato.gamjacamp.repository.querydto.CampQueryDto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,30 +26,6 @@ public class CampDto {
         }
 
     }
-
-
-    @Getter
-    @NoArgsConstructor
-    public static class CampSearch {
-
-        private Long id;
-        private String name;
-        private double rate;
-        private List<String> images;
-        private double latitude;
-        private double longitude;
-
-        public CampSearch(Camp camp) {
-            this.id = camp.getId();
-            this.name = camp.getName();
-            this.rate = camp.getRate();
-            this.images = List.of("https://picsum.photos/300", "https://picsum.photos/300", "https://picsum.photos/300"); //TODO dummy -> image
-            this.latitude = camp.getLatitude();
-            this.longitude = camp.getLongitude();
-        }
-
-    }
-
 
     @Getter
     @NoArgsConstructor
@@ -103,34 +80,44 @@ public class CampDto {
             this.checkInTime = camp.getCampOperationStart();
             this.checkOutTime = camp.getCampOperationEnd();
             this.introduction = camp.getCampIntroduction();
-
-        }
-
-    }
-
-    @Getter
-    @NoArgsConstructor
-    public static class SearchItem{
-        private CampSearch camp;
-        private PriceDto price;
-
-        public SearchItem(Camp camp, List<Integer> dailyPrice) {
-            this.camp = new CampSearch(camp);
-            this.price = new PriceDto(dailyPrice);
         }
     }
 
     @Getter
     @NoArgsConstructor
-    public static class SearchResult<T> extends PageResult<T>{
+    public static class CampSearchItem {
+
+        private Long id;
+        private String name;
+        private String address;
+        private int price;
+        private double latitude;
+        private double longitude;
+        private List<String> images;
+//        private double rate;
+
+        public CampSearchItem(CampQueryDto campQueryDto) {
+            this.id = campQueryDto.getCamp_Id();
+            this.name = campQueryDto.getName();
+            this.address = campQueryDto.getAddress();
+            this.price = campQueryDto.getMin_Price();
+            this.latitude = campQueryDto.getLatitude();
+            this.longitude = campQueryDto.getLongitude();
+            this.images = List.of("https://picsum.photos/300", "https://picsum.photos/300", "https://picsum.photos/300"); //TODO dummy -> image
+//            this.rate = campQueryDto.getRate();
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class CampSearchResult<T> extends PageResult<T> {
         private LocalDate checkIn;
         private LocalDate checkOut;
 
-        public SearchResult(Page<T> page, LocalDate checkIn, LocalDate checkOut) {
+        public CampSearchResult(Page<T> page, LocalDate checkIn, LocalDate checkOut) {
             super(page);
             this.checkIn = checkIn;
             this.checkOut = checkOut;
         }
     }
-
 }
