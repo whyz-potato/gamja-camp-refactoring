@@ -1,8 +1,10 @@
 package whyzpotato.gamjacamp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -99,20 +101,36 @@ class RoomControllerTest {
         session.clearAttributes();
     }
 
+    @DisplayName("예약 가능 객실 조회")
     @Test
     void availableRooms() throws Exception {
         String uri = "/rooms";
         mockMvc.perform(get(uri)
                         .param("camp", String.valueOf(camp.getId()))
-                        .param("check-in", LocalDate.now().toString())
-                        .param("check-out", LocalDate.now().plusDays(1).toString())
+                        .param("check-in", LocalDate.now().plusDays(3).toString())
+                        .param("check-out", LocalDate.now().plusDays(6).toString())
                         .param("guests", String.valueOf(1))
                 )
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.campId").value(camp.getId()))
+                .andExpect(jsonPath("$.rooms.length()").value(2))
+                .andExpect(jsonPath("$.rooms[*].price").exists())
+                .andExpect(jsonPath("$.rooms[*].price.dailyPrices.length()", Matchers.everyItem(Matchers.is(3))))
+                .andDo(print());
+    }
+
+    @DisplayName("예약 가능 객실 조회_파라미터 기본값 - 당일 1박, 2명")
+    @Test
+    void availableRooms_defaultParameter() throws Exception {
+        String uri = "/rooms";
+        mockMvc.perform(get(uri)
+                        .param("camp", String.valueOf(camp.getId()))
+                )
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.checkIn").value(LocalDate.now().toString()))
-                .andExpect(jsonPath("$.camp.name").value(camp.getName()))
-                .andExpect(jsonPath("$.rooms[3]").exists())
-                .andExpect(jsonPath("$.rooms[0].price").exists())
+                .andExpect(jsonPath("$.checkOut").value(LocalDate.now().plusDays(1).toString()))
+                .andExpect(jsonPath("$.rooms.length()").value(4))
+                .andExpect(jsonPath("$.rooms[*].capacity", Matchers.everyItem(Matchers.greaterThanOrEqualTo(2))))
                 .andDo(print());
     }
 }

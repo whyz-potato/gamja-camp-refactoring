@@ -18,13 +18,12 @@ public class RoomController {
 
     @GetMapping("/rooms")
     public ResponseEntity<RoomSearchResponse> availableRooms(@RequestParam("camp") Long campId,
-                                                             @RequestParam("check-in") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkIn,
-                                                             @RequestParam("check-out") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkOut,
-                                                             @RequestParam("guests") int numGuest) {
+                                                             @RequestParam(value = "check-in", defaultValue = "#{T(java.time.LocalDateTime).now()}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkIn,
+                                                             @RequestParam(value = "check-out", defaultValue = "#{T(java.time.LocalDateTime).now().plusDays(1)}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkOut,
+                                                             @RequestParam(value = "guests", defaultValue = "2") int numGuest) {
 
         return ResponseEntity.ok(roomService.findCampAvailableRooms(campId, checkIn, checkOut, numGuest));
     }
-
 
 //    //curl --location 'localhost:8080/rooms/:id?check-in=null&check-out=null&guests=null'
 //    public RoomResponse availableRoom() {

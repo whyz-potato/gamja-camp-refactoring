@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import whyzpotato.gamjacamp.controller.dto.CampDto.SearchItem;
-import whyzpotato.gamjacamp.controller.dto.CampDto.SearchResult;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampSearchItem;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampSearchResult;
 import whyzpotato.gamjacamp.controller.dto.Utility.PageResult;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Coordinate;
@@ -21,7 +21,7 @@ import whyzpotato.gamjacamp.repository.CampRepository;
 import whyzpotato.gamjacamp.repository.ImageRepository;
 import whyzpotato.gamjacamp.repository.MemberRepository;
 import whyzpotato.gamjacamp.repository.RoomRepository;
-import whyzpotato.gamjacamp.repository.querydto.CampSearchResult;
+import whyzpotato.gamjacamp.repository.querydto.CampQueryDto;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -165,8 +165,10 @@ public class CampService {
      */
     //TODO 화면 내 검색 활성화
     //TODO refactor (파라미터 줄이기)
-    public PageResult<CampSearchResult> search(String query, Double neLatitude, Double swLatitude, Double neLongitude, Double swLongitude, LocalDate checkIn, LocalDate checkOut, int numGuests, Pageable pageable) {
-        return new PageResult(campRepository.findAvailableCamp(query, checkIn, checkOut, numGuests, pageable));
+    public CampSearchResult<CampSearchItem> search(String query, Double neLatitude, Double swLatitude, Double neLongitude, Double swLongitude, LocalDate checkIn, LocalDate checkOut, int numGuests, Pageable pageable) {
+        Page<CampSearchItem> result = campRepository.searchAvailCamp(query, checkIn, checkOut, numGuests, pageable)
+                .map(CampSearchItem::new);
+        return new CampSearchResult<>(result, checkIn, checkOut);
     }
 
     /**
@@ -251,15 +253,6 @@ public class CampService {
     public Camp findById(Long campId) {
         return campRepository.findById(campId)
                 .orElseThrow(() -> new NotFoundException());
-
-    }
-
-    public PageResult<SearchItem> findAll(LocalDate stayStart, LocalDate stayEnd, Pageable pageable) {
-        Page<Camp> all = campRepository.findAll(pageable);
-        return new SearchResult<>(all.map
-                (c -> new SearchItem(c, c.getRooms().get(0).getPrices(stayStart, stayEnd))),
-                stayStart, stayEnd);
-
 
     }
 }

@@ -3,17 +3,17 @@ package whyzpotato.gamjacamp.controller;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import whyzpotato.gamjacamp.controller.dto.CampDto.SearchItem;
 import whyzpotato.gamjacamp.controller.dto.Utility.PageResult;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampDetail;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampSaveRequest;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampSearchItem;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampSearchResult;
 import whyzpotato.gamjacamp.service.CampService;
 import whyzpotato.gamjacamp.service.AwsS3Service;
 
@@ -29,15 +29,17 @@ public class CampController {
     private final AwsS3Service awsS3Service;
 
     @GetMapping("/search")
-    public PageResult<SearchItem> search(@RequestParam String query,
-                                         @RequestParam("ne-lat") Double neLatitude, @RequestParam("sw-lat") Double swLatitude,
-                                         @RequestParam("ne-lng") Double neLongitude, @RequestParam("sw-lng") Double swLongitude,
-                                         @RequestParam("check-in") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkIn,
-                                         @RequestParam("check-out") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkOut,
-                                         @RequestParam("guests") int numGuests,
-                                         @PageableDefault Pageable pageable) {
+    public CampSearchResult<CampSearchItem> search(@RequestParam String query,
+                                                   @RequestParam("ne-lat") Double neLatitude,
+                                                   @RequestParam("sw-lat") Double swLatitude,
+                                                   @RequestParam("ne-lng") Double neLongitude,
+                                                   @RequestParam("sw-lng") Double swLongitude,
+                                                   @RequestParam(value = "check-in", defaultValue = "#{T(java.time.LocalDate).now()}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkIn,
+                                                   @RequestParam(value = "check-out", defaultValue = "#{T(java.time.LocalDate).now().plusDays(1)}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate checkOut,
+                                                   @RequestParam(value = "guests", defaultValue = "2") int numGuests,
+                                                   Pageable pageable) {
 
-        return campService.findAll(checkIn, checkOut, pageable);
+        return campService.search(query, neLatitude, swLatitude, neLongitude, swLongitude, checkIn, checkOut, numGuests, pageable);
     }
 
     @PostMapping ("/new/{memberId}")
