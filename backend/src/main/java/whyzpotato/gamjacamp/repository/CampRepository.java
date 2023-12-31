@@ -46,18 +46,34 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
                     "         ) reserved " +
                     "         ON r.room_id = reserved.room_id" +
                     "         CROSS JOIN t_temp_dates dates" +
-                    "         WHERE r.capacity>=:capacity AND r.cnt > IFNULL(reserved.cnt, 0)" +
+                    "         WHERE r.capacity>=:capacity AND r.cnt > COALESCE(reserved.cnt, 0)" +
                     "         GROUP BY r.room_id, r.camp_id" +
                     "     )" +
                     "     GROUP BY camp_id " +
                     " ) camp_price" +
                     " ON c.camp_id = camp_price.camp_id" +
                     " WHERE c.name LIKE %:query% OR c.address LIKE %:query%",
-            countProjection = "c.camp_id")
+            countQuery = " SELECT COUNT(*)" +
+                    " FROM camp c" +
+                    " JOIN (" +
+                    "     SELECT r.camp_id," +
+                    "     FROM room r" +
+                    "     LEFT JOIN (" +
+                    "         SELECT room_id, COUNT(*) AS cnt" +
+                    "         FROM reservation" +
+                    "         WHERE stay_starts < :end AND stay_ends >:start" +
+                    "         GROUP BY room_id " +
+                    "     ) reserved " +
+                    "     ON r.room_id = reserved.room_id" +
+                    "     WHERE r.capacity >= :capacity AND r.cnt > COALESCE(reserved.cnt, 0)" +
+                    "     GROUP BY r.camp_id" +
+                    " ) avail" +
+                    " ON c.camp_id = avail.camp_id" +
+                    " WHERE c.name LIKE %:query% OR c.address LIKE %:query%")
     Page<CampQueryDto> searchAvailCamp(@Param("query") String query,
-                                           @Param("start") LocalDate start,
-                                           @Param("end") LocalDate end,
-                                           @Param("capacity") int capacity,
-                                           Pageable pageable);
+                                       @Param("start") LocalDate start,
+                                       @Param("end") LocalDate end,
+                                       @Param("capacity") int capacity,
+                                       Pageable pageable);
 
 }
