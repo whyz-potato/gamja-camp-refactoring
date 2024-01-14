@@ -14,4 +14,6 @@ public interface CampQueryDto {
 
     Double getLongitude();
 
+    Double getRate();
+
 }

@@ -111,6 +111,7 @@ class CampControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(4))
                 .andExpect(jsonPath("$.numberOfElements").value(2))
                 .andExpect(jsonPath("$.isLast").value(true))
+                .andExpect(jsonPath("$.content[*].rate").exists())
                 .andDo(print());
     }
 
