@@ -51,6 +51,9 @@ public class Camp {
     @Column
     private LocalTime campOperationEnd;
 
+    @Column
+    private double rate = 0.0;
+
     @OneToMany(mappedBy = "camp")
     private List<Room> rooms = new ArrayList<>();
 
@@ -94,10 +97,9 @@ public class Camp {
         return this;
     }
 
-    public double getRate() {
-        return reviews.stream()
-                .mapToInt(r -> r.getRate())
-                .average().orElse(0);
+    public Camp updateRate(double rate) {
+        this.rate = rate;
+        return this;
     }
 
 }
