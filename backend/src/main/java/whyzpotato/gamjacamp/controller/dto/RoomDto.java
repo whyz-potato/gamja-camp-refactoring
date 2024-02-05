@@ -50,19 +50,16 @@ public class RoomDto {
         @Positive
         private int weekendPrice;
 
-        private List<PeakPriceDto> peakPrices;
-
         //TODO : 대표 사진
 
         @Builder
-        public RoomSaveRequest(Long id, String name, int cnt, int capacity, int weekPrice, int weekendPrice, List<PeakPriceDto> peakPrices) {
+        public RoomSaveRequest(Long id, String name, int cnt, int capacity, int weekPrice, int weekendPrice) {
             this.id = id;
             this.name = name;
             this.cnt = cnt;
             this.capacity = capacity;
             this.weekPrice = weekPrice;
             this.weekendPrice = weekendPrice;
-            this.peakPrices = peakPrices;
         }
 
         public Room toEntity() {
@@ -72,10 +69,6 @@ public class RoomDto {
                     .capacity(capacity)
                     .weekPrice(weekPrice)
                     .weekendPrice(weekendPrice)
-                    .peakPrices(Optional.ofNullable(peakPrices)
-                            .orElseGet(Collections::emptyList)
-                            .stream()
-                            .map(dto -> dto.toEntity()).collect(Collectors.toList()))
                     .build();
         }
     }

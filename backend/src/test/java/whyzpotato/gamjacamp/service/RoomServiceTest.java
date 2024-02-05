@@ -4,7 +4,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import whyzpotato.gamjacamp.controller.dto.PeakPriceDto;
 import whyzpotato.gamjacamp.controller.dto.RoomDto;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomSearchResponse;
 import whyzpotato.gamjacamp.domain.Camp;
@@ -20,8 +19,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,36 +89,6 @@ class RoomServiceTest {
 
         //then
         assertThat(constraintViolations.size()).isNotEqualTo(0);
-    }
-
-
-    @DisplayName("객실 PeakPrice 영속성 전이 성공")
-    @Test
-    public void saveRoom_withPeakPrice() {
-        // given
-        List<PeakPriceDto> list = new ArrayList<>();
-        list.add(PeakPriceDto.builder()
-                .price(1)
-                .peakStart(LocalDate.now())
-                .peakEnd(LocalDate.now())
-                .build());
-        list.add(PeakPriceDto.builder()
-                .price(1)
-                .peakStart(LocalDate.now())
-                .peakEnd(LocalDate.now())
-                .build());
-
-        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
-                .peakPrices(list)
-                .build();
-
-        //when
-        Room room = roomService.saveRoom(camp, roomSaveRequest);
-
-        //then
-        assertThat(room.getPeakPrices().get(0).getId()).isNotNull();
-        assertThat(room.getPeakPrices().get(1).getId()).isNotNull();
-
     }
 
     @DisplayName("객실 캠핑장 연관관계 편의 메소드 확인")

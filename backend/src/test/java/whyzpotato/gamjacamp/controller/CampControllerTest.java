@@ -120,7 +120,7 @@ class CampControllerTest {
     void searchCamp_defaultParameter() throws Exception {
         String uri = "/camps/search";
         mockMvc.perform(get(uri)
-                        .param("query", "")
+//                        .param("query", "")
                         .param("ne-lat", "37.43")
                         .param("sw-lng", "127.0")
                         .param("ne-lng", "128.0")
