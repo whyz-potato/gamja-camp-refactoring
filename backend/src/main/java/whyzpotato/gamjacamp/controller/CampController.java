@@ -29,7 +29,7 @@ public class CampController {
     private final AwsS3Service awsS3Service;
 
     @GetMapping("/search")
-    public CampSearchResult<CampSearchItem> search(@RequestParam String query,
+    public CampSearchResult<CampSearchItem> search(@RequestParam(defaultValue = "") String query,
                                                    @RequestParam("ne-lat") Double neLatitude,
                                                    @RequestParam("sw-lat") Double swLatitude,
                                                    @RequestParam("ne-lng") Double neLongitude,
