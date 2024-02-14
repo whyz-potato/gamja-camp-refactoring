@@ -71,18 +71,18 @@ public class ReservationService {
     public Long createReservation(Long memberId, ReservationRequest request) {
         Member member = memberService.findById(memberId);
         Room room = roomService.findById(request.getRoomId());
-        Camp camp = room.getCamp();
-
-        if (!camp.getId().equals(request.getCampId()))
-            throw new IllegalArgumentException("잘못된 접근입니다.");
-
         Reservation reservation = Reservation.builder()
-                .member(member).camp(camp).room(room)
+                .member(member).camp(room.getCamp()).room(room)
                 .numGuest(request.getReservation().getNumGuest())
                 .stayStarts(request.getCheckIn())
                 .stayEnds(request.getCheckOut())
                 .prices(request.getReservation().getDailyPrice())
                 .build();
+
+        Long count = reservationRepository.countByRoomAndStayEndsGreaterThanAndStayStartsLessThan(room, request.getCheckIn(), request.getCheckOut());
+        if(room.getCnt() <= count){
+            throw new IllegalStateException("변경된 예약정보가 있습니다.");
+        }
 
         reservationRepository.save(reservation);
         return reservation.getId();
@@ -139,7 +139,4 @@ public class ReservationService {
 
         return new ReservationDetail(reservation);
     }
-
-
-
 }

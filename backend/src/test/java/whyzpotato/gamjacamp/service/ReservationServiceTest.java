@@ -109,8 +109,14 @@ class ReservationServiceTest {
     @DisplayName("객실 예약 실패 <- 객실이 부족한 경우 예약할 수 있다")
     @Test
     public void reserve_fullReserve_fail() {
-        //TODO
+        LocalDate start = LocalDate.now(), end = LocalDate.now().plusDays(1);
+        em.persist(Reservation.builder().member(customer).camp(camp).room(room).numGuest(2).stayStarts(start).stayEnds(end).prices(room.getPrices(start, end)).build());
+        em.persist(Reservation.builder().member(customer).camp(camp).room(room).numGuest(2).stayStarts(start).stayEnds(end).prices(room.getPrices(start, end)).build());
+        em.persist(Reservation.builder().member(customer).camp(camp).room(room).numGuest(2).stayStarts(start).stayEnds(end).prices(room.getPrices(start, end)).build());
 
+        ReservationRequest dto = new ReservationRequest(camp.getId(), room.getId(), start, end, new MemberDto.MemberSimple(customer), new ReservationDto.ReservationSimple(2, List.copyOf(room.getPrices(start, end))));
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> reservationService.createReservation(customer.getId(), dto));
     }
 
     @DisplayName("객실 예약 실패 <- 인원 수는 수용가능인원 이하여야 한다.")
