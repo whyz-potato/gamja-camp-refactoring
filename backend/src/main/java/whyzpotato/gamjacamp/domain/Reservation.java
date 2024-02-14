@@ -133,14 +133,14 @@ public class Reservation extends BaseTimeEntity {
         }
 
         public Reservation build() {
-
-            if (!camp.getId().equals(room.getCamp().getId()) || prices.isEmpty() || room.getCapacity() < numGuest)
+            if (!camp.getId().equals(room.getCamp().getId()) || prices.isEmpty() || room.getCapacity() < numGuest){
                 throw new IllegalArgumentException("잘못된 접근입니다.");
-            if (!room.getPrices(stayStarts, stayEnds).containsAll(prices))
+            }
+            if (!room.getPrices(stayStarts, stayEnds).containsAll(prices)){
                 throw new IllegalStateException("변경된 정보가 있습니다.");
+            }
 
             return new Reservation(member, camp, room, numGuest, stayStarts, stayEnds, prices);
-
         }
 
         public String toString() {
