@@ -134,7 +134,7 @@ class CampRepositoryTest {
     @DisplayName("캠핑장 검색_전체")
     @Test
     public void searchAll() {
-        Page<CampQueryDto> result = campRepository.searchAvailCamp("", noReservationStart, noReservationEnd, 1, pageable);
+        Page<CampQueryDto> result = campRepository.searchAvailCamp("", noReservationStart, noReservationEnd, 1, 126.0, 127.0, 90.0, 93.0, pageable);
 
         System.out.println(result.getContent().size());
 
@@ -146,7 +146,7 @@ class CampRepositoryTest {
     @ParameterizedTest
     @CsvSource(value = {"감자,5", "서울,2", "춘천,1"})
     public void querySearch(String query, int expectedCnt) {
-        Page<CampQueryDto> result = campRepository.searchAvailCamp(query, noReservationStart, noReservationEnd, 1, pageable);
+        Page<CampQueryDto> result = campRepository.searchAvailCamp(query, noReservationStart, noReservationEnd, 1, 126.0, 127.0, 90.0, 93.0, pageable);
 
         assertThat(result.getTotalElements()).isEqualTo(expectedCnt);
     }
@@ -154,7 +154,7 @@ class CampRepositoryTest {
     @DisplayName("캠핑장 검색_예약가능한 캠핑장만 반환된다.")
     @Test
     public void searchDate() {
-        Page<CampQueryDto> result = campRepository.searchAvailCamp("", reservationStart, reservationEnd, 1, pageable);
+        Page<CampQueryDto> result = campRepository.searchAvailCamp("", reservationStart, reservationEnd, 1, 126.0, 127.0, 90.0, 93.0, pageable);
 
         assertThat(result.getContent()).extracting("name")
                 .containsExactly("감자캠핑2", "감자캠핑3", "감자캠핑4", "감자캠핑5");
@@ -163,7 +163,7 @@ class CampRepositoryTest {
     @DisplayName("캠핑장 검색_캠핑장 검색 시 예약가능한 객실 중 최저가 정보가 반환된다.")
     @Test
     public void searchMinPrice() {
-        Page<CampQueryDto> result = campRepository.searchAvailCamp("", reservationStart, reservationEnd, 1, pageable);
+        Page<CampQueryDto> result = campRepository.searchAvailCamp("", reservationStart, reservationEnd, 1, 126.0, 127.0, 90.0, 93.0, pageable);
 
         assertThat(result.getContent()).extracting("min_Price").containsOnly(45000);
     }
@@ -172,7 +172,7 @@ class CampRepositoryTest {
     @ParameterizedTest
     @CsvSource(value = {"0,3,3,", "2,2,1"})
     public void searchPageTest(int page, int size, int expectedNumElements) {
-        Page<CampQueryDto> result = campRepository.searchAvailCamp("", noReservationStart, noReservationEnd, 1, PageRequest.of(page, size));
+        Page<CampQueryDto> result = campRepository.searchAvailCamp("", noReservationStart, noReservationEnd, 1, 126.0, 127.0, 90.0, 93.0, PageRequest.of(page, size));
 
         assertThat(result.getNumberOfElements()).isEqualTo(expectedNumElements);
     }

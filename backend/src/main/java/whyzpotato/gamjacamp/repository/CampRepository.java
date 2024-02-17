@@ -52,7 +52,7 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
                     "     GROUP BY camp_id " +
                     " ) camp_price" +
                     " ON c.camp_id = camp_price.camp_id" +
-                    " WHERE c.name LIKE %:query% OR c.address LIKE %:query%",
+                    " WHERE c.longitude between :left and :right and c.latitude between :down and :up and c.name LIKE %:query% OR c.address LIKE %:query%",
             countQuery = " SELECT COUNT(*)" +
                     " FROM camp c" +
                     " JOIN (" +
@@ -69,11 +69,15 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
                     "     GROUP BY r.camp_id" +
                     " ) avail" +
                     " ON c.camp_id = avail.camp_id" +
-                    " WHERE c.name LIKE %:query% OR c.address LIKE %:query%")
+                    " WHERE c.longitude between :left and :right and c.latitude between :up and :down and c.name LIKE %:query% OR c.address LIKE %:query%")
     Page<CampQueryDto> searchAvailCamp(@Param("query") String query,
                                        @Param("start") LocalDate start,
                                        @Param("end") LocalDate end,
                                        @Param("capacity") int capacity,
+                                       @Param("left") Double left,
+                                       @Param("right") Double right,
+                                       @Param("down") Double down,
+                                       @Param("up") Double up,
                                        Pageable pageable);
 
 }

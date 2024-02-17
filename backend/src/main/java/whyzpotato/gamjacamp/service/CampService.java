@@ -166,7 +166,7 @@ public class CampService {
     //TODO 화면 내 검색 활성화
     //TODO refactor (파라미터 줄이기)
     public CampSearchResult<CampSearchItem> search(String query, Double neLatitude, Double swLatitude, Double neLongitude, Double swLongitude, LocalDate checkIn, LocalDate checkOut, int numGuests, Pageable pageable) {
-        Page<CampSearchItem> result = campRepository.searchAvailCamp(query, checkIn, checkOut, numGuests, pageable)
+        Page<CampSearchItem> result = campRepository.searchAvailCamp(query, checkIn, checkOut, numGuests, swLongitude, neLongitude, swLatitude, neLatitude, pageable)
                 .map(CampSearchItem::new);
         return new CampSearchResult<>(result, checkIn, checkOut);
     }
