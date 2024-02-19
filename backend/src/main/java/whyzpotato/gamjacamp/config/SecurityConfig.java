@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,9 +28,11 @@ public class SecurityConfig {
                 .cors().configurationSource(corsConfigurationSource());
 
         //relax csrf for sockJS
+//        http
+//                .csrf(csrf -> csrf
+//                        .ignoringAntMatchers("/prototype/**", "/chats/**"));
         http
-                .csrf(csrf -> csrf
-                        .ignoringAntMatchers("/prototype/**", "/chats/**"));
+                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 
         //allow frame-option for sockJS
 //        http
