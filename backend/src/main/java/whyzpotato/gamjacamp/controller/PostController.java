@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import whyzpotato.gamjacamp.config.auth.LoginMember;
+import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostDetail;
 import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostSaveRequest;
 import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostSimple;
@@ -28,8 +30,11 @@ public class PostController {
 
     @PostMapping("/general/new/{memberId}")
     public ResponseEntity createGeneralPost(@PathVariable("memberId") Long memberId,
-                                            @RequestPart("request") GeneralPostSaveRequest request,
+//                                            @RequestPart("request") GeneralPostSaveRequest request,
+                                            @RequestPart("title") String title,
+                                            @RequestPart("content") String content,
                                             @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
+        GeneralPostSaveRequest request = new GeneralPostSaveRequest(title, content);
         return new ResponseEntity(new createdBodyDto(postService.saveGeneralPost(memberId, request, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
     }
 
