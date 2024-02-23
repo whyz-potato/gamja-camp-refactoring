@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampUpdateRequest;
 
@@ -50,6 +51,9 @@ public class Camp {
 
     @Column
     private LocalTime campOperationEnd;
+
+    @ColumnDefault("0")
+    private double rate;
 
     @OneToMany(mappedBy = "camp")
     private List<Room> rooms = new ArrayList<>();
@@ -98,6 +102,11 @@ public class Camp {
         return reviews.stream()
                 .mapToInt(r -> r.getRate())
                 .average().orElse(0);
+    }
+
+    public Camp updateRate(double rate) {
+        this.rate = rate;
+        return this;
     }
 
 }

@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import whyzpotato.gamjacamp.controller.dto.ReviewDto.ReviewUpdateRequest;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.controller.dto.review.ReviewUpdateRequestDto;
 
 import javax.persistence.*;
 import javax.validation.constraints.Max;
@@ -46,10 +46,11 @@ public class Review {
     private List<Image> images = new ArrayList<Image>();
 
     @Builder
-    public Review(Member writer, Camp camp, Reservation reservation, String content, List<Image> images) {
+    public Review(Member writer, Camp camp, Reservation reservation, int rate, String content, List<Image> images) {
         this.writer = writer;
         this.camp = camp;
         this.reservation = reservation;
+        this.rate = rate;
         this.content = content;
         this.images = images;
     }
@@ -61,8 +62,13 @@ public class Review {
         }
     }
 
-    public Review update(ReviewUpdateRequestDto reviewUpdateRequestDto) {
-        this.content = reviewUpdateRequestDto.getContent();
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
+    }
+
+    public Review update(ReviewUpdateRequest request) {
+        this.rate = request.getRate();
+        this.content = request.getContent();
         return this;
     }
 
