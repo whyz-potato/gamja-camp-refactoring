@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import whyzpotato.gamjacamp.config.auth.LoginMember;
+import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentDetail;
 import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentInfo;
 import whyzpotato.gamjacamp.controller.dto.CommentDto.CommentSaveRequest;
@@ -21,11 +23,11 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/post/general/comment/new/{memberId}/{postId}")
-    public ResponseEntity createGeneralPostComment(@PathVariable("memberId") Long memberId,
+    @PostMapping("/post/general/comment/new/{postId}")
+    public ResponseEntity createGeneralPostComment(@LoginMember SessionMember member,
                                                    @PathVariable("postId") Long postId,
                                                    @RequestBody CommentSaveRequest request) {
-        return new ResponseEntity(new createdBodyDto(commentService.save(memberId, postId, request)), HttpStatus.CREATED);
+        return new ResponseEntity(new createdBodyDto(commentService.save(member.getId(), postId, request)), HttpStatus.CREATED);
     }
 
     @GetMapping("/post/general/comment/list/{postId}")
@@ -33,17 +35,17 @@ public class CommentController {
         return new ResponseEntity<>(commentService.findCommentList(postId), HttpStatus.OK);
     }
 
-    @PutMapping("/post/general/comment/update/{memberId}/{commentId}")
-    public ResponseEntity<CommentDetail> updateGeneralPostComment(@PathVariable("memberId") Long memberId,
+    @PutMapping("/post/general/comment/update/{commentId}")
+    public ResponseEntity<CommentDetail> updateGeneralPostComment(@LoginMember SessionMember member,
                                                                   @PathVariable("commentId") Long commentId,
                                                                   @RequestBody CommentUpdateRequest request) {
-        return new ResponseEntity<>(commentService.update(memberId, commentId, request),HttpStatus.OK);
+        return new ResponseEntity<>(commentService.update(member.getId(), commentId, request),HttpStatus.OK);
     }
 
-    @DeleteMapping("/post/general/comment/delete/{memberId}/{commentId}")
-    public ResponseEntity deleteGeneralPostComment(@PathVariable("memberId") Long memberId,
+    @DeleteMapping("/post/general/comment/delete/{commentId}")
+    public ResponseEntity deleteGeneralPostComment(@LoginMember SessionMember member,
                                                    @PathVariable("commentId") Long commentId) {
-        commentService.delete(memberId, commentId);
+        commentService.delete(member.getId(), commentId);
         return new ResponseEntity(HttpStatus.OK);
     }
 

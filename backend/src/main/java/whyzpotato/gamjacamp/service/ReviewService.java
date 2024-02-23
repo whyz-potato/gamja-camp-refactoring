@@ -6,18 +6,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import whyzpotato.gamjacamp.controller.dto.ReviewDto.ReviewDetail;
+import whyzpotato.gamjacamp.controller.dto.ReviewDto.ReviewSaveRequest;
+import whyzpotato.gamjacamp.controller.dto.ReviewDto.ReviewSimple;
+import whyzpotato.gamjacamp.controller.dto.ReviewDto.ReviewUpdateRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Image;
+import whyzpotato.gamjacamp.domain.Reservation;
 import whyzpotato.gamjacamp.domain.Review;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.controller.dto.review.ReviewDto;
-import whyzpotato.gamjacamp.controller.dto.review.ReviewSaveDto;
-import whyzpotato.gamjacamp.controller.dto.review.ReviewUpdateRequestDto;
-import whyzpotato.gamjacamp.controller.dto.review.SimpleReviewResponseDto;
-import whyzpotato.gamjacamp.repository.CampRepository;
-import whyzpotato.gamjacamp.repository.ImageRepository;
-import whyzpotato.gamjacamp.repository.MemberRepository;
-import whyzpotato.gamjacamp.repository.ReviewRepository;
+import whyzpotato.gamjacamp.repository.*;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -29,58 +27,82 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final ImageRepository imageRepository;
     private final CampRepository campRepository;
-//    private final ReservationRepository reservationRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * 리뷰 작성
      */
-    public Long saveReview(Long memberId, Long campId, Long reservationId, ReviewSaveDto reviewSaveDto, List<String> fileNameList) {
+    public Long saveReview(Long memberId, Long campId, Long reservationId, ReviewSaveRequest request, List<String> fileNameList) {
         Member member = memberRepository.findById(memberId).get();
         Camp camp = campRepository.findById(campId).get();
-//        Reservation reservation = reservationRepository.findByid(reservationId).get();
-        //TODO resevation 상태 체크, 이미 작성한 리뷰가 있는지 확인
+        Reservation reservation = reservationRepository.findById(reservationId).get();
 
-        whyzpotato.gamjacamp.domain.Review review = reviewRepository.save(reviewSaveDto.toEntity(member));
+        if (reviewRepository.findByReservation(reservation).isPresent()) {
+            throw new IllegalStateException("이미 작성한 리뷰가 존재합니다.");
+        }
+
+        Review review = reviewRepository.save(request.toEntity(member, camp, reservation));
         review.setCamp(camp);
-//        review.setReservation(reservation);
+        review.setReservation(reservation);
 
         for (String fileName : fileNameList) {
             String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
             imageRepository.save(Image.builder().review(review).fileName(fileName).path(fileUrl).build());
         }
+
+        campRepository.save(camp.updateRate(reviewRepository.getRateAverage(camp)));
+
         return review.getId();
     }
 
     /**
      * 리뷰 조회
      */
-    public ReviewDto findReview(Long reviewId) {
+    public ReviewDetail findReview(Long reviewId) {
         Review review = reviewRepository.findById(reviewId).get();
-        return new ReviewDto(review);
+        return new ReviewDetail(review);
     }
 
     /**
      * 리뷰 목록 조회
      */
-    public Page<SimpleReviewResponseDto> findReviewList(Long lastReviewId) {
+    public Page<ReviewSimple> findReviewList(Long lastReviewId) {
         Pageable sortedByIdDesc = PageRequest.of(0, 10, Sort.by("id").descending());
         Page<Review> reviews = reviewRepository.findByIdLessThan(lastReviewId, sortedByIdDesc);
-        Page<SimpleReviewResponseDto> simpleReviewResponseDtoList = new SimpleReviewResponseDto().toDtoList(reviews);
-        return  simpleReviewResponseDtoList;
+        Page<ReviewSimple> reviewSimpleList = new ReviewSimple().toList(reviews);
+        return  reviewSimpleList;
+    }
+
+    /**
+     * 개인 리뷰 목록 조회
+     */
+    public Page<ReviewSimple> findMyReviewList(Long memberId, Long lastReviewId) {
+        Member writer = memberRepository.findById(memberId).get();
+        Pageable sortedByIdDesc = PageRequest.of(0, 10, Sort.by("id").descending());
+        Page<Review> reviews = reviewRepository.findByWriterAndIdLessThan(writer, lastReviewId, sortedByIdDesc);
+        Page<ReviewSimple> myReviewSimpleList = new ReviewSimple().toList(reviews);
+        return myReviewSimpleList;
     }
 
     /**
      * 리뷰 수정
      */
-    public ReviewDto updateReview(Long memberId, Long reviewId, ReviewUpdateRequestDto reviewUpdateRequestDto, List<String> fileNameList) {
+    public ReviewDetail updateReview(Long memberId, Long reviewId, ReviewUpdateRequest request, List<String> fileNameList) {
         Member writer = memberRepository.findById(memberId).get();
         Review review = reviewRepository.findById(reviewId).get();
+        Camp camp = campRepository.findById(review.getCamp().getId()).get();
+
         if(review.getWriter().equals(writer)) {
-            for (String fileName : fileNameList) {
-                String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
-                imageRepository.save(Image.builder().review(review).fileName(fileName).path(fileUrl).build());
+            review.getImages().clear();
+            if(fileNameList != null) {
+                for (String fileName : fileNameList) {
+                    String fileUrl = "https://gamja-camp.s3.ap-northeast-2.amazonaws.com/" + fileName;
+                    review.getImages().add(imageRepository.save(Image.builder().review(review).fileName(fileName).path(fileUrl).build()));
+                }
             }
-            return new ReviewDto(reviewRepository.save(review.update(reviewUpdateRequestDto)));
+            ReviewDetail reviewDetail = new ReviewDetail(reviewRepository.save(review.update(request)));
+            campRepository.save(camp.updateRate(reviewRepository.getRateAverage(camp)));
+            return reviewDetail;
         }
         throw new NoSuchElementException();
     }
@@ -91,9 +113,21 @@ public class ReviewService {
     public void delete(Long memberId, Long reviewId) {
         Member writer = memberRepository.findById(memberId).get();
         Review review = reviewRepository.findById(reviewId).get();
+        Camp camp = campRepository.findById(review.getCamp().getId()).get();
+
         if(review.getWriter().equals(writer)) {
             reviewRepository.delete(review);
+            campRepository.save(camp.updateRate(reviewRepository.getRateAverage(camp)));
             return;
+        }
+        throw new NoSuchElementException();
+    }
+
+    public List<Image> findReviewImages(Long memberId, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).get();
+        Member member = memberRepository.findById(memberId).get();
+        if(review.getWriter().equals(member)) {
+            return review.getImages();
         }
         throw new NoSuchElementException();
     }

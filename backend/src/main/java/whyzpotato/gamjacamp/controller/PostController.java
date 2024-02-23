@@ -28,14 +28,11 @@ public class PostController {
     private final PostService postService;
     private final AwsS3Service awsS3Service;
 
-    @PostMapping("/general/new/{memberId}")
-    public ResponseEntity createGeneralPost(@PathVariable("memberId") Long memberId,
-//                                            @RequestPart("request") GeneralPostSaveRequest request,
-                                            @RequestPart("title") String title,
-                                            @RequestPart("content") String content,
+    @PostMapping("/general/new")
+    public ResponseEntity createGeneralPost(@LoginMember SessionMember member,
+                                            @RequestPart("request") GeneralPostSaveRequest request,
                                             @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
-        GeneralPostSaveRequest request = new GeneralPostSaveRequest(title, content);
-        return new ResponseEntity(new createdBodyDto(postService.saveGeneralPost(memberId, request, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
+        return new ResponseEntity(new createdBodyDto(postService.saveGeneralPost(member.getId(), request, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
     }
 
     @GetMapping("/general/{postId}")
@@ -49,20 +46,20 @@ public class PostController {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-    @PutMapping("/general/update/{memberId}/{postId}")
-    public ResponseEntity<GeneralPostDetail> updateGeneralPost(@PathVariable("memberId") Long memberId,
+    @PutMapping("/general/update/{postId}")
+    public ResponseEntity<GeneralPostDetail> updateGeneralPost(@LoginMember SessionMember member,
                                                             @PathVariable("postId") Long postId,
                                                             @RequestPart("request") GeneralPostUpdateRequest request,
                                                             @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
-        awsS3Service.removeImages(postService.findGeneralPostImages(memberId, postId));
-        return new ResponseEntity<>(postService.updateGeneralPost(memberId, postId, request, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
+        awsS3Service.removeImages(postService.findGeneralPostImages(member.getId(), postId));
+        return new ResponseEntity<>(postService.updateGeneralPost(member.getId(), postId, request, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
     }
 
-    @DeleteMapping("/general/delete/{memberId}/{postId}")
-    public ResponseEntity deleteGeneralPost(@PathVariable("memberId") Long memberId,
+    @DeleteMapping("/general/delete/{postId}")
+    public ResponseEntity deleteGeneralPost(@LoginMember SessionMember member,
                                             @PathVariable("postId") Long postId) {
-        awsS3Service.removeImages(postService.findGeneralPostImages(memberId, postId));
-        postService.delete(memberId, postId);
+        awsS3Service.removeImages(postService.findGeneralPostImages(member.getId(), postId));
+        postService.delete(member.getId(), postId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
