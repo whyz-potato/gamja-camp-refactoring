@@ -56,15 +56,15 @@ class CampControllerTest {
         customer = Member.builder().account("customer@mail.com").role(Role.CUSTOMER).username("customer").picture("img")
                 .build();
         camp1 = Camp.builder().member(host).name("감자캠핑1").address("서울특별시 동일로40길 25-1").phone("010-1234-1234")
-                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(92.1234455).build();
+                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(37.1234455).build();
         camp2 = Camp.builder().member(host).name("감자캠핑2").address("서울특별시 광진구").phone("010-1234-1234")
-                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(92.1234455).build();
+                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(37.1234455).build();
         camp3 = Camp.builder().member(host).name("감자캠핑3").address("부산광역시 중구").phone("010-1234-1234")
-                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(92.1234455).build();
+                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(37.1234455).build();
         camp4 = Camp.builder().member(host).name("감자캠핑4").address("경기도 구리시").phone("010-1234-1234")
-                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(92.1234455).build();
+                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(37.1234455).build();
         camp5 = Camp.builder().member(host).name("감자캠핑5").address("강원도 춘천시").phone("010-1234-1234")
-                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(92.1234455).build();
+                .campIntroduction("캠프소개").longitude(126.1332152f).latitude(37.1234455).build();
         em.persist(host);
         em.persist(customer);
         em.persist(camp1);
@@ -97,10 +97,10 @@ class CampControllerTest {
         String uri = "/camps/search";
         mockMvc.perform(get(uri)
                         .param("query", "")
-                        .param("ne-lat", "37.43")
-                        .param("sw-lng", "127.0")
-                        .param("ne-lng", "128.0")
-                        .param("sw-lat", "37.33")
+                        .param("ne-lat", "43.00")
+                        .param("sw-lng", "124.0")
+                        .param("ne-lng", "132.0")
+                        .param("sw-lat", "33.00")
                         .param("check-in", LocalDate.now().toString())
                         .param("check-out", LocalDate.now().plusDays(1).toString())
                         .param("guests", "3")
@@ -120,11 +120,10 @@ class CampControllerTest {
     void searchCamp_defaultParameter() throws Exception {
         String uri = "/camps/search";
         mockMvc.perform(get(uri)
-//                        .param("query", "")
-                        .param("ne-lat", "37.43")
-                        .param("sw-lng", "127.0")
-                        .param("ne-lng", "128.0")
-                        .param("sw-lat", "37.33")
+                        .param("ne-lat", "43.00")
+                        .param("sw-lng", "124.0")
+                        .param("ne-lng", "132.0")
+                        .param("sw-lat", "33.00")
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(5))
