@@ -133,4 +133,29 @@ class RoomControllerTest {
                 .andExpect(jsonPath("$.rooms[*].capacity", Matchers.everyItem(Matchers.greaterThanOrEqualTo(2))))
                 .andDo(print());
     }
+
+    @DisplayName("객실 상세 조회_파라미터 기본값")
+    @Test
+    void availableRoomWithCount() throws Exception {
+        String uri = "/rooms/" + room1.getId();
+        mockMvc.perform(get(uri))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.checkIn").value(LocalDate.now().toString()))
+                .andExpect(jsonPath("$.checkOut").value(LocalDate.now().plusDays(1).toString()))
+                .andExpect(jsonPath("$.availCnt").value(room1.getCnt()))
+                .andDo(print());
+    }
+
+    @DisplayName("객실 상세 조회_예약 가능한 객실이 없는 경우 availCnt 0 으로 반환")
+    @Test
+    void availableRoomWithCountZero() throws Exception {
+        String uri = "/rooms/" + room3.getId();
+        mockMvc.perform(get(uri)
+                        .param("check-in", LocalDate.now().plusDays(3).toString())
+                        .param("check-out", LocalDate.now().plusDays(4).toString())
+                        .param("guests", String.valueOf(1)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.availCnt").value(0))
+                .andDo(print());
+    }
 }

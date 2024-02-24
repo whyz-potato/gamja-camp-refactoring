@@ -7,6 +7,7 @@ import whyzpotato.gamjacamp.controller.dto.CampDto;
 import whyzpotato.gamjacamp.controller.dto.PriceDto;
 import whyzpotato.gamjacamp.controller.dto.RoomDto;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomDetail;
+import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomResponse;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomSearchResponse;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Room;
@@ -48,16 +49,25 @@ public class RoomService {
     }
 
     public RoomSearchResponse findCampAvailableRooms(Long campId, LocalDate checkIn, LocalDate checkOut, int numGuests) {
-        Camp camp = campRepository.findById(campId).orElseThrow(IllegalArgumentException::new);
         List<Room> availRooms = roomRepository.findAvailRooms(campId, checkIn, checkOut, numGuests);
-        return toRoomSearchResponse(camp, availRooms, checkIn, checkOut);
+        return toRoomSearchResponse(campId, availRooms, checkIn, checkOut);
     }
 
-    private RoomSearchResponse toRoomSearchResponse(Camp camp, List<Room> rooms, LocalDate checkIn, LocalDate checkOut) {
+    public RoomResponse availRoomDetail(Long roomId, LocalDate checkIn, LocalDate checkOut, int numGuests){
+        Room room = roomRepository.findById(roomId).orElseThrow(NotFoundException::new);
+        Long count = roomRepository.countAvailRoom(roomId, checkIn, checkOut, numGuests);
+        return toRoomResponse(room, checkIn, checkOut, count);
+    }
+
+    private RoomSearchResponse toRoomSearchResponse(Long campId, List<Room> rooms, LocalDate checkIn, LocalDate checkOut) {
         List<RoomDetail> roomDetails = rooms.stream()
                 .map(r -> toRoomDetail(r, checkIn, checkOut))
                 .collect(Collectors.toList());
-        return new RoomSearchResponse(checkIn, checkOut, camp.getId(), roomDetails);
+        return new RoomSearchResponse(checkIn, checkOut, campId, roomDetails);
+    }
+
+    private RoomResponse toRoomResponse(Room room, LocalDate checkIn, LocalDate checkOut, Long cnt){
+        return new RoomResponse(checkIn, checkOut, cnt.intValue(), toRoomDetail(room, checkIn, checkOut));
     }
 
     private RoomDetail toRoomDetail(Room room, LocalDate stayStarts, LocalDate stayEnds) {
