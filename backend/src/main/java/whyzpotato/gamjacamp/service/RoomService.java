@@ -3,13 +3,11 @@ package whyzpotato.gamjacamp.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import whyzpotato.gamjacamp.controller.dto.CampDto;
 import whyzpotato.gamjacamp.controller.dto.PriceDto;
-import whyzpotato.gamjacamp.controller.dto.RoomDto;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomDetail;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomResponse;
+import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomSaveRequest;
 import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomSearchResponse;
-import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Room;
 import whyzpotato.gamjacamp.exception.NotFoundException;
 import whyzpotato.gamjacamp.repository.CampRepository;
@@ -27,20 +25,17 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final CampRepository campRepository;
 
-    // RQ08 : 사장 객실 등록/수정
-    public Room saveRoom(Camp camp, RoomDto.RoomSaveRequest saveDto) {
-
-        Room entity = saveDto.toEntity();
-
-        if (saveDto.getId() != null) {
-            Room room = roomRepository.findById(saveDto.getId())
-                    .orElseThrow(() -> new NotFoundException());
-            room.update(entity);
-            return room;
+    public Long saveRoom(Long campId, RoomSaveRequest request) {
+        Room room = request.toEntity();
+        if (request.getId() != null) {
+            Room updateRoom = roomRepository.findById(request.getId()).orElseThrow(NotFoundException::new);
+            updateRoom.update(room);
+            return updateRoom.getId();
         }
 
-        entity.setCamp(camp);
-        return roomRepository.save(entity);
+        room.setCamp(campRepository.findById(campId).orElseThrow(NotFoundException::new));
+        roomRepository.save(room);
+        return room.getId();
     }
 
     public Room findById(Long id) {
@@ -53,7 +48,7 @@ public class RoomService {
         return toRoomSearchResponse(campId, availRooms, checkIn, checkOut);
     }
 
-    public RoomResponse availRoomDetail(Long roomId, LocalDate checkIn, LocalDate checkOut, int numGuests){
+    public RoomResponse availRoomDetail(Long roomId, LocalDate checkIn, LocalDate checkOut, int numGuests) {
         Room room = roomRepository.findById(roomId).orElseThrow(NotFoundException::new);
         Long count = roomRepository.countAvailRoom(roomId, checkIn, checkOut, numGuests);
         return toRoomResponse(room, checkIn, checkOut, count);
@@ -66,7 +61,7 @@ public class RoomService {
         return new RoomSearchResponse(checkIn, checkOut, campId, roomDetails);
     }
 
-    private RoomResponse toRoomResponse(Room room, LocalDate checkIn, LocalDate checkOut, Long cnt){
+    private RoomResponse toRoomResponse(Room room, LocalDate checkIn, LocalDate checkOut, Long cnt) {
         return new RoomResponse(checkIn, checkOut, cnt.intValue(), toRoomDetail(room, checkIn, checkOut));
     }
 

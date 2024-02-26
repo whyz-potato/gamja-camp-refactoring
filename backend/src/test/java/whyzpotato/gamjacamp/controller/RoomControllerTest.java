@@ -9,9 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import whyzpotato.gamjacamp.controller.dto.RoomDto.RoomSaveRequest;
 import whyzpotato.gamjacamp.domain.Camp;
 import whyzpotato.gamjacamp.domain.Reservation;
 import whyzpotato.gamjacamp.domain.Room;
@@ -22,7 +25,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -156,6 +161,39 @@ class RoomControllerTest {
                         .param("guests", String.valueOf(1)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.availCnt").value(0))
+                .andDo(print());
+    }
+
+    @DisplayName("객실 등록")
+    @Test
+    @WithMockUser(username = "host", roles = "OWNER")
+    void createRoom() throws Exception {
+        String uri = "/owner/rooms/" + camp.getId();
+        String request = objectMapper.writeValueAsString(new RoomSaveRequest(null, "글램핑A호", 3, 3, 18000, 20000));
+
+        mockMvc.perform(post(uri)
+                        .with(csrf())
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andDo(print());
+    }
+
+    @DisplayName("객실 등록_실패_손님계정인경우 403")
+    @Test
+    @WithMockUser(username = "host", roles = "CUSTOMER")
+    void createRoom_fail_customer() throws Exception {
+        String uri = "/owner/rooms/" + camp.getId();
+        String request = objectMapper.writeValueAsString(new RoomSaveRequest(null, "글램핑A호", 3, 3, 18000, 20000));
+
+        mockMvc.perform(post(uri)
+                        .with(csrf())
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
                 .andDo(print());
     }
 }
