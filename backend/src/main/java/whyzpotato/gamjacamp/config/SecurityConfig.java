@@ -27,10 +27,6 @@ public class SecurityConfig {
         http
                 .cors().configurationSource(corsConfigurationSource());
 
-        //relax csrf for sockJS
-//        http
-//                .csrf(csrf -> csrf
-//                        .ignoringAntMatchers("/prototype/**", "/chats/**"));
         http
                 .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 
@@ -52,8 +48,8 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/login/**").permitAll()
                 .antMatchers("/rooms/**").permitAll()
-                .antMatchers("/customer").hasRole(Role.CUSTOMER.name())
-                .antMatchers("/owner").hasRole(Role.OWNER.name())
+                .antMatchers("/customer/**").hasRole(Role.CUSTOMER.name())
+                .antMatchers("/owner/**").hasRole(Role.OWNER.name())
                 .antMatchers("/csrf/**").authenticated() //csrf token for sock js & spring security
                 .antMatchers("/prototype/**").permitAll() //websocket test endpoint
                 .antMatchers("/socket/**").authenticated() //websocket endpoint
@@ -78,7 +74,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // json을 자바스크립트에서 처리할 수 있게 설정
 

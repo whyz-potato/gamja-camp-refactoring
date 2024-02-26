@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
@@ -66,6 +67,7 @@ class ScrapCampControllerTest {
 
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     @DisplayName("캠프 스크랩 생성")
     public void postCampScrap() throws Exception {
 
@@ -80,6 +82,7 @@ class ScrapCampControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     @DisplayName("캠프 스크랩 조회")
     public void getCampScraps() throws Exception {
 
