@@ -26,6 +26,7 @@ import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -72,13 +73,14 @@ class ChatControllerTest {
         String request = objectMapper.writeValueAsString(new ChatDto.PrivateChatRequest(receiver.getId()));
 
         session.setAttribute("member", new SessionMember(sender));
-        mockMvc.perform(post("/chats/single").session(session)
+        mockMvc.perform(post("/chats/single")
+                        .session(session)
+                        .with(csrf())
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
-
     }
 
     //TODO after post
@@ -111,8 +113,6 @@ class ChatControllerTest {
                 .andExpect(jsonPath("numberOfElements").value(10))
                 .andExpect(jsonPath("hasNext").value("true"))
                 .andDo(print());
-
-
     }
 
     @Test
@@ -136,7 +136,6 @@ class ChatControllerTest {
                 .andExpect(jsonPath("numberOfElements").value(5))
                 .andExpect(jsonPath("hasNext").value("false"))
                 .andDo(print());
-
     }
 
     @Test
@@ -155,7 +154,6 @@ class ChatControllerTest {
         Message fifth = messages.get(5);
         chatMember.updateLastReadMessage(fifth);
 
-
         String uri = String.format("/chats/%d", chat.getId());
         session.setAttribute("member", new SessionMember(receiver));
         mockMvc.perform(get(uri).session(session)
@@ -166,7 +164,6 @@ class ChatControllerTest {
                 .andExpect(jsonPath("$.hasNext").value("true"))
                 .andExpect(jsonPath("$.messages[0].id").value(fifth.getId()))
                 .andDo(print());
-
     }
 
 
@@ -178,11 +175,11 @@ class ChatControllerTest {
 
         String uri = String.format("/chats/%d/members", chat.getId());
         session.setAttribute("member", new SessionMember(receiver));
-        mockMvc.perform(delete(uri).session(session))
+        mockMvc.perform(delete(uri)
+                        .session(session)
+                        .with(csrf()))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print());
-
-
     }
 
     @Test
@@ -193,13 +190,12 @@ class ChatControllerTest {
 
         String uri = String.format("/chats/%d/members", chat.getId());
         session.setAttribute("member", new SessionMember(sender));
-        mockMvc.perform(delete(uri).session(session))
+        mockMvc.perform(delete(uri)
+                        .session(session)
+                        .with(csrf()))
                 .andExpect(status().is3xxRedirection())
                 .andDo(print());
-
-
     }
-
 
     @Test
     void 채팅방삭제_방장() throws Exception {
@@ -209,10 +205,11 @@ class ChatControllerTest {
 
         String uri = String.format("/chats/%d", chat.getId());
         session.setAttribute("member", new SessionMember(sender));
-        mockMvc.perform(delete(uri).session(session))
+        mockMvc.perform(delete(uri)
+                        .session(session)
+                        .with(csrf()))
                 .andExpect(status().is2xxSuccessful())
                 .andDo(print());
-
     }
 
 
@@ -227,7 +224,6 @@ class ChatControllerTest {
         mockMvc.perform(delete(uri).session(session))
                 .andExpect(status().is4xxClientError())
                 .andDo(print());
-
     }
 
     @Test
@@ -242,7 +238,6 @@ class ChatControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("numUnread").value(0))
                 .andDo(print());
-
     }
 
     @Test
@@ -303,6 +298,4 @@ class ChatControllerTest {
                 .andExpect(jsonPath("$.chats[1].title").value("chat2"))
                 .andDo(print());
     }
-
-
 }

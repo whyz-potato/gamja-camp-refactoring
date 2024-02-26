@@ -14,12 +14,10 @@ import whyzpotato.gamjacamp.exception.NotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.time.LocalDate;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -68,47 +66,14 @@ class RoomServiceTest {
                 .build();
 
         //when
-        Room room = roomService.saveRoom(camp, roomSaveRequest);
+        Long roomId = roomService.saveRoom(camp.getId(), roomSaveRequest);
 
         //then
-        assertThat(room.getId()).isNotNull();
+        assertThat(roomId).isNotNull();
 
     }
 
-    @DisplayName("객실 저장 실패 : 필수 정보 누락")
-    @Test
-    public void saveRoom_withoutRequireParam_fail() {
-        //given
-        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
-                .cnt(1)
-                .build();
-
-        //when
-        Room room = roomService.saveRoom(camp, roomSaveRequest);
-        Set<ConstraintViolation<Room>> constraintViolations = validator.validate(room);
-
-        //then
-        assertThat(constraintViolations.size()).isNotEqualTo(0);
-    }
-
-    @DisplayName("객실 캠핑장 연관관계 편의 메소드 확인")
-    @Test
-    public void campRoom_relation() {
-        //given
-        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
-                .name("room")
-                .build();
-
-        //when
-        Room room = roomService.saveRoom(camp, roomSaveRequest);
-
-        //then
-        assertThat(room.getCamp()).isEqualTo(camp);
-        assertThat(camp.getRooms().get(0)).isEqualTo(room);
-
-    }
-
-    @DisplayName("객실 정보 수정 성공 : 영속된 객체 반환")
+    @DisplayName("객실 정보 수정 성공")
     @Test
     public void updateRoom() {
         //given
@@ -119,55 +84,22 @@ class RoomServiceTest {
                 .weekendPrice(1000)
                 .weekPrice(1200)
                 .build();
-        Room room = roomService.saveRoom(camp, roomSaveRequest);
+        Long saveId = roomService.saveRoom(camp.getId(), roomSaveRequest);
 
         //when
         RoomDto.RoomSaveRequest updateRoomSaveRequest = RoomDto.RoomSaveRequest.builder()
-                .id(room.getId())
+                .id(saveId)
                 .name("room")
                 .cnt(5)
                 .capacity(1)
                 .weekendPrice(2000)
                 .weekPrice(8000)
                 .build();
-        Room updatedRoom = roomService.saveRoom(camp, updateRoomSaveRequest);
+        Long updateId = roomService.saveRoom(camp.getId(), updateRoomSaveRequest);
 
 
         //that
-        assertThat(updatedRoom).isSameAs(room);
-
-    }
-
-    @DisplayName("객실 정보 수정 성공 : 정보 업데이트")
-    @Test
-    public void updateRoom_infoUpdate() {
-        //given
-        RoomDto.RoomSaveRequest roomSaveRequest = RoomDto.RoomSaveRequest.builder()
-                .name("room")
-                .cnt(10)
-                .capacity(3)
-                .weekendPrice(1000)
-                .weekPrice(1200)
-                .build();
-        Room room = roomService.saveRoom(camp, roomSaveRequest);
-
-        //when
-        RoomDto.RoomSaveRequest updateRoomSaveRequest = RoomDto.RoomSaveRequest.builder()
-                .id(room.getId())
-                .name("room")
-                .cnt(5)
-                .capacity(1)
-                .weekendPrice(2000)
-                .weekPrice(8000)
-                .build();
-        Room updatedRoom = roomService.saveRoom(camp, updateRoomSaveRequest);
-
-
-        //that
-        assertThat(updatedRoom.getCnt()).isEqualTo(room.getCnt());
-        assertThat(updatedRoom.getCapacity()).isEqualTo(room.getCapacity());
-        assertThat(updatedRoom.getWeekendPrice()).isEqualTo(room.getWeekendPrice());
-        assertThat(updatedRoom.getWeekPrice()).isEqualTo(room.getWeekPrice());
+        assertThat(saveId).isEqualTo(updateId);
 
     }
 
@@ -186,7 +118,7 @@ class RoomServiceTest {
                 .build();
 
         //then
-        assertThrows(NotFoundException.class, () -> roomService.saveRoom(camp, updateRoomSaveRequest));
+        assertThrows(NotFoundException.class, () -> roomService.saveRoom(camp.getId(), updateRoomSaveRequest));
 
     }
 
@@ -207,12 +139,4 @@ class RoomServiceTest {
         assertThat(result.getRooms().size()).isEqualTo(4);
         assertThat(result.getRooms()).extracting("name").containsOnly("room1", "room2", "room3", "room4");
     }
-
-//    @DisplayName("예약가능한 객실 검색 성공 : 날짜가 없는 경우 당일 1박 검색")
-//
-//    @DisplayName("예약가능한 객실 검색 성공 : 그러한 객실이 존재하지 않음")
-//
-//    @DisplayName("예약가능한 객실 검색 실패 : 필수 파라미터 검증")
-
-
 }

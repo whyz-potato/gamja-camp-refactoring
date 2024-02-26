@@ -23,5 +23,14 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
                     " where r.camp_id = :camp_id and r.capacity >= :numGuests and r.cnt > IFNULL(reserved.cnt, 0)"
     )
     List<Room> findAvailRooms(@Param("camp_id") Long campId, @Param("start") LocalDate checkIn, @Param("end") LocalDate checkOut, @Param("numGuests") int numGuests);
-}
 
+    @Query(
+            nativeQuery = true,
+            value = "select r.cnt - (select count(*)" +
+                    "               from reservation" +
+                    "               where room_id = :room_id and stay_starts < :end AND stay_ends > :start)" +
+                    " from room r" +
+                    " where r.room_id = :room_id and r.capacity >= :numGuests"
+    )
+    Long countAvailRoom(@Param("room_id") Long roomId, @Param("start") LocalDate checkIn, @Param("end") LocalDate checkOut, @Param("numGuests") int numGuests);
+}

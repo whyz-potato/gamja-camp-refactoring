@@ -1,6 +1,5 @@
 package whyzpotato.gamjacamp.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalDate;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -83,7 +84,7 @@ class RoomRepositoryTest {
     void findAvailRooms_noReservation() {
         List<Room> availRooms = roomRepository.findAvailRooms(camp.getId(), today, today.plusDays(1), 2);
 
-        Assertions.assertThat(availRooms).contains(room1, room2, room3, room4);
+        assertThat(availRooms).contains(room1, room2, room3, room4);
     }
 
     @DisplayName("인원 수를 만족하는 객실만 반환")
@@ -91,7 +92,7 @@ class RoomRepositoryTest {
     void findAvailCapacityRooms() {
         List<Room> availRooms = roomRepository.findAvailRooms(camp.getId(), today, today.plusDays(1), 4);
 
-        Assertions.assertThat(availRooms).containsOnly(room3, room4);
+        assertThat(availRooms).containsOnly(room3, room4);
     }
 
     @DisplayName("예약가능한 객실 조회")
@@ -99,6 +100,22 @@ class RoomRepositoryTest {
     void findAvailRooms() {
         List<Room> availRooms = roomRepository.findAvailRooms(camp.getId(), today.plusDays(3), today.plusDays(4), 2);
 
-        Assertions.assertThat(availRooms).containsOnly(room2, room4);
+        assertThat(availRooms).containsOnly(room2, room4);
+    }
+
+    @DisplayName("특정 객실의 남은 방 개수 조회_1")
+    @Test
+    void countAvailRoom() {
+        Long cnt = roomRepository.countAvailRoom(room1.getId(), today, today.plusDays(1), 2);
+
+        assertThat(cnt).isEqualTo(2);
+    }
+
+    @DisplayName("특정 객실의 남은 방 개수 조회_2")
+    @Test
+    void countAvailRoom2() {
+        Long cnt = roomRepository.countAvailRoom(room2.getId(), today.plusDays(3), today.plusDays(4), 2);
+
+        assertThat(cnt).isEqualTo(1);
     }
 }

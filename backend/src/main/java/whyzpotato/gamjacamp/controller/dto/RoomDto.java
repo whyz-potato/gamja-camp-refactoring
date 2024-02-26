@@ -4,16 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import whyzpotato.gamjacamp.controller.dto.CampDto.CampInfo;
 import whyzpotato.gamjacamp.domain.Room;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class RoomDto {
 
@@ -80,7 +76,7 @@ public class RoomDto {
         private Long id;
         private String name;
         private int capacity;
-        private List<String> images;
+//        private List<String> images;
 
         public RoomReserved(Room room) {
             this.id = room.getId();
@@ -97,7 +93,7 @@ public class RoomDto {
         private Long id;
         private String name;
         private int capacity;
-        //        private List<String> images;
+//        private List<String> images;
         private PriceDto price;
 
         public RoomDetail(Room room, LocalDate stayStarts, LocalDate stayEnds) {
@@ -130,13 +126,13 @@ public class RoomDto {
     public static class RoomResponse {
         private LocalDate checkIn;
         private LocalDate checkOut;
-        private Long campId;
+        private int availCnt;
         private RoomDetail room;
 
-        public RoomResponse(LocalDate checkIn, LocalDate checkOut, Long campId, RoomDetail room) {
+        public RoomResponse(LocalDate checkIn, LocalDate checkOut, int availCnt, RoomDetail room) {
             this.checkIn = checkIn;
             this.checkOut = checkOut;
-            this.campId = campId;
+            this.availCnt = availCnt;
             this.room = room;
         }
     }
