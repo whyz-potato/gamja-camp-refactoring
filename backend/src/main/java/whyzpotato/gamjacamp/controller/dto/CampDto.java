@@ -98,7 +98,7 @@ public class CampDto {
         private int price;
         private double latitude;
         private double longitude;
-        private List<String> images;
+        private String mainImage;
         private double rate;
 
         public CampSearchItem(CampQueryDto campQueryDto) {
@@ -108,7 +108,7 @@ public class CampDto {
             this.price = campQueryDto.getMin_Price();
             this.latitude = campQueryDto.getLatitude();
             this.longitude = campQueryDto.getLongitude();
-            this.images = List.of("https://picsum.photos/300", "https://picsum.photos/300", "https://picsum.photos/300"); //TODO dummy -> image
+            this.mainImage = campQueryDto.getImage();
             this.rate = campQueryDto.getRate();
         }
     }

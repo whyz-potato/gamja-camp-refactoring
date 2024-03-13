@@ -28,7 +28,7 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
                     "    WHERE" +
                     "        DATEADD(DAY, 1, dt) < :end" +
                     ")" +
-                    " SELECT c.camp_id, c.name, c.address, c.latitude, c.longitude, c.rate, camp_price.min_price" +
+                    " SELECT c.camp_id, c.name, c.address, c.latitude, c.longitude, c.rate, camp_price.min_price, im.path image " +
                     " FROM camp c" +
                     " JOIN (" +
                     "     SELECT camp_id, MIN(price) as min_price " +
@@ -52,6 +52,11 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
                     "     GROUP BY camp_id " +
                     " ) camp_price" +
                     " ON c.camp_id = camp_price.camp_id" +
+                    " LEFT JOIN (" +
+                    " select * from image" +
+                    " group by camp_id" +
+                    " ) im " +
+                    " on c.camp_id = im.camp_id " +
                     " WHERE c.longitude between :left and :right and c.latitude between :down and :up and (c.name LIKE %:query% OR c.address LIKE %:query%)",
             countQuery = " SELECT COUNT(*)" +
                     " FROM camp c" +
