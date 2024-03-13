@@ -25,11 +25,15 @@ public class ChatMember extends BaseTimeEntity {
     private Chat chat;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "sender_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_id")
+    @JoinColumn(name = "receiver_id", nullable = true)
+    private Member receiver = null;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_read_message_id")
     private Message lastReadMessage = null;
 
     @NotNull
@@ -39,6 +43,13 @@ public class ChatMember extends BaseTimeEntity {
         this.chat = chat;
         this.member = member;
         this.title = title;
+    }
+
+    public ChatMember(Chat chat, Member sender, Member receiver) {
+        this.chat = chat;
+        this.member = sender;
+        this.receiver = receiver;
+        this.title = receiver.getUsername();
     }
 
     public void updateLastReadMessage(Message lastReadMessage) {

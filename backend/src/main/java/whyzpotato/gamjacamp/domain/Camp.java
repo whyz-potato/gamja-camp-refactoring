@@ -4,8 +4,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 import whyzpotato.gamjacamp.domain.member.Member;
-import whyzpotato.gamjacamp.controller.dto.camp.CampUpdateRequestDto;
+import whyzpotato.gamjacamp.controller.dto.CampDto.CampUpdateRequest;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -15,15 +16,16 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name="camp")
+@Table(name = "camp")
 public class Camp {
 
     @Id
     @GeneratedValue
+    @Column(name = "camp_id")
     private Long id;
 
     @OneToOne
-    @JoinColumn(name="memberId")
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @Column(nullable = false)
@@ -50,14 +52,21 @@ public class Camp {
     @Column
     private LocalTime campOperationEnd;
 
-    @OneToMany(mappedBy="camp")
-    private List<Room> rooms = new ArrayList<Room>();
+    @Column
+    @ColumnDefault("0.0")
+    private double rate;
 
-    // reviews
-    // images
+    @OneToMany(mappedBy = "camp")
+    private List<Room> rooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "camp")
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "camp")
+    private List<Image> images = new ArrayList<>();
 
     @Builder
-    public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd) {
+    public Camp(Member member, String name, String address, String phone, String campIntroduction, double longitude, double latitude, LocalTime campOperationStart, LocalTime campOperationEnd, List<Image> images) {
         this.member = member;
         this.name = name;
         this.address = address;
@@ -67,12 +76,13 @@ public class Camp {
         this.latitude = latitude;
         this.campOperationStart = campOperationStart;
         this.campOperationEnd = campOperationEnd;
+        this.images = images;
     }
 
-    public Camp update(CampUpdateRequestDto campUpdateRequestDto) {
-        this.name = campUpdateRequestDto.getName();
-        this.phone = campUpdateRequestDto.getPhone();
-        this.campIntroduction = campUpdateRequestDto.getCampIntroduction();
+    public Camp update(CampUpdateRequest request) {
+        this.name = request.getName();
+        this.phone = request.getPhone();
+        this.campIntroduction = request.getCampIntroduction();
         return this;
     }
 
@@ -88,4 +98,10 @@ public class Camp {
         this.campOperationEnd = end;
         return this;
     }
+
+    public Camp updateRate(double rate) {
+        this.rate = rate;
+        return this;
+    }
+
 }

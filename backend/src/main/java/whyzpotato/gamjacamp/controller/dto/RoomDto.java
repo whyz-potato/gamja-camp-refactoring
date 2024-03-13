@@ -1,5 +1,6 @@
 package whyzpotato.gamjacamp.controller.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,15 +9,21 @@ import whyzpotato.gamjacamp.domain.Room;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static java.util.Optional.ofNullable;
 
 public class RoomDto {
 
+    @Getter
+    @NoArgsConstructor
+    public static class RoomSimple {
+        private Long id;
+        private String name;
+
+        public RoomSimple(Room room) {
+            this.id = room.getId();
+            this.name = room.getName();
+        }
+    }
 
     @Getter
     @NoArgsConstructor
@@ -39,33 +46,25 @@ public class RoomDto {
         @Positive
         private int weekendPrice;
 
-        private List<PeakPriceDto> peakPrices;
-
         //TODO : 대표 사진
 
         @Builder
-        public RoomSaveRequest(Long id, String name, int cnt, int capacity, int weekPrice, int weekendPrice, List<PeakPriceDto> peakPrices) {
+        public RoomSaveRequest(Long id, String name, int cnt, int capacity, int weekPrice, int weekendPrice) {
             this.id = id;
             this.name = name;
             this.cnt = cnt;
             this.capacity = capacity;
             this.weekPrice = weekPrice;
             this.weekendPrice = weekendPrice;
-            this.peakPrices = peakPrices;
         }
 
         public Room toEntity() {
-
             return Room.builder()
                     .name(name)
                     .cnt(cnt)
                     .capacity(capacity)
                     .weekPrice(weekPrice)
                     .weekendPrice(weekendPrice)
-                    .peakPrices(Optional.ofNullable(peakPrices)
-                            .orElseGet(Collections::emptyList)
-                            .stream()
-                            .map(dto -> dto.toEntity()).collect(Collectors.toList()))
                     .build();
         }
     }
@@ -73,42 +72,68 @@ public class RoomDto {
 
     @Getter
     @NoArgsConstructor
-    public static class RoomResponse {
-
+    public static class RoomReserved {
+        private Long id;
         private String name;
-        private List<Integer> prices;
-        private int minPrice;
         private int capacity;
+//        private List<String> images;
 
-        public RoomResponse(Room room) {
+        public RoomReserved(Room room) {
+            this.id = room.getId();
             this.name = room.getName();
             this.capacity = room.getCapacity();
+            //this.images = room.getImages(); //TODO 이미지
         }
-
-        public RoomResponse(Room room, LocalDate start, LocalDate end) {
-            this.name = room.getName();
-            this.prices = room.getPrices(start, end);
-            this.minPrice = Collections.min(prices);
-            this.capacity = room.getCapacity();
-        }
-
-
     }
 
-    //실제로는 path variable로 받을 예정
     @Getter
     @NoArgsConstructor
-    public static class RoomSearchParam {
+    @AllArgsConstructor
+    public static class RoomDetail {
+        private Long id;
+        private String name;
+        private int capacity;
+//        private List<String> images;
+        private PriceDto price;
 
-        private int numGuest;
-        private LocalDate stayStarts;
-        private LocalDate stayEnds;
-
-        public RoomSearchParam(int numGuest, LocalDate stayStarts, LocalDate stayEnds) {
-            this.numGuest = ofNullable(numGuest).orElse(1);
-            this.stayStarts = ofNullable(stayStarts).orElse(LocalDate.now());
-            this.stayEnds = ofNullable(stayStarts).orElse(LocalDate.now().plusDays(1));
+        public RoomDetail(Room room, LocalDate stayStarts, LocalDate stayEnds) {
+            this.id = room.getId();
+            this.name = room.getName();
+            this.capacity = room.getCapacity();
+            //this.images = room.getImages(); //TODO 이미지
+            this.price = new PriceDto(room.getPrices(stayStarts, stayEnds));
         }
+    }
 
+    @Getter
+    @NoArgsConstructor
+    public static class RoomSearchResponse {
+        private LocalDate checkIn;
+        private LocalDate checkOut;
+        private Long campId;
+        private List<RoomDetail> rooms;
+
+        public RoomSearchResponse(LocalDate checkIn, LocalDate checkOut, Long campId, List<RoomDetail> rooms) {
+            this.checkIn = checkIn;
+            this.checkOut = checkOut;
+            this.campId = campId;
+            this.rooms = rooms;
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    public static class RoomResponse {
+        private LocalDate checkIn;
+        private LocalDate checkOut;
+        private int availCnt;
+        private RoomDetail room;
+
+        public RoomResponse(LocalDate checkIn, LocalDate checkOut, int availCnt, RoomDetail room) {
+            this.checkIn = checkIn;
+            this.checkOut = checkOut;
+            this.availCnt = availCnt;
+            this.room = room;
+        }
     }
 }

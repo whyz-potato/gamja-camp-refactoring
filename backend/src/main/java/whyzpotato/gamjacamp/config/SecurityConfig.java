@@ -7,6 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,10 +27,8 @@ public class SecurityConfig {
         http
                 .cors().configurationSource(corsConfigurationSource());
 
-        //relax csrf for sockJS
         http
-                .csrf(csrf -> csrf
-                        .ignoringAntMatchers("/prototype/**", "/chats/**"));
+                .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
 
         //allow frame-option for sockJS
 //        http
@@ -48,15 +47,17 @@ public class SecurityConfig {
                         "/webjars/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers("/login/**").permitAll()
-                .antMatchers("/customer").hasRole(Role.CUSTOMER.name())
-                .antMatchers("/owner").hasRole(Role.OWNER.name())
+                .antMatchers("/rooms/**").permitAll()
+                .antMatchers("/customer/**").hasRole(Role.CUSTOMER.name())
+                .antMatchers("/owner/**").hasRole(Role.OWNER.name())
                 .antMatchers("/csrf/**").authenticated() //csrf token for sock js & spring security
                 .antMatchers("/prototype/**").permitAll() //websocket test endpoint
                 .antMatchers("/socket/**").authenticated() //websocket endpoint
                 .anyRequest().permitAll(); //TODO denyAll();
 
         http
-                .logout().logoutSuccessUrl("/"); // 로그아웃 성공시 "/" 주소로 이동
+                .logout()
+                .logoutSuccessUrl("http://localhost:7777"); // 로그아웃 성공시 "/" 주소로 이동
 
         http
                 .oauth2Login()//oauth2 설정
@@ -73,7 +74,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true); // json을 자바스크립트에서 처리할 수 있게 설정
 

@@ -1,6 +1,7 @@
 package whyzpotato.gamjacamp.domain;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import whyzpotato.gamjacamp.domain.post.Post;
@@ -37,6 +38,20 @@ public class Image {
     private String path;
 
     @Column(nullable = false)
-    private String filename;
+    private String fileName;
 
+    @Builder
+    public Image(Camp camp, Room room, Review review, Post post, String path, String fileName) {
+        this.camp = camp;
+        this.room = room;
+        this.review = review;
+        this.post = post;
+        this.path = path;
+        this.fileName = fileName;
+    }
+
+    public Image(String path, String fileName) {
+        this.path = path;
+        this.fileName = fileName;
+    }
 }

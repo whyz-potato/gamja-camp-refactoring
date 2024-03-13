@@ -1,13 +1,18 @@
 package whyzpotato.gamjacamp.controller.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.data.domain.Slice;
+import whyzpotato.gamjacamp.controller.dto.ChatMemberDto.SimpleChatMember;
 import whyzpotato.gamjacamp.domain.chat.Message;
-import whyzpotato.gamjacamp.domain.member.Member;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ChatMessageDto {
@@ -21,21 +26,33 @@ public class ChatMessageDto {
     @NoArgsConstructor
     public static class MessageListDto {
 
+        @Accessors(fluent = true)
+        @JsonProperty("hasNext")
         private boolean hasNext;
+
         private int numberOfElements;
         private List<DetailMessageDto> messages;
+        private Boolean isStacked = false;
 
-        public MessageListDto(boolean hasNext, int numberOfElements, List<DetailMessageDto> messages) {
+        protected MessageListDto(boolean hasNext, int numberOfElements, List<DetailMessageDto> messages, boolean isStacked) {
             this.hasNext = hasNext;
             this.numberOfElements = numberOfElements;
             this.messages = messages;
+            this.isStacked = isStacked;
         }
 
-        public MessageListDto(Slice<DetailMessageDto> result) {
-            this.hasNext = result.hasNext();
-            this.numberOfElements = result.getNumberOfElements();
-            this.messages = result.getContent();
+        public static MessageListDto naturalOrderMessageList(Slice<DetailMessageDto> result, boolean isStacked){
+            return new MessageListDto(result.hasNext(), result.getNumberOfElements(), result.getContent(), isStacked);
         }
+
+        public static MessageListDto reverseOrderMessageList(Slice<DetailMessageDto> result){
+            ArrayList<DetailMessageDto> messages = new ArrayList<>(result.getContent());
+            Collections.reverse(messages);
+            return new MessageListDto(result.hasNext(), result.getNumberOfElements(), messages, false);
+        }
+
+
+
     }
 
     @Getter
@@ -44,30 +61,17 @@ public class ChatMessageDto {
 
         private Long id;
         private String content;
-        private LocalDateTime time;
-        private Sender from;
+        private LocalDate date;
+        private LocalTime time;
+        private SimpleChatMember from;
 
         public DetailMessageDto(Message message) {
             this.id = message.getId();
             this.content = message.getContent();
-            this.time = message.getCreatedTime();
-            this.from = new Sender(message.getFrom());
+            this.date = message.getCreatedTime().toLocalDate();
+            this.time = message.getCreatedTime().toLocalTime();
+            this.from = new SimpleChatMember(message.getFrom());
         }
-
-        @Getter
-        @NoArgsConstructor
-        private static class Sender {
-            private Long id;
-            private String username;
-
-            public Sender(Member member) {
-                this.id = member.getId();
-                this.username = member.getUsername();
-            }
-
-        }
-
     }
-
 
 }
