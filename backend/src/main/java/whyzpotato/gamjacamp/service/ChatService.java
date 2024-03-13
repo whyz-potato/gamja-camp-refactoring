@@ -41,10 +41,11 @@ public class ChatService {
     }
 
 
-    public Chat enterChat(Long chatId, Long memberId) {
+    public void enterChat(Long chatId, Long memberId) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(NotFoundException::new);
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundException::new);
-        return chat.enter(member);
+
+        chat.enter(member);
     }
 
     public boolean isHost(Long chatId, Long memberId) {
