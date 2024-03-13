@@ -16,4 +16,6 @@ public interface CampQueryDto {
 
     Double getRate();
 
+    String getImage();
+
 }
