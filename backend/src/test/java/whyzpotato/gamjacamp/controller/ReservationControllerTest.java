@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -132,6 +133,7 @@ class ReservationControllerTest {
 
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     public void reservationDetail() throws Exception {
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
@@ -146,6 +148,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     public void book() throws Exception {
 
         session.setAttribute("member", new SessionMember(customer));
@@ -169,6 +172,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "host", roles = "OWNER")
     public void changeStatusConfirm() throws Exception {
 
         session.setAttribute("member", new SessionMember(host));
@@ -194,6 +198,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     public void cancel() throws Exception {
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
@@ -208,6 +213,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     public void cancelFail() throws Exception {
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
@@ -222,6 +228,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     void getReservationList() throws Exception {
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
@@ -238,6 +245,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "customer", roles = "CUSTOMER")
     void getReservationPageableList() throws Exception {
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
@@ -256,6 +264,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "host", roles = "OWNER")
     void getPendingReservationList() throws Exception {
 
         session.setAttribute("member", new SessionMember(host));
@@ -274,6 +283,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "host", roles = "OWNER")
     void getBookedReservationList() throws Exception {
 
         reservationAfterWeek.confirm(host);
@@ -294,6 +304,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "host", roles = "OWNER")
     void getCampReservationDetail() throws Exception {
 
         session.setAttribute("member", new SessionMember(host));
@@ -316,6 +327,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "host", roles = "OWNER")
     void getCampReservation_NotHost_Fail() throws Exception {
 
         session.setAttribute("member", new SessionMember(reservedCustomer));
