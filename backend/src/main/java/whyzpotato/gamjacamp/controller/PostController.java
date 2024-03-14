@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import whyzpotato.gamjacamp.config.auth.LoginMember;
@@ -19,16 +18,16 @@ import whyzpotato.gamjacamp.service.PostService;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Slf4j
-@Controller
+@RequiredArgsConstructor
+@RestController
 @RequestMapping("/post")
 public class PostController {
 
     private final PostService postService;
     private final AwsS3Service awsS3Service;
 
-    @PostMapping("/general/new")
+    @PostMapping("/general")
     public ResponseEntity createGeneralPost(@LoginMember SessionMember member,
                                             @RequestPart("request") GeneralPostSaveRequest request,
                                             @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
@@ -46,7 +45,7 @@ public class PostController {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-    @PutMapping("/general/update/{postId}")
+    @PutMapping("/general/{postId}")
     public ResponseEntity<GeneralPostDetail> updateGeneralPost(@LoginMember SessionMember member,
                                                             @PathVariable("postId") Long postId,
                                                             @RequestPart("request") GeneralPostUpdateRequest request,
@@ -55,7 +54,7 @@ public class PostController {
         return new ResponseEntity<>(postService.updateGeneralPost(member.getId(), postId, request, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
     }
 
-    @DeleteMapping("/general/delete/{postId}")
+    @DeleteMapping("/general/{postId}")
     public ResponseEntity deleteGeneralPost(@LoginMember SessionMember member,
                                             @PathVariable("postId") Long postId) {
         awsS3Service.removeImages(postService.findGeneralPostImages(member.getId(), postId));

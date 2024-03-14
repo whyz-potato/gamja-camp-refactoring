@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import whyzpotato.gamjacamp.config.auth.LoginMember;
+import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
 import whyzpotato.gamjacamp.controller.dto.Utility.PageResult;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampDetail;
 import whyzpotato.gamjacamp.controller.dto.CampDto.CampSaveRequest;
@@ -42,11 +44,11 @@ public class CampController {
         return campService.search(query, neLatitude, swLatitude, neLongitude, swLongitude, checkIn, checkOut, numGuests, pageable);
     }
 
-    @PostMapping ("/new/{memberId}")
-    public ResponseEntity createCamp(@PathVariable("memberId") Long memberId,
+    @PostMapping
+    public ResponseEntity createCamp(@LoginMember SessionMember member,
                                      @RequestPart("request") CampSaveRequest request,
                                      @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
-        return new ResponseEntity(new createdBodyDto(campService.register(memberId, request, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
+        return new ResponseEntity(new createdBodyDto(campService.register(member.getId(), request, awsS3Service.uploadImages(multipartFiles))), HttpStatus.CREATED);
     }
 
     @GetMapping("/{campId}")
@@ -54,33 +56,33 @@ public class CampController {
         return new ResponseEntity<>(campService.findCamp(campId), HttpStatus.OK);
     }
 
-    @PutMapping("/update/{memberId}/{campId}")
-    public ResponseEntity<CampDetail> updateCamp(@PathVariable("memberId") Long memberId,
-                                                    @PathVariable("campId") Long campId,
-                                                    @RequestBody CampUpdateRequest request) {
-        return new ResponseEntity<>(campService.updateCamp(memberId, campId, request), HttpStatus.OK);
+    @PutMapping("/{campId}")
+    public ResponseEntity<CampDetail> updateCamp(@LoginMember SessionMember member,
+                                                 @PathVariable("campId") Long campId,
+                                                 @RequestBody CampUpdateRequest request) {
+        return new ResponseEntity<>(campService.updateCamp(member.getId(), campId, request), HttpStatus.OK);
     }
 
-    @PutMapping("/update/address/{memberId}/{campId}")
-    public ResponseEntity<CampDetail> updateCampAddress(@PathVariable("memberId") Long memberId,
-                                                    @PathVariable("campId") Long campId,
-                                                    @RequestParam("address") String address) {
-        return new ResponseEntity<>(campService.updateCampAddress(memberId, campId, address), HttpStatus.OK);
+    @PutMapping("/update/address/{campId}")
+    public ResponseEntity<CampDetail> updateCampAddress(@LoginMember SessionMember member,
+                                                        @PathVariable("campId") Long campId,
+                                                        @RequestParam("address") String address) {
+        return new ResponseEntity<>(campService.updateCampAddress(member.getId(), campId, address), HttpStatus.OK);
     }
 
     @PutMapping("/update/image/{memberId}/{campId}")
-    public ResponseEntity<CampDetail> updateCampImages(@PathVariable("memberId") Long memberId,
-                                                    @PathVariable("campId") Long campId,
-                                                    @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
-        awsS3Service.removeImages(campService.findCampImages(memberId, campId));
-        return new ResponseEntity<>(campService.updateCampImages(memberId, campId, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
+    public ResponseEntity<CampDetail> updateCampImages(@LoginMember SessionMember member,
+                                                       @PathVariable("campId") Long campId,
+                                                       @RequestPart(value = "images", required = false) List<MultipartFile> multipartFiles) {
+        awsS3Service.removeImages(campService.findCampImages(member.getId(), campId));
+        return new ResponseEntity<>(campService.updateCampImages(member.getId(), campId, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{memberId}/{campId}")
-    public ResponseEntity deleteCamp(@PathVariable("memberId") Long memberId,
+    @DeleteMapping("/{campId}")
+    public ResponseEntity deleteCamp(@LoginMember SessionMember member,
                                      @PathVariable("campId") Long campId) {
-        awsS3Service.removeImages(campService.findCampImages(memberId, campId));
-        campService.delete(memberId, campId);
+        awsS3Service.removeImages(campService.findCampImages(member.getId(), campId));
+        campService.delete(member.getId(), campId);
         return new ResponseEntity(HttpStatus.OK);
     }
 
