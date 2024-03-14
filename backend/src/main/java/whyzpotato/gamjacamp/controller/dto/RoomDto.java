@@ -58,6 +58,15 @@ public class RoomDto {
             this.weekendPrice = weekendPrice;
         }
 
+        public RoomSaveRequest(Room room){
+            this.id = room.getId();
+            this.name = room.getName();
+            this.cnt = room.getCnt();
+            this.capacity = room.getCapacity();
+            this.weekPrice = room.getWeekPrice();
+            this.weekendPrice = room.getWeekendPrice();
+        }
+
         public Room toEntity() {
             return Room.builder()
                     .name(name)
@@ -100,7 +109,7 @@ public class RoomDto {
             this.id = room.getId();
             this.name = room.getName();
             this.capacity = room.getCapacity();
-            //this.images = room.getImages(); //TODO 이미지
+//            this.images = room.getImages(); //TODO 이미지
             this.price = new PriceDto(room.getPrices(stayStarts, stayEnds));
         }
     }
@@ -123,13 +132,13 @@ public class RoomDto {
 
     @Getter
     @NoArgsConstructor
-    public static class RoomResponse {
+    public static class RemainRoom {
         private LocalDate checkIn;
         private LocalDate checkOut;
         private int availCnt;
         private RoomDetail room;
 
-        public RoomResponse(LocalDate checkIn, LocalDate checkOut, int availCnt, RoomDetail room) {
+        public RemainRoom(LocalDate checkIn, LocalDate checkOut, int availCnt, RoomDetail room) {
             this.checkIn = checkIn;
             this.checkOut = checkOut;
             this.availCnt = availCnt;
