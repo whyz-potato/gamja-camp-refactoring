@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import whyzpotato.gamjacamp.config.auth.LoginMember;
@@ -20,16 +19,16 @@ import whyzpotato.gamjacamp.service.ReviewService;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Slf4j
-@Controller
+@RequiredArgsConstructor
+@RestController
 @RequestMapping("/review")
 public class ReviewController {
 
     private final ReviewService reviewService;
     private final AwsS3Service awsS3Service;
 
-    @PostMapping("/new/{campId}/{reservationId}")
+    @PostMapping("/{campId}/{reservationId}")
     public ResponseEntity createReview(@LoginMember SessionMember member,
                                        @PathVariable("campId") Long campId,
                                        @PathVariable("reservationId") Long reservationId,
@@ -58,7 +57,7 @@ public class ReviewController {
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
-    @PutMapping("/update/{reviewId}")
+    @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewDetail> updateReview(@LoginMember SessionMember member,
                                                      @PathVariable("reviewId") Long reviewId,
                                                      @RequestPart("request") ReviewUpdateRequest request,
@@ -67,7 +66,7 @@ public class ReviewController {
         return new ResponseEntity<>(reviewService.updateReview(member.getId(), reviewId, request, awsS3Service.uploadImages(multipartFiles)), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{reviewId}")
+    @DeleteMapping("/{reviewId}")
     public ResponseEntity deleteReview(@LoginMember SessionMember member,
                                        @PathVariable("reviewId") Long reviewId) {
         awsS3Service.removeImages(reviewService.findReviewImages(member.getId(), reviewId));

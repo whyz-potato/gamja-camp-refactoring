@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import whyzpotato.gamjacamp.config.auth.LoginMember;
 import whyzpotato.gamjacamp.config.auth.dto.SessionMember;
@@ -17,13 +16,13 @@ import whyzpotato.gamjacamp.service.CommentService;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @Slf4j
-@Controller
+@RequiredArgsConstructor
+@RestController
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping("/post/general/comment/new/{postId}")
+    @PostMapping("/post/general/comment/{postId}")
     public ResponseEntity createGeneralPostComment(@LoginMember SessionMember member,
                                                    @PathVariable("postId") Long postId,
                                                    @RequestBody CommentSaveRequest request) {
@@ -35,14 +34,14 @@ public class CommentController {
         return new ResponseEntity<>(commentService.findCommentList(postId), HttpStatus.OK);
     }
 
-    @PutMapping("/post/general/comment/update/{commentId}")
+    @PutMapping("/post/general/comment/{commentId}")
     public ResponseEntity<CommentDetail> updateGeneralPostComment(@LoginMember SessionMember member,
                                                                   @PathVariable("commentId") Long commentId,
                                                                   @RequestBody CommentUpdateRequest request) {
         return new ResponseEntity<>(commentService.update(member.getId(), commentId, request),HttpStatus.OK);
     }
 
-    @DeleteMapping("/post/general/comment/delete/{commentId}")
+    @DeleteMapping("/post/general/comment/{commentId}")
     public ResponseEntity deleteGeneralPostComment(@LoginMember SessionMember member,
                                                    @PathVariable("commentId") Long commentId) {
         commentService.delete(member.getId(), commentId);
@@ -58,3 +57,4 @@ public class CommentController {
         }
     }
 }
+

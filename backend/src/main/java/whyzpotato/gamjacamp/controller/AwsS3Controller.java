@@ -15,12 +15,12 @@ public class AwsS3Controller {
 
     private final AwsS3Service awsS3Service;
 
-    @PostMapping("/upload")
+    @PostMapping("")
     public ResponseEntity<String> upload(@RequestParam("image") MultipartFile file) throws IOException {
         return ResponseEntity.ok(awsS3Service.upload(file));
     }
 
-    @DeleteMapping("/remove/{id}")
+    @DeleteMapping("/{id}")
     public void remove(@PathVariable("id") Long imageId) {
         awsS3Service.remove(imageId);
     }
