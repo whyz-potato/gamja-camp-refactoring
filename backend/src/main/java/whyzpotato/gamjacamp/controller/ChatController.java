@@ -77,7 +77,11 @@ public class ChatController {
     public ResponseEntity<Void> enterChat(@LoginMember SessionMember member,
                                           @PathVariable Long roomId) {
         chatService.enterChat(roomId, member.getId());
-        return ResponseEntity.ok().build();
+        URI uri = ServletUriComponentsBuilder.fromUriString("/chats")
+                .path("/{roomId}")
+                .buildAndExpand(roomId)
+                .toUri();
+        return ResponseEntity.created(uri).build();
     }
 
     @PostMapping("/{roomId}/last-read/{messageId}")
@@ -86,7 +90,7 @@ public class ChatController {
                                                       @PathVariable Long messageId) {
 
         chatMemberService.updateLastReadMessage(roomId, member.getId(), messageId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{roomId}")
@@ -151,7 +155,7 @@ public class ChatController {
     }
 
     @DeleteMapping("/{roomId}")
-    public ResponseEntity<?> removeChat(@LoginMember SessionMember member,
+    public ResponseEntity<Void> removeChat(@LoginMember SessionMember member,
                                         @PathVariable Long roomId) {
 
         if (!chatService.isHost(roomId, member.getId())) {

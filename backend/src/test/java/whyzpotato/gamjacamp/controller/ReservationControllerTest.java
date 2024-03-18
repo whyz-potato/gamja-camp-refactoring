@@ -208,7 +208,7 @@ class ReservationControllerTest {
                         .session(session)
                         .with(csrf())
                 )
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andDo(print());
     }
 

@@ -23,19 +23,17 @@ public class ScrapCampController {
     private final ScrapCampService scrapCampService;
 
     @PostMapping("/customer/my-camp")
-    public ResponseEntity scrapCamp(@LoginMember SessionMember member,
-                                    @RequestParam(value = "camp") Long campId) {
+    public ResponseEntity<Void> scrapCamp(@LoginMember SessionMember member,
+                                          @RequestParam(value = "camp") Long campId) {
 
         scrapCampService.createScrap(member.getId(), campId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/customer/my-camp")
     public PageResult<CampSimple> scrapCampList(@LoginMember SessionMember member,
                                                 @PageableDefault(size = 10) Pageable pageable) {
 
-        return new PageResult<CampSimple>(scrapCampService.scraps(member.getId(), pageable));
+        return new PageResult<>(scrapCampService.scraps(member.getId(), pageable));
     }
-
-
 }

@@ -49,30 +49,30 @@ public class ReservationController {
 
 
     @DeleteMapping("/customer/reservations/{id}")
-    public ResponseEntity cancelReservation(@LoginMember SessionMember sessionMember,
+    public ResponseEntity<Void> cancelReservation(@LoginMember SessionMember sessionMember,
                                             @PathVariable Long id) {
 
         reservationService.cancel(sessionMember.getId(), id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
 
     }
 
     @GetMapping("/customer/reservations/my")
-    public ResponseEntity<?> reservationList(@LoginMember SessionMember sessionMember,
+    public ResponseEntity<PageResult<ReservationListItem>> reservationList(@LoginMember SessionMember sessionMember,
                                              @PageableDefault(size = 10) Pageable pageable) {
 
         Page<ReservationListItem> customerReservations = reservationService.findCustomerReservations(sessionMember.getId(), pageable);
-        return ResponseEntity.ok(new PageResult(customerReservations));
+        return ResponseEntity.ok(new PageResult<>(customerReservations));
 
     }
 
     @GetMapping("/owner/reservations")
-    public ResponseEntity<?> campReservationList(@LoginMember SessionMember sessionMember,
+    public ResponseEntity<PageResult<ReservationInfo>> campReservationList(@LoginMember SessionMember sessionMember,
                                                  @RequestParam(value = "status") ReservationStatus status,
                                                  @PageableDefault(size = 10) Pageable pageable) {
 
         Page<ReservationInfo> campReservations = reservationService.findCampReservations(sessionMember.getId(), status, pageable);
-        return ResponseEntity.ok(new PageResult(campReservations));
+        return ResponseEntity.ok(new PageResult<>(campReservations));
     }
 
     @GetMapping("/owner/reservations/{id}")
@@ -83,7 +83,7 @@ public class ReservationController {
     }
 
     @PostMapping("/owner/reservations/status")
-    public ResponseEntity changeReservationStatus(@LoginMember SessionMember sessionMember,
+    public ResponseEntity<Void> changeReservationStatus(@LoginMember SessionMember sessionMember,
                                                   @Valid @RequestBody StatusMultipleRequest request) {
 
         reservationService.updateStatus(sessionMember.getId(), request.getStatus(), request.getReservations());

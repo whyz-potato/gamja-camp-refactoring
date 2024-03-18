@@ -77,7 +77,7 @@ class ScrapCampControllerTest {
                         .session(session)
                         .param("camp", String.valueOf(camp.getId()))
                         .with(csrf()))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andDo(print());
     }
 
