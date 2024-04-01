@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import whyzpotato.gamjacamp.domain.Image;
+import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.domain.post.Comment;
 import whyzpotato.gamjacamp.domain.post.Post;
@@ -18,19 +19,19 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class GeneralPostDto {
+public class GatherPostDto {
 
-    //GeneralPostSimple
+    //GatherPostSimple
     @Getter
     @NoArgsConstructor
-    public static class GeneralPostSimple {
+    public static class GatherPostSimple {
         private Long id;
         private String title;
         private String content;
         private String image;
 
         @Builder
-        public GeneralPostSimple(Long id, String title, String content, List<Image> images) {
+        public GatherPostSimple(Long id, String title, String content, List<Image> images) {
             this.id = id;
             this.title = title;
             this.content = content;
@@ -38,7 +39,7 @@ public class GeneralPostDto {
                 this.image = images.get(0).getPath();   //첫번째 사진
         }
 
-        public GeneralPostSimple(Post post) {
+        public GatherPostSimple(Post post) {
             this.id = post.getId();
             this.title = post.getTitle();
             this.content = post.getContent();
@@ -46,68 +47,72 @@ public class GeneralPostDto {
                 this.image = post.getImages().get(0).getPath();   //첫번째 사진
         }
 
-        public Page<GeneralPostSimple> toList(Page<Post> posts) {
-            Page<GeneralPostSimple> generalPostSimpleList = posts.map(
-                    m -> GeneralPostSimple.builder()
+        public Page<GatherPostSimple> toList(Page<Post> posts) {
+            Page<GatherPostSimple> gatherPostSimpleList = posts.map(
+                    m -> GatherPostSimple.builder()
                             .id(m.getId())
                             .title(m.getTitle())
                             .content(m.getContent())
                             .images(m.getImages())
                             .build());
-            return generalPostSimpleList;
+            return gatherPostSimpleList;
         }
     }
 
-    //GeneralPostDetail
+    //GatherPostDetail
     @Getter
     @NoArgsConstructor
-    public static class GeneralPostDetail {
+    public static class GatherPostDetail {
         private Long id;
         private String writer;
         private String title;
         private String content;
+
         private PostType postType;
         private List<String> images;
+        private Long chat;
 
         @Builder
-        public GeneralPostDetail(Long id, Member writer, String title, String content, PostType postType, List<Image> images) {
+        public GatherPostDetail(Long id, Member writer, String title, String content, PostType postType, List<Image> images, Chat chat) {
             this.id = id;
             this.writer = writer.getUsername();
             this.title = title;
             this.content = content;
             this.postType = postType;
-            if (!images.isEmpty()) {
+            if(!images.isEmpty()) {
                 this.images = images.stream()
                         .map(Image::getPath)
                         .collect(Collectors.toList());
             }
+            this.chat = chat.getId();
         }
 
-        public GeneralPostDetail(Post post) {
+        public GatherPostDetail(Post post) {
             this.id = post.getId();
             this.writer = post.getWriter().getUsername();
             this.title = post.getTitle();
             this.content = post.getContent();
             this.postType = post.getType();
-            if (!post.getImages().isEmpty()) {
+            if(!post.getImages().isEmpty()) {
                 this.images = post.getImages().stream()
                         .map(Image::getPath)
                         .collect(Collectors.toList());
             }
+            this.chat = post.getChat().getId();
         }
     }
 
-    //GeneralPostSaveRequest
+    //GatherPostSaveRequest
     @Getter
     @NoArgsConstructor
-    public static class GeneralPostSaveRequest {
+    public static class GatherPostSaveRequest {
         @NotBlank
         private String title;
         @NotBlank
         private String content;
 
         @Builder
-        public GeneralPostSaveRequest(String title, String content) {
+        public GatherPostSaveRequest(String title, String content) {
             this.title = title;
             this.content = content;
         }
@@ -124,18 +129,17 @@ public class GeneralPostDto {
         }
     }
 
-    //GeneralPostUpdateRequest
     @Getter
     @NoArgsConstructor
-    public static class GeneralPostUpdateRequest {
+    public static class GatherPostUpdateRequest {
         private String title;
         private String content;
 
         @Builder
-        public GeneralPostUpdateRequest(String title, String content) {
+
+        public GatherPostUpdateRequest(String title, String content) {
             this.title = title;
             this.content = content;
         }
     }
-
 }
