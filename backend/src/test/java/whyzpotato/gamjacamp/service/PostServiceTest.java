@@ -202,7 +202,7 @@ public class PostServiceTest {
         Member member = memberRepository.save(Member.builder().account("hsy3130@test.com").username("hsy").picture(null).role(Role.CUSTOMER).build());
         Post post = postRepository.save(Post.builder().writer(member).title("제목").content("내용").type(PostType.GENERAL).images(images).build());
 
-        postService.delete(member.getId(), post.getId());
+        postService.deleteGeneralPost(member.getId(), post.getId());
 
         Optional<Post> deletePost = postRepository.findById(post.getId());
         assertThat(deletePost.isPresent()).isFalse();
@@ -237,8 +237,8 @@ public class PostServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         //when
-        Page<GeneralPostSimple> postPage = postService.search(100L, "key");
-        Page<GeneralPostSimple> postPage1 = postService.search(post.getId(), "key");
+        Page<GeneralPostSimple> postPage = postService.searchGeneralPost(100L, "key");
+        Page<GeneralPostSimple> postPage1 = postService.searchGeneralPost(post.getId(), "key");
 
         List<GeneralPostSimple> posts = postPage.getContent();
         List<GeneralPostSimple> posts1 = postPage1.getContent();

@@ -9,6 +9,7 @@ import whyzpotato.gamjacamp.domain.Image;
 import whyzpotato.gamjacamp.domain.chat.Chat;
 import whyzpotato.gamjacamp.domain.member.Member;
 import whyzpotato.gamjacamp.controller.dto.GeneralPostDto.GeneralPostUpdateRequest;
+import whyzpotato.gamjacamp.controller.dto.GatherPostDto.GatherPostUpdateRequest;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -59,6 +60,12 @@ public class Post extends BaseTimeEntity {
     }
 
     public Post update(GeneralPostUpdateRequest request) {
+        this.title = request.getTitle();
+        this.content = request.getContent();
+        return this;
+    }
+
+    public Post update(GatherPostUpdateRequest request) {
         this.title = request.getTitle();
         this.content = request.getContent();
         return this;
